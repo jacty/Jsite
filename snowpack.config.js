@@ -1,9 +1,12 @@
 module.exports = {
-    "alias":{
-        "@style":"./src/assets/styles",
+    alias:{
+        "@assets":"./src/assets/",
+        "@com":"./src/components/",
+        "@data":"./src/data/",
+        "@lib":"./src/lib/"
     },
-    "plugins": ["@snowpack/plugin-sass"],
-    "mount":{
-        "./src":'/'
+    plugins: ["@snowpack/plugin-sass"],
+    mount:{
+        src:'/',
     }
 }

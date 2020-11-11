@@ -8,10 +8,13 @@ import '@assets/styles/main.sass';
 import Interview from '@com/Interview/interview.jsx';
 import Footer from '@com/Footer/footer.jsx';
 
-ReactDOM.render(
+
+ReactDOM.createRoot = ReactDOM.unstable_createRoot;
+
+ReactDOM.createRoot(document.getElementById('root')).render(
     <ErrorBoundary>
-        <Interview data = {data}/>
+        <Interview data = {data} />
         <Footer />
-    </ErrorBoundary>,
-    document.getElementById('root')
+    </ErrorBoundary>
 )
+

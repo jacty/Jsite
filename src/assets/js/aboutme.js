@@ -1,2 +1,2 @@
-import '@style/main.sass';
-import '@style/index.sass';
+import '@assets/styles/main.sass';
+import '@assets/styles/index.sass';

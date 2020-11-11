@@ -1,0 +1,189 @@
+// Reboot
+//
+// Normalization of HTML elements, manually forked from Normalize.css to remove
+// styles targeting irrelevant browsers while applying new styles.
+//
+// Normalize is licensed MIT. https://github.com/necolas/normalize.css
+@use "vars" as vars
+
+// Document
+//
+// Change from `box-sizing: content-box` so that `width` is not affected by `padding` or `border`.
+
+*,*::before,*::after
+    box-sizing: border-box
+
+// Body
+//
+// 1. Remove the margin in all browsers.
+// 2. As a best practice, apply a default `background-color`.
+// 3. Prevent adjustments of font size after orientation changes in iOS.
+// 4. Change the default tap highlight to be completely transparent in iOS.
+body
+    margin: 0 //1
+    font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji"
+    font-size: 1rem
+    font-weight: 400
+    line-height: 1.5
+    color: #212529  
+    background-color: #fff //2
+    -webkit-text-size-adjust: 100% //3
+    -webkit-tap-highlight-color: rgba(#000, 0) //4
+
+// Typography
+//
+// 1. Remove top margins from headings
+//    By default, `<h1>`-`<h6>` all receive top and bottom margins. We nuke the top
+//    margin for easier control within type scales as it avoids margin collapsing.
+
+%heading
+    margin-top: 0 // 1
+    margin-bottom: vars.$spacer / 2
+    font-weight: 500
+    line-height: 1.2
+
+h1
+    @extend %heading
+    font-size: vars.$h1-font-size
+
+h2
+    @extend %heading
+    font-size: vars.$h2-font-size
+
+h3
+    @extend %heading
+    font-size: vars.$h3-font-size
+
+h4
+    @extend %heading
+    font-size: vars.$h4-font-size
+
+h5 
+    @extend %heading
+    font-size: vars.$h5-font-size
+
+h6
+    @extend %heading
+    font-size: vars.$h6-font-size
+
+// Reset margins on paragraphs
+//
+// Similarly, the top margin on `<p>`s get reset. However, we also reset the
+// bottom margin to use `rem` units instead of `em`.
+
+p
+    margin-top: 0
+    margin-bottom: 1rem
+
+// Address
+
+address 
+    margin-bottom: 1rem
+    font-style: normal
+    line-height: inherit
+
+// Lists
+ol,ul,dl
+    margin: 0
+    padding: 0
+    margin-top: 0
+    margin-bottom: 1rem
+
+ol ol,
+ul ul,
+ol ul,
+ul ol
+    margin-bottom: 0
+
+dt
+    font-weight: 700
+
+// 1. Undo browser default
+
+dd
+    margin-bottom: .5rem
+    margin-left: 0
+
+// Blockquote
+
+blockquote
+    margin: 0 0 1rem
+
+// Strong
+//
+// Add the correct font weight in Chrome, Edge, and Safari
+
+b,
+strong 
+    font-weight: bolder
+
+// Small
+//
+// Add the correct font size in all browsers
+
+small 
+    font-size: .875rem
+
+// Links
+
+a
+    color: vars.$link-color
+    text-decoration: underline
+
+    &:hover
+        color: vars.$link-hover-color
+
+// Figures
+//
+// Apply a consistent margin strategy
+
+figure
+    margin: 0 0 1rem
+
+// Images and content
+
+img
+    vertical-align: middle
+
+// Tables
+//
+// Prevent double borders
+
+table
+    caption-side: bottom
+    border-collapse: collapse
+
+caption
+    padding-top: .5rem
+    padding-bottom: .5rem
+    color: #6c757d
+    text-align: left
+
+// Matches default `<td>` alignment by inheriting `text-align`.
+th
+    text-align: inherit
+
+thead,
+tbody,
+tfoot,
+tr,
+td,
+th
+    border-color: inherit
+    border-style: solid
+    border-width: 0
+
+// Progress
+//
+// Add the correct vertical alignment in Chrome.
+
+progress
+    vertical-align: baseline
+
+
+
+
+
+
+
+

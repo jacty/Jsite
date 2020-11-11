@@ -1,0 +1,48 @@
+@use "../../assets/styles/vars" as vars
+$pos-box-size: 8rem !default //TD: find another way to make it base on a natural attribute of CSS3
+$skill-round-btn-size: 4rem !default
+.intro
+    width: 60vw
+    margin: auto
+    text-align: center
+    position: relative
+    p
+        color: #8e8b8b
+.aside div
+    position: absolute
+    top: 50%
+    left: -15vw
+    color: #aeb1b5
+    width: min-content
+    transform: rotate(-90deg)
+    &:before,&:after
+        content: ""
+        display: block
+        margin: auto auto auto -95%
+        width: 300%
+        height: 1px
+        background: linear-gradient(90deg, transparent,vars.$border-color,transparent)
+    &:last-child
+        left: auto
+        right: -15vw
+        transform: rotate(90deg)
+
+.career
+    display: grid
+.c_nav
+    display: grid
+    grid-auto-flow: column
+    margin: auto
+    text-align: center
+    line-height: $pos-box-size / 2
+    li
+        width: $pos-box-size
+        height: $pos-box-size / 2
+        border: 1px solid vars.$border-color
+        margin: auto 5px
+        border-radius: vars.$border-radius
+        box-shadow: 5px 5px 5px 0 #f4f4f4
+
+
+
+

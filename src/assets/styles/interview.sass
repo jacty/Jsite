@@ -1,0 +1,21 @@
+@use "mods/vars" as vars
+
+body
+    padding: vars.$container-padding-x*2
+    font-size: vars.$font-size-sm
+h2
+    font-size: vars.$font-size-base
+    cursor: pointer
+
+li
+    border: vars.$border-width*2 solid vars.$border-color
+    border-radius: vars.$border-radius
+    padding: vars.$container-padding-x vars.$container-padding-x*2
+    margin: vars.$container-padding-x 0
+    div 
+        border-top: vars.$border-width solid vars.$border-color
+        padding-top: vars.$spacer / 2
+        overflow: hidden
+        height: 0
+    &.cur div  
+            height: auto

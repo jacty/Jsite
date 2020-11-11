@@ -1,0 +1,11 @@
+How to write a Git commit message
+
+A diff will tell you what changed but only the Commit Message can properly tell you WHY.
+
+1. First line capitalized with less than 50 characters and separated from the body with a blank line.
+2. Write in imperative and present tense.
+3. No whitespace errors. Use git diff —check to check it.
+4. A commit should contain exactly one logical change including adding a new feature, fixing a specific bug, etc. If it is not possible to describe the change in a few words, it is most likely too complex for a single commit.
+5. Describe the intent, the approach and  the effects rather than the code. Explain how things worked before this commit, what has changed, and how things work now.
+6. Don’t end the summary line with a period - it is a title and titles don’t end with a period.
+7. A properly formed commit subject line should always be able to complete this sentence: If applied, this commit will DO STH.

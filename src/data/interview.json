@@ -1,0 +1,6 @@
+[
+{"header":"What is the difference between Element and Component?",
+ "content":"<p>An <em>Element</em> is a plain object describing what you want to appear on the screen in terms of the DOM nodes or other components. <em>Elements</em> can contain other <em>Elements</em> in their props. Creating a React element is cheap.</p><p>Whereas a <em>Component</em> can be declared in several different ways. It can be a class with a <code>render()</code> method. Alternatively, in simple cases, it can be defined as a function. In either case, it takes props as an input, and returns a JSX tree as the output.</p>"
+},
+ {"header":"Why should we not update the state directly?",
+    "content":"<p>If you try to update state directly then it won't re-render the component. Instead use <code>setState()</code> method, it schedules an update to a component's state object. When state changes, the component responds by re-rendering.</p>"}]

@@ -1,2 +1,2 @@
 import '@style/main.sass';
-import '@style/mods/index.sass';
+import '@style/index.sass';

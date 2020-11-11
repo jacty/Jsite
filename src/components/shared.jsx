@@ -1,8 +1,7 @@
+//Shared Components like Footer, Header and so on.
 import React from 'react';
 
-function Footer(props){
+export function Footer(props){
     const year = new Date().getFullYear()
     return <footer>© {year} Jacty</footer>
 }
-
-export default Footer;

@@ -1,7 +1,7 @@
 import React, { Suspense } from 'react';
 
-import '../../assets/styles/interview.sass';
-const List = React.lazy(()=> import('../List/list.jsx'));
+import '@assets/styles/interview.sass';
+const List = React.lazy(()=> import('@com/List/list.jsx'));
 
 function Interview(props){
     document.title='Interview Q&A';

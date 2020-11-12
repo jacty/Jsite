@@ -32,6 +32,8 @@ const JeactElement = function(type, key, ref, self, source, owner, props){
 }
 
 export function createElement(type, config, children){
+  console.error('createElement', type, config, children)
+  return;
   let propName;
 
   const props = {};

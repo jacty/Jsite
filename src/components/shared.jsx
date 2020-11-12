@@ -1,7 +1,6 @@
 //Shared Components like Footer, Header and so on.
-import Jeact from '@Jeact';
-
-const React = Jeact;
+import {createElement} from '@Jeact';
+const React = {createElement:createElement};
 
 export function Footer(props){
     const year = new Date().getFullYear()

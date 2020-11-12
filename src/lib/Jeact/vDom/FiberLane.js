@@ -1,17 +1,14 @@
 import {
-  NoLanePriority,
-  NormalPriority,
+//   NormalPriority,
   DefaultLanePriority,
-  TransitionLanePriority,
-  SyncLanePriority,
-  DefaultLanes,
-  NonIdleLanes,
-  NoLane,
-  NoLanes,
+//   TransitionLanePriority,
+//   SyncLanePriority,
+//   DefaultLanes,
+//   NonIdleLanes,
   TotalLanes,
   NoTimestamp,
-  NormalSchedulePriority,
-} from '../shared/Constants';
+//   NormalSchedulePriority,
+} from '@Jeact/shared/Constants';
 
 // Used by getHighestPriorityLanes and getNextLanes:
 let highestLanePriority = DefaultLanePriority;

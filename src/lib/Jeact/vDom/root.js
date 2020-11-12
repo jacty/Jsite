@@ -1,14 +1,14 @@
 import {
   __ENV__,
 } from '../shared/Constants';
-// import { createFiberRoot } from './JeactFiberRoot';
+import { createFiberRoot } from '@Jeact/vDom/FiberRoot';
 // import { updateContainer } from './JeactFiberReconciler';
 
-function JdomRoot(container, options){
-  this._internalRoot = createRootImpl(container, options);
+function vRoot(container){
+  this._internalRoot = createRootImpl(container);
 }
 
-JdomRoot.prototype.render = function(children){
+vRoot.prototype.render = function(children){
   const root = this._internalRoot;
   updateContainer(children, root);
 };
@@ -17,13 +17,10 @@ JdomRoot.prototype.render = function(children){
 function createRootImpl(container){
   // Connect FiberRootNode to FiberNode and initialize UpdateQueue in FiberNode
   const root = createFiberRoot(container);
-
   return root;
 }
 
 export function createRoot(container){
-    console.error('createRoot')
-    return;
-  return new JdomRoot(container)
+  return new vRoot(container)
 }
 

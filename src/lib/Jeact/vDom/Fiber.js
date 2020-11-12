@@ -1,17 +1,15 @@
 import {
-  NoFlags,
   StaticMask,
-  NoLanes,
   HostRoot,
   IndeterminateComponent,
-} from '../shared/Constants';
+} from '@Jeact/shared/Constants';
 
 let debugCounter = 1;
 
 function FiberNode(tag, pendingProps, key, mode){
   /* Instance */
   this.tag = tag;// Decides which kind of component the fiber is, e.g.
-                 // HostRoot, Unknown Component.
+                 // HostRoot, Unknown Component, Function Component etc.
   this.key = key; // {key} attribute in lists' items
   this.elementType = null;
   this.type = null;
@@ -31,15 +29,13 @@ function FiberNode(tag, pendingProps, key, mode){
   this.memoizedState = null; // As baseState in update queue.
   this.dependencies = null;
 
-  this.mode = mode; //TODO: seems useless, ready to remove.
-
   // Effects
-  this.flags = NoFlags;
-  this.subtreeFlags = NoFlags;
+  this.flags = 0;
+  this.subtreeFlags = 0;
   this.deletions = null;
 
-  this.lanes = NoLanes;
-  this.childLanes = NoLanes;
+  this.lanes = 0;
+  this.childLanes = 0;
 
   this.alternate = null; // Kind of back up for lanes' operation in case we need to recover it after mistakes.
 

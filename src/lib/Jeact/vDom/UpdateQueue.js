@@ -75,15 +75,15 @@
 // deterministic regardless of priority. Intermediate state may vary according
 // to system resources, but the final state is always the same.
 
-import {
-  __ENV__,
-  UpdateState,
-  NoLanes,
-} from '../shared/Constants';
-import {
-  isSubsetOfLanes,
-} from './JeactFiberLane';
-import { markSkippedUpdateLanes } from './JeactFiberWorkLoop';
+// import {
+//   __ENV__,
+//   UpdateState,
+//   NoLanes,
+// } from '../shared/Constants';
+// import {
+//   isSubsetOfLanes,
+// } from './JeactFiberLane';
+// import { markSkippedUpdateLanes } from './JeactFiberWorkLoop';
 
 // Global state that is reset at the beginning of calling `processUpdateQueue`.
 // It should only be read right after calling `processUpdateQueue`, via

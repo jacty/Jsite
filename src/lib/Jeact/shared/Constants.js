@@ -23,8 +23,6 @@ export const emptyContextObject = {};
 
 /* JeactFiberLane */
 export const TotalLanes = 31;
-export const NoLanes = /*                        */ 0b0000000000000000000000000000000;
-export const NoLane = /*                         */ 0b0000000000000000000000000000000;
 export const SyncLane = /*                       */ 0b0000000000000000000000000000001;
 export const DefaultLanes = /*                   */ 0b0000000000000000000111000000000;
 export const NonIdleLanes = /*                   */ 0b0000111111111111111111111111111;
@@ -40,7 +38,6 @@ export const ImmediateSchedulePriority = 1;
 export const NormalSchedulePriority = 3;
 
 /* LanePriorities */
-export const NoLanePriority = 0;
 export const DefaultLanePriority = 8;
 export const TransitionLanePriority = 6;
 export const SyncLanePriority = 15; //?
@@ -49,7 +46,6 @@ export const SyncLanePriority = 15; //?
 export const UpdateState = 0;
 
 /* JeactFiberFlags.js */
-export const NoFlags = /*                      */ 0b0000000000000000000;
 export const PerformedWork = /*                */ 0b0000000000000000001;
 
 export const Placement = /*                    */ 0b0000000000000000010;

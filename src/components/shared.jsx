@@ -8,5 +8,6 @@ export function Footer(props){
     const year = new Date().getFullYear()
     return <footer>© {year} Jacty</footer>
 }
-console.error('Footer',Footer());
+
+console.error('Footer', Footer());
 // Jeact.createElement('footer', null, '\xA9', year, 'Jacty');

@@ -1,23 +1,13 @@
-import {__ENV__} from '@Jeact/shared/Constants';
+import {
+  __ENV__,  
+  JEACT_ELEMENT_TYPE,
+} from '@Jeact/shared/Constants';
 import {JeactCurrentOwner} from '@Jeact/Shared/JeactSharedInternals.js';
-import {JEACT_ELEMENT_TYPE} from './JeactSymbols.js'
 
-const RESERVED_PROPS = {
-  key: true,
-  ref: true,
-  __self: true,
-  __source: true,
-};
-function hasValidRef(config){
-  return config.ref !== undefined;
-}
-
-function hasValidKey(config){
-  return config.key !== undefined;
-}
-
+// Todo: Remove argument self.
 const JeactElement = function(type, key, ref, self, source, owner, props){
   const element = {
+    // to identify if this is a Jeact Element.
     $$typeof: JEACT_ELEMENT_TYPE,
 
     // Built-in properties
@@ -27,7 +17,7 @@ const JeactElement = function(type, key, ref, self, source, owner, props){
     props: props,
 
     _owner: owner,
-  }
+  };
 
   return element;
 }

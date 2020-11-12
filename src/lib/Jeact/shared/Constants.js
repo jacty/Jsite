@@ -1,6 +1,11 @@
 export const __ENV__ = import.meta.env.MODE !== 'production';
 export const NoTimestamp = -1;
 /*
+* JeactSymbols
+*/
+export let JEACT_ELEMENT_TYPE = Symbol.for('jeact.element');
+
+/*
 *JeactWorkTags
 */
 export const FunctionComponent = 0;

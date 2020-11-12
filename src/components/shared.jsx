@@ -1,6 +1,6 @@
 //Shared Components like Footer, Header and so on.
 // import React from 'react';
-import Jeact from '@lib/Jeact';
+import Jeact from '@Jeact';
 
 const React = Jeact;
 

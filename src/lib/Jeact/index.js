@@ -1,4 +1,4 @@
-import { createRoot } from './Jdom/index';
+// import { createRoot } from './Jdom/index';
 
 import {
   createElement
@@ -7,6 +7,6 @@ import {
 
 export default {
   createElement,
-  createRoot,
+  // createRoot,
 };
 

@@ -3,7 +3,7 @@ module.exports = {
         "@assets":"./src/assets/",
         "@com":"./src/components/",
         "@data":"./src/data/",
-        "@lib":"./src/lib/"
+        "@Jeact":"./src/lib/Jeact"
     },
     plugins: ["@snowpack/plugin-sass"],
     mount:{

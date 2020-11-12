@@ -1,4 +1,5 @@
-import JeactCurrentOwner from './JeactCurrentOwner.js';
+import {__ENV__} from '@Jeact/shared/Constants';
+import {JeactCurrentOwner} from '@Jeact/Shared/JeactSharedInternals.js';
 import {JEACT_ELEMENT_TYPE} from './JeactSymbols.js'
 
 const RESERVED_PROPS = {
@@ -32,8 +33,7 @@ const JeactElement = function(type, key, ref, self, source, owner, props){
 }
 
 export function createElement(type, config, children){
-  console.error('createElement', type, config, children)
-  return;
+
   let propName;
 
   const props = {};
@@ -44,32 +44,29 @@ export function createElement(type, config, children){
   let source = null;
 
   if (config != null) {
-    if (hasValidRef(config)){
-        console.log('hasValidRef is True');
-    }
-    if (hasValidKey(config)){
-      console.log('hasValidKey is True');
-    }
-    for (propName in config){
-      if(
-        hasOwnProperty.call(config, propName) &&
-        !RESERVED_PROPS.hasOwnProperty(propName)
-      ){
-          props[propName] = config[propName];//Key method of this part
-      }
-    }
+    console.error('createElement1');
   }
 
   const childrenLength = arguments.length - 2;
+
   if (childrenLength === 1){
     props.children = children;
   } else if (childrenLength > 1){
-    console.log('childrenLength > 1')
+    const childArray = Array(childrenLength);
+    for (let i = 0; i < childrenLength; i++){
+      childArray[i] = arguments[i + 2];
+    }
+    props.children = childArray;
   }
 
   // Resolve default props
   if (type && type.defaultProps) {
-    console.log('type.defaultProps is True')
+    console.log('createElement2')
+  }
+  if (__ENV__){
+    if (key || ref){
+      console.error('createElement3')
+    }
   }
   return JeactElement(
     type,

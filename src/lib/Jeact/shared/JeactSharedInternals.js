@@ -19,7 +19,7 @@ const JeactCurrentBatchConfig = {
 /**
  * Keeps track of the current dispatcher.
  */
-const JeactCurrentDispatcher = {
+export const JeactCurrentDispatcher = {
   /**
    * @internal
    * @type {ReactComponent}

@@ -4,6 +4,26 @@ import {
 } from '@Jeact/shared/Constants';
 import {JeactCurrentOwner} from '@Jeact/Shared/JeactSharedInternals.js';
 
+const hasOwnProperty = Object.prototype.hasOwnProperty;
+
+function hasValidRef(config){
+  if(__ENV__){
+    if(hasOwnProperty.call(config, 'ref')){
+      console.error('hasValidRef1')
+    }
+  }
+  return config.ref !== undefined;
+}
+
+function hasValidKey(config){
+  if(__ENV__){
+    if(hasOwnProperty.call(config, 'key')){
+      console.error('hasValidKey1')
+    }
+  }
+  return config.key !== undefined;
+}
+
 // Todo: Remove argument self.
 const JeactElement = function(type, key, ref, self, source, owner, props){
   const element = {
@@ -34,7 +54,20 @@ export function createElement(type, config, children){
   let source = null;
 
   if (config != null) {
-    console.error('createElement1');
+    if (hasValidRef(config)){
+      console.error('createElement1');
+    }
+    if (hasValidKey(config)){
+      console.error('createElement1.1')
+    }
+    self = config.__self === undefined ? null : config.__self;
+    source = config.__source === undefined ? null : config.__source;
+    // Remaining properties are added to a new props object
+    for (propName in config){
+      if (hasOwnProperty.call(config, propName)){
+        props[propName] = config[propName];
+      }
+    }
   }
 
   const childrenLength = arguments.length - 2;

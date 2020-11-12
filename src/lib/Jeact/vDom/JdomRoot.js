@@ -1,8 +1,8 @@
 import {
   __ENV__,
 } from '../shared/Constants';
-import { createFiberRoot } from './JeactFiberRoot';
-import { updateContainer } from './JeactFiberReconciler';
+// import { createFiberRoot } from './JeactFiberRoot';
+// import { updateContainer } from './JeactFiberReconciler';
 
 function JdomRoot(container, options){
   this._internalRoot = createRootImpl(container, options);
@@ -22,6 +22,8 @@ function createRootImpl(container){
 }
 
 export function createRoot(container){
+    console.error('createRoot')
+    return;
   return new JdomRoot(container)
 }
 

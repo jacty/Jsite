@@ -1,10 +1,10 @@
-import {createElement} from '@Jeact/JeactElement.js'
-import {useState} from '@Jeact/JeactHooks.js';
-// import { createRoot } from './Jdom/index';
+import {createElement} from '@Jeact/JeactElement'
+import {useState} from '@Jeact/JeactHooks';
+import { createRoot } from '@Jeact/vDom/JdomRoot';
 
 export {
   createElement,
   useState,
-  // createRoot,
+  createRoot,
 };
 

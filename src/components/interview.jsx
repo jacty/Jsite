@@ -11,7 +11,7 @@ const mask = 1; // Toggle mask;
 function Interview(props){
     document.title='Interview Q&A';
     const items = props.data;
-    const [ind, setInd] = useState(0);
+    const [ind, setInd] = useState(rnd(0, items.length-1));
     const btnAllTxt = ['All Questions','Random Question'];
     const btnTitleTxt = ['List all questions','Show a random question'];
 

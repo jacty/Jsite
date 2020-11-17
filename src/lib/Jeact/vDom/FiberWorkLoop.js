@@ -1,5 +1,6 @@
 import {
 //   __ENV__,
+  NoFlags,
   NoLanes,
   DiscreteEventContext,
   NoTimestamp,
@@ -11,7 +12,7 @@ import {
   NormalSchedulePriority,
   NoPriority,
   NormalPriority,
-//   Incomplete,
+  Incomplete,
   noTimeout,
   NoContext,
   RenderContext,
@@ -57,10 +58,9 @@ import {
   scheduleCallback,
 } from '@Jeact/scheduler';
 import { beginWork } from '@Jeact/vDom/FiberBeginWork';
-
-// import {
-//   completeWork
-// } from './JeactFiberCompleteWork';
+import {
+  completeWork
+} from '@Jeact/vDom/FiberCompleteWork';
 import { invariant } from '@Jeact/shared/invariant';
 // import {
 //   commitBeforeMutationEffects,
@@ -196,7 +196,8 @@ export function scheduleUpdateOnFiber(fiber, lane, eventTime){
   if (nestedUpdateCount > NESTED_UPDATE_LIMIT){
       console.error('Maximum update depth exceeded.')
   }
-
+  console.error('scheduleUpdateOnFiber', fiber);
+  return;
   // Update Fiber.lanes
   const root = markUpdateLaneFromFiberToRoot(fiber, lane);
 
@@ -432,6 +433,7 @@ function performUnitOfWork(unitOfWork){
   const alternate = unitOfWork.alternate;
 
   let next = beginWork(alternate, unitOfWork, subtreeRenderLanes);
+
   unitOfWork.memoizedProps = unitOfWork.pendingProps;
   if (next == null){
     // If this doesn't spawn new work, complete the current work.

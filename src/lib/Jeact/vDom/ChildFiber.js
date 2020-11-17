@@ -1,11 +1,10 @@
 import {
+  JEACT_ELEMENT_TYPE,
   Placement
 } from '@Jeact/shared/Constants';
 import {
-  JEACT_ELEMENT_TYPE,
-} from '@Jeact/shared/Constants';
-import {
-  createFiberFromElement
+  createFiberFromElement,
+  createFiberFromText,
 } from '@Jeact/vDom/Fiber';
 
 function coerceRef(
@@ -63,7 +62,13 @@ function ChildReconciler(shouldTrackSideEffects){
 
   function createChild(returnFiber, newChild, lanes){
     if (typeof newChild === 'string' || typeof newChild === 'number'){
-      console.error('createChild1');
+      const created = createFiberFromText(
+        ''+ newChild,
+        returnFiber.mode,
+        lanes,
+      );
+      created.return = returnFiber;
+      return created;
     }
     if(typeof newChild === 'object' && newChild !== null){
       switch(newChild.$$typeof){
@@ -136,7 +141,7 @@ function ChildReconciler(shouldTrackSideEffects){
     const created = createFiberFromElement(element, returnFiber.mode, lanes);
     created.ref = coerceRef(returnFiber, currentFirstChild, element);
     created.return = returnFiber;
-
+    
     return created;
   }
   // This API will tag the children with the side-effect of the reconciliation

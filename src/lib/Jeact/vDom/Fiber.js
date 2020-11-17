@@ -3,6 +3,7 @@ import {
   HostRoot,
   IndeterminateComponent,
   HostComponent,
+  HostText,
 } from '@Jeact/shared/Constants';
 
 let debugCounter = 1;
@@ -146,5 +147,11 @@ export function createFiberFromElement(
     mode,
     lanes,
   );
+  return fiber;
+}
+
+export function createFiberFromText(content, mode, lanes){
+  const fiber = createFiber(HostText, content, null, mode);
+  fiber.lanes = lanes;
   return fiber;
 }

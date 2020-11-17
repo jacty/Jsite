@@ -20,6 +20,7 @@ import {
   FunctionComponent,
   PerformedWork,
   HostComponent,
+  HostText,
 } from '@Jeact/shared/Constants';
 import {
   mountChildFibers,
@@ -29,9 +30,9 @@ import {
   cloneUpdateQueue,
   processUpdateQueue,
 } from '@Jeact/vDom/UpdateQueue';
-// import {
-//   markSkippedUpdateLanes,
-// } from './JeactFiberWorkLoop';
+import {
+  markSkippedUpdateLanes,
+} from '@Jeact/vDom/FiberWorkLoop';
 
 let didReceiveUpdate = false;
 
@@ -101,7 +102,6 @@ function pushHostRootContext(workInProgress){
 }
 
 function updateHostRoot(current, workInProgress, renderLanes){
-
   pushHostRootContext(workInProgress);
 
   const updateQueue = workInProgress.updateQueue;
@@ -130,13 +130,23 @@ function updateHostComponent(
   workInProgress,
   renderLanes
 ){
-  // pushHostContext(workInProgress);
   const type = workInProgress.type;
   const nextProps = workInProgress.pendingProps;
   const prevProps = current !== null ? current.memoizedProps : null;
 
   let nextChildren = nextProps.children;
-  console.error('updateHostComponent', current);
+  const isDirectTextChild = shouldSetTextContent(type, nextProps);
+  if (isDirectTextChild){
+    console.error('updateHostComponent1')
+  } else if(prevProps !== null && shouldSetTextContent(type, prevProps)){
+    console.error('updateHostComponent2')
+  }
+  reconcileChildren(current, workInProgress, nextChildren, renderLanes);
+  return workInProgress.child;
+}
+
+function updateHostText(current, workInProgress){
+  return null;
 }
 
 function mountIndeterminateComponent(
@@ -174,15 +184,15 @@ function bailoutOnAlreadyFinishedWork(
   workInProgress,
   renderLanes,
   ){
-  console.error('bailoutOnAlreadyFinishedWork', current);
-  return;
+
   if (current !== null){
     // Reuse previous dependencies
     workInProgress.dependencies = current.dependencies;
   }
 
   markSkippedUpdateLanes(workInProgress.lanes);
-
+  console.error('bailoutOnAlreadyFinishedWork', workInProgress);
+  return;
   // Check if the children have any pending work.
   if (!includesSomeLane(renderLanes, workInProgress.childLanes)){
     // The children don't have any work either. We can skip  them.
@@ -196,7 +206,6 @@ function bailoutOnAlreadyFinishedWork(
 
 export function beginWork(alternate, workInProgress, renderLanes){
   const updateLanes = workInProgress.lanes;
-
   if (alternate !== null){
     const oldProps = alternate.memoizedProps;
     const newProps = workInProgress.pendingProps;
@@ -229,7 +238,6 @@ export function beginWork(alternate, workInProgress, renderLanes){
   } else {
     didReceiveUpdate = false;
   }
-
   switch (workInProgress.tag){
     case IndeterminateComponent:{//2
       return mountIndeterminateComponent(
@@ -260,7 +268,22 @@ export function beginWork(alternate, workInProgress, renderLanes){
       return updateHostRoot(alternate, workInProgress, renderLanes);
     case HostComponent:
       return updateHostComponent(alternate, workInProgress, renderLanes);
+    case HostText:
+      return updateHostText(alternate, workInProgress);
     default:
       console.error('beginWork4', workInProgress.tag);
   }
+}
+
+function shouldSetTextContent(type, props){
+  return (
+    type === 'textarea' ||
+    type === 'option' ||
+    type === 'noscript' ||
+    typeof props.children === 'string' ||
+    typeof props.children === 'number' ||
+    (typeof props.dangerouslySetInnerHTML === 'object' &&
+      props.dangerouslySetInnerHTML !== null &&
+      props.dangerouslySetInnerHTML.__html != null)
+  );
 }

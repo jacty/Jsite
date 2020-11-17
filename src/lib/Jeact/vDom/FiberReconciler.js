@@ -1,7 +1,3 @@
-// import {
-//   __ENV__,
-//   emptyContextObject,
-// } from '../shared/Constants';
 import {
   requestEventTime,
   requestUpdateLane,
@@ -25,7 +21,7 @@ export function updateContainer(element, container){
   const eventTime =requestEventTime();
   const lane = requestUpdateLane(current);
   const context = getContextForSubtree();
-  //TODO: Update pendingContext each time regardless context is null or not?
+
   if (container.context === null){
     container.context = context;
   } else {

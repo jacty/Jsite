@@ -1,17 +1,18 @@
 import {
   IndeterminateComponent,
   FunctionComponent,
-  NoFlags,
-  NoLanes,
+  HostText,
+//   NoFlags,
+//   NoLanes,
   HostRoot,
-} from '../shared/Constants';
-import {
-  popHostContainer
-} from './JeactFiberHostContext';
-import { resetWorkInProgressVersions } from './JeactMutableSource';
-import {
-  mergeLanes
-} from './JeactFiberLane';
+} from '@Jeact/shared/Constants';
+// import {
+//   popHostContainer
+// } from './JeactFiberHostContext';
+// import { resetWorkInProgressVersions } from './JeactMutableSource';
+// import {
+//   mergeLanes
+// } from './JeactFiberLane';
 function updateHostContainer(){
 
 };
@@ -51,10 +52,12 @@ export function completeWork(
   workInProgress,
   renderLanes
   ){
+  console.error('completedWork', current, workInProgress, renderLanes);
+  return;
   const newProps = workInProgress.pendingProps;
 
   switch(workInProgress.tag){
-    case IndeterminateComponent:
+    case IndeterminateComponent://TODO:remove IndeterminateComponent;
     case FunctionComponent:
       bubbleProperties(workInProgress)
       return null;
@@ -69,7 +72,16 @@ export function completeWork(
       bubbleProperties(workInProgress)
       return null;
     }
+    case HostText: {
+      const newText = newProps;
+      if(current){
+        console.error('HostText')
+      } else {
+
+      }
+      console.error('HostText', workInProgress.stateNode);
+    }
     default:
-      console.error('completeWork', workInProgress.tag, HostRoot)
+      console.error('completeWork', workInProgress.tag)
   }
 }

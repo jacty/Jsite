@@ -2,6 +2,7 @@ import {
   StaticMask,
   HostRoot,
   IndeterminateComponent,
+  HostComponent,
 } from '@Jeact/shared/Constants';
 
 let debugCounter = 1;
@@ -51,9 +52,9 @@ function shouldConstruct(Component){
 }
 
 // This is used to create an alternate fiber to do work on.
+// Why it is not a completed copy of current?
 export function createWorkInProgress(current, pendingProps=null){
   let workInProgress = current.alternate;
-
   if (workInProgress === null){
     // We use a double buffering pooling technique because we know that we'll
     // only ever need at most two versions of a tree. We pool the "other"
@@ -64,7 +65,6 @@ export function createWorkInProgress(current, pendingProps=null){
       pendingProps,
       current.key,
     );
-
     workInProgress.elementType = current.elementType;
     workInProgress.type = current.type;
     workInProgress.stateNode = current.stateNode;
@@ -75,8 +75,6 @@ export function createWorkInProgress(current, pendingProps=null){
     console.error('createWorkInProgress1')
   }
 
-  // Reset all effect except static ones.
-  workInProgress.flags = current.flags & StaticMask;
   workInProgress.childLanes = current.childLanes;
   workInProgress.lanes = current.lanes;
 
@@ -111,10 +109,13 @@ export function createFiberFromTypeAndProps(
   ){
   let fiberTag = IndeterminateComponent;
   let resolvedType = type;
+
   if (typeof type === 'function'){
     if(shouldConstruct(type)){
       console.error('createFiberFromTypeAndProps2')
     }
+  } else if(typeof type === 'string'){
+    fiberTag = HostComponent;
   } else {
     console.error('createFiberFromTypeAndProps1')
   }

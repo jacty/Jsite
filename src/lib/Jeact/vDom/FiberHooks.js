@@ -1,18 +1,15 @@
 import {
   NoLanes
-} from '../shared/Constants';
+} from '@Jeact/shared/Constants';
 import {
-  JeactSharedInternals
-} from '../shared/JeactSharedInternals';
-const {
-  JeactCurrentDispatcher
-} = JeactSharedInternals;
+  CurrentDispatcher
+} from '@Jeact/shared/internals';
 
 // These are set right before calling the component.
-let renderLanes = NoLanes;
+// let renderLanes = NoLanes;
 // The work-in-progress fiber. named it differently to distinguish it from
 // the work-in-progress hook.
-let currentlyRenderingFiber = null;
+// let currentlyRenderingFiber = null;
 // Where an update was scheduled only during the current render pass. This
 // gets reset after each attempt.
 // TODO: Maybe there's some way to consolidate this with
@@ -32,7 +29,7 @@ export function renderWithHooks(
   workInProgress.updateQueue = null;
   workInProgress.lanes = NoLanes;
 
-  JeactCurrentDispatcher.current =
+  CurrentDispatcher.current =
     current === null || current.memoizedState === null
     ? HooksDispatcherOnMount
     : HooksDispatcherOnUpdate;
@@ -44,7 +41,7 @@ export function renderWithHooks(
     console.error('renderWithHooks1')
   }
 
-  JeactCurrentDispatcher.current = ContextOnlyDispatcher;
+  CurrentDispatcher.current = ContextOnlyDispatcher;
 
   return children
 }
@@ -54,6 +51,6 @@ export const ContextOnlyDispatcher = {
 }
 
 const HooksDispatcherOnMount ={
-
+  'HooksDispatcherOnMount':1
 }
 

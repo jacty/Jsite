@@ -1,10 +1,12 @@
 import {
-//   NormalPriority,
+  NoLane,
+  NoLanes,
+  NormalPriority,
   DefaultLanePriority,
-//   TransitionLanePriority,
+  TransitionLanePriority,
 //   SyncLanePriority,
-//   DefaultLanes,
-//   NonIdleLanes,
+  DefaultLanes,
+  NonIdleLanes,
   TotalLanes,
   NoTimestamp,
 //   NormalSchedulePriority,
@@ -15,7 +17,7 @@ let highestLanePriority = DefaultLanePriority;
 
 function getHighestPriorityLanes(lanes){
   const defaultLanes = DefaultLanes & lanes;
-  if (defaultLanes !== NoLanes){
+  if (defaultLanes !== 0){
     highestLanePriority = DefaultLanePriority;
     return defaultLanes;
   }
@@ -32,14 +34,15 @@ export function LanePriorityToPriority(lanePriority){
 }
 
 export function getNextLanes(root, wipLanes){
+
   const pendingLanes = root.pendingLanes;
   if (pendingLanes === NoLanes){
     highestLanePriority = NoLanePriority;
-    return NoLanes;
+    return 0;
   }
 
-  let nextLanes = NoLanes;
-  let nextLanePriority = NoLanePriority;
+  let nextLanes = 0;
+  let nextLanePriority = 0;
 
   const expiredLanes = root.expiredLanes;
   const suspendedLanes = root.suspendedLanes;
@@ -108,9 +111,9 @@ export function getNextLanes(root, wipLanes){
 
 function computeExpirationTime(lane, currentTime){
   // TODO: Expiration heuristic is constant per lane, so could use a map.
-  getHighestPriorityLanes(lane);
-
+  getHighestPriorityLanes(lane);//update global variable highestLanePriority
   const priority = highestLanePriority;
+
   if (priority >= TransitionLanePriority){
     return currentTime + 5000;
   } else {
@@ -121,13 +124,12 @@ function computeExpirationTime(lane, currentTime){
 export function markStarvedLanesAsExpired(root, currentTime){
   //TODO: This gets called every time we yield. We can optimize by storing the earliest expiration time on the root. Then use that to quickly bail out of this function.
 
-  const pendingLanes = root.pendingLanes;
   const suspendedLanes = root.suspendedLanes;
   const pingedLanes = root.pingedLanes;
   const expirationTimes = root.expirationTimes;
 
   // Iterate through the pending lanes and check if we've reached their expiration time. If so, we'll assume the update is being starved and mark it as expired to force it to finish.
-  let lanes = pendingLanes;
+  let lanes = root.pendingLanes;
   while (lanes>0) {
     const index = pickArbitraryLaneIndex(lanes);
     const lane = 1 << index; // move 1 towards left for {index} bits.
@@ -138,8 +140,8 @@ export function markStarvedLanesAsExpired(root, currentTime){
       // or if it's pinged, assume it's CPU-bound. Compute a new expiration
       // time using the current time.
       if (
-        (lane & suspendedLanes) === NoLanes ||
-        (lane & pingedLanes) !== NoLanes){
+        (lane & suspendedLanes) === 0 ||
+        (lane & pingedLanes) !== 0){
         // Assumes timestamps are monotonically increasing.
         expirationTimes[index] = computeExpirationTime(lane, currentTime);
       }
@@ -178,7 +180,7 @@ function pickArbitraryLaneIndex(lanes){
 export function findUpdateLane(lanePriority, wipLanes){
   switch (lanePriority) {
     case DefaultLanePriority: {//8
-      let lane = getHighestPriorityLane(DefaultLanes & ~wipLanes);// Why DefaultLanes & ~wipLanes ?
+      let lane = getHighestPriorityLane(DefaultLanes & ~wipLanes);
       if (lane === NoLane) {
         console.error('findUpdateLane1')
       }
@@ -214,10 +216,18 @@ export function createLaneMap(initial){
 }
 
 export function markRootUpdated(root, updateLane, eventTime){
+
   root.pendingLanes |= updateLane;
 
-  //TODO: Theoretically, any update to any lane can unblock any other lane. But it's not practical to try every single possible combination. We need a heuristic to decide which lanes to attempt to render, and in which batches.
-  // For now, we use the same heuristic as in the old ExpirationTimes model: retry any lane at equal or lower priority, but don't try updates at higher priority without also including the lower priority updates. This works well when considering updates across different priority levels, but isn't sufficient for updates within the same priority, since we want to treat those updates as parallel.
+  //TODO: Theoretically, any update to any lane can unblock any other lane. 
+  // But it's not practical to try every single possible combination. We need 
+  // a heuristic to decide which lanes to attempt to render, and in which 
+  // batches. For now, we use the same heuristic as in the old ExpirationTimes 
+  // model: retry any lane at equal or lower priority, but don't try updates 
+  // at higher priority without also including the lower priority updates. 
+  // This works well when considering updates across different priority 
+  // levels, but isn't sufficient for updates within the same priority, since 
+  // we want to treat those updates as parallel.
 
   // Unsuspend any update at equal or lower priority.
   const higherPriorityLanes = updateLane - 1; // Turns 0b1000 into 0b0111

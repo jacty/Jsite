@@ -1,35 +1,37 @@
 import {
   includesSomeLane,
-} from './JeactFiberLane';
+} from '@Jeact/vDom/FiberLane';
 import {
   hasContextChanged,
-} from './JeactFiberContext';
+} from '@Jeact/vDom/FiberContext';
 import {
   prepareToReadContext
-} from './JeactFiberNewContext';
-import { renderWithHooks } from './JeactFiberHooks';
+} from '@Jeact/vDom/FiberNewContext';
+import { renderWithHooks } from '@Jeact/vDom/FiberHooks';
 import {
+  pushHostContext,
   pushHostContainer
-} from './JeactFiberHostContext';
+} from '@Jeact/vDom/FiberHostContext';
 import {
-  __ENV__,
+//   __ENV__,
   HostRoot,
-  NoLanes,
+//   NoLanes,
   IndeterminateComponent,
   FunctionComponent,
   PerformedWork,
-} from '../shared/Constants';
+  HostComponent,
+} from '@Jeact/shared/Constants';
 import {
   mountChildFibers,
   reconcileChildFibers,
-} from './JeactChildFiber';
+} from '@Jeact/vDom/ChildFiber';
 import {
   cloneUpdateQueue,
   processUpdateQueue,
-} from './JeactUpdateQueue';
-import {
-  markSkippedUpdateLanes,
-} from './JeactFiberWorkLoop';
+} from '@Jeact/vDom/UpdateQueue';
+// import {
+//   markSkippedUpdateLanes,
+// } from './JeactFiberWorkLoop';
 
 let didReceiveUpdate = false;
 
@@ -83,6 +85,7 @@ function updateFunctionComponent(
     console.error('updateFunctionComponent')
   };
   workInProgress.flags |= PerformedWork;
+
   reconcileChildren(current, workInProgress, nextChildren, renderLanes);
   return workInProgress.child;
 }
@@ -93,10 +96,12 @@ function pushHostRootContext(workInProgress){
   if(root.pendingContext){
     console.error('pushHostRootContext1');
   }
+  // push and pop Stacks.
   pushHostContainer(workInProgress, root.containerInfo);
 }
 
 function updateHostRoot(current, workInProgress, renderLanes){
+
   pushHostRootContext(workInProgress);
 
   const updateQueue = workInProgress.updateQueue;
@@ -104,12 +109,11 @@ function updateHostRoot(current, workInProgress, renderLanes){
   const prevState = workInProgress.memoizedState;
   const prevChildren = prevState !== null ? prevState.element : null;
 
-  cloneUpdateQueue(current, workInProgress);
+  cloneUpdateQueue(current, workInProgress);//Why?
   processUpdateQueue(workInProgress, nextProps, null, renderLanes);
 
   const nextState = workInProgress.memoizedState;
-  // Caution: Jeact DevTools currently depends on this property
-  // being called 'element'.
+
   const nextChildren = nextState.element;
   if (nextChildren === prevChildren){
     console.error('updateHostRoot1')
@@ -121,15 +125,31 @@ function updateHostRoot(current, workInProgress, renderLanes){
   return workInProgress.child;
 }
 
+function updateHostComponent(
+  current,
+  workInProgress,
+  renderLanes
+){
+  // pushHostContext(workInProgress);
+  const type = workInProgress.type;
+  const nextProps = workInProgress.pendingProps;
+  const prevProps = current !== null ? current.memoizedProps : null;
+
+  let nextChildren = nextProps.children;
+  console.error('updateHostComponent', current);
+}
+
 function mountIndeterminateComponent(
   _current,
   workInProgress,
   Component,
   renderLanes,
   ){
+
   if (_current !== null){
-    console.error('mountIndeterminateComponent')
+    console.error('mountIndeterminateComponent1')
   }
+
   const props = workInProgress.pendingProps;
   let context;
   prepareToReadContext(workInProgress, renderLanes);
@@ -141,8 +161,8 @@ function mountIndeterminateComponent(
     context,
     renderLanes,
   );
-  workInProgress.flags |= PerformedWork;
 
+  workInProgress.flags |= PerformedWork;
   workInProgress.tag = FunctionComponent;
   reconcileChildren(null, workInProgress, value, renderLanes);
 
@@ -154,6 +174,8 @@ function bailoutOnAlreadyFinishedWork(
   workInProgress,
   renderLanes,
   ){
+  console.error('bailoutOnAlreadyFinishedWork', current);
+  return;
   if (current !== null){
     // Reuse previous dependencies
     workInProgress.dependencies = current.dependencies;
@@ -178,14 +200,12 @@ export function beginWork(alternate, workInProgress, renderLanes){
   if (alternate !== null){
     const oldProps = alternate.memoizedProps;
     const newProps = workInProgress.pendingProps;
-    if (
-      oldProps !== newProps ||
-      hasContextChanged() ||
-      // Force a re-render if the implementation changed due to hot reload:
-      (__ENV__ ? workInProgress.type !== alternate.type : false)
-      ){
+
+    if (oldProps !== newProps || hasContextChanged()){
       console.error('beginWork1')
     } else if(!includesSomeLane(renderLanes, updateLanes)){
+      console.error('beginWork2');
+      return;
       didReceiveUpdate = false;
       // This fiber does not have any pending work. Bailout without entering
       // the begin phase. There's still some bookkeeping we that needs to be
@@ -238,6 +258,8 @@ export function beginWork(alternate, workInProgress, renderLanes){
     case HostRoot://3
       // find child of root
       return updateHostRoot(alternate, workInProgress, renderLanes);
+    case HostComponent:
+      return updateHostComponent(alternate, workInProgress, renderLanes);
     default:
       console.error('beginWork4', workInProgress.tag);
   }

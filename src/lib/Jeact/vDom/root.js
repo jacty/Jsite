@@ -2,7 +2,7 @@ import {
   __ENV__,
 } from '../shared/Constants';
 import { createFiberRoot } from '@Jeact/vDom/FiberRoot';
-// import { updateContainer } from './JeactFiberReconciler';
+import { updateContainer } from '@Jeact/vDom/FiberReconciler';
 
 function vRoot(container){
   this._internalRoot = createRootImpl(container);

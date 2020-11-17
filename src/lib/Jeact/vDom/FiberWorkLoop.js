@@ -1,45 +1,37 @@
 import {
-  __ENV__,
-  NoContext,
+//   __ENV__,
+  NoLanes,
   DiscreteEventContext,
   NoTimestamp,
-  NoLanes,
-  SyncLane,
-  NoFlags,
-  Placement,
-  Hydrating,
+//   SyncLane,
+//   Placement,
+//   Hydrating,
   HostRoot,
   DefaultLanePriority,
   NormalSchedulePriority,
   NoPriority,
   NormalPriority,
-  Incomplete,
+//   Incomplete,
   noTimeout,
+  NoContext,
   RenderContext,
   CommitContext,
-  ImmediatePriority,
-  PassiveMask,
-  BeforeMutationMask,
-  MutationMask,
-  LayoutMask,
-} from '../shared/Constants';
+//   ImmediatePriority,
+//   PassiveMask,
+//   BeforeMutationMask,
+//   MutationMask,
+//   LayoutMask,
+} from '@Jeact/shared/Constants';
+import {
+  CurrentBatchConfig,
+  CurrentOwner,
+} from '@Jeact/shared/internals';
 import {
   getCurrentSchedulePriority,
   PriorityToLanePriority,
   shouldYieldToHost,
-  runWithPriority,
-} from '../scheduler';
-import {
-  createWorkInProgress
-} from './JeactFiber';
-import {
-  ContextOnlyDispatcher,
-} from './JeactFiberHooks';
-import {JeactSharedInternals} from '../shared/JeactSharedInternals';
-import {
-  scheduleCallback,
-} from '../scheduler';
-import { beginWork } from './JeactFiberBeginWork';
+//   runWithPriority,
+} from '@Jeact/scheduler';
 import {
   findUpdateLane,
   mergeLanes,
@@ -48,28 +40,38 @@ import {
   markStarvedLanesAsExpired,
   markRootUpdated,
   LanePriorityToPriority,
-  includesSomeLane,
-  markRootFinished,
-} from './JeactFiberLane';
+//   includesSomeLane,
+//   markRootFinished,
+} from '@Jeact/vDom/FiberLane';
 import {
-  completeWork
-} from './JeactFiberCompleteWork';
-import { invariant } from '../shared/invariant';
+  CurrentDispatcher
+} from '@Jeact/shared/internals';
 import {
-  commitBeforeMutationEffects,
-  commitMutationEffects,
-  commitLayoutEffects,
-} from './JeactFiberCommitWork';
+  createWorkInProgress
+} from '@Jeact/vDom/Fiber';
+import {
+  ContextOnlyDispatcher,
+} from '@Jeact/vDom/FiberHooks';
 
-const {
-  JeactCurrentDispatcher,
-  JeactCurrentOwner,
-} = JeactSharedInternals;
+import {
+  scheduleCallback,
+} from '@Jeact/scheduler';
+import { beginWork } from '@Jeact/vDom/FiberBeginWork';
+
+// import {
+//   completeWork
+// } from './JeactFiberCompleteWork';
+import { invariant } from '@Jeact/shared/invariant';
+// import {
+//   commitBeforeMutationEffects,
+//   commitMutationEffects,
+//   commitLayoutEffects,
+// } from './JeactFiberCommitWork';
 
 const RootIncomplete = 0;
-const RootCompleted = 5;
+// const RootCompleted = 5;
 
-let executionContext = NoContext;
+let executionContext = 0;
 // The root we're working on
 let wipRoot = null;
 // The fiber we're working on
@@ -90,18 +92,18 @@ export let subtreeRenderLanes = NoLanes;
 let wipRootExitStatus = RootIncomplete;
 let wipRootFatalError = null;
 
-// "Included" lanes refer to lanes that were worked on during this render. It's
-// slightly different than `renderLanes` because `renderLanes` can change as you
-// enter and exit an Offscreen tree. This value is the combination of all render
+// // "Included" lanes refer to lanes that were worked on during this render. It's
+// // slightly different than `renderLanes` because `renderLanes` can change as you
+// // enter and exit an Offscreen tree. This value is the combination of all render
 // lanes for the entire render phase.
-let wipRootIncludedLanes = NoLanes;
-// The work left over by components that were visited during this render. Only
-// includes unprocessed updates, not work in bailed out children.
+let wipRootIncludedLanes = 0;
+// // The work left over by components that were visited during this render. Only
+// // includes unprocessed updates, not work in bailed out children.
 let wipRootSkippedLanes = NoLanes;
 let wipRootUpdatedLanes = NoLanes;
 
 let wipRootPingedLanes = NoLanes;
-// The absolute time for when we should start giving up on rendering more and
+// // The absolute time for when we should start giving up on rendering more and
 // prefer CPU suspense heuristic instead.
 let wipRootRenderTargetTime = Infinity;
 // How long a render is supposed to take before we start following CPU suspense
@@ -112,23 +114,23 @@ function resetRenderTimer(){
   wipRootRenderTargetTime = performance.now() + RENDER_TIMEOUT;
 }
 
-let rootWithPendingPassiveEffects = null;
+// let rootWithPendingPassiveEffects = null;
 let pendingPassiveEffectsRenderPriority = NoPriority;
-let rootsWithPendingDiscreteUpdates = null;
+// let rootsWithPendingDiscreteUpdates = null;
 
 // Use these to prevent an infinite loop of nested updates
 const NESTED_UPDATE_LIMIT = 50;
 let nestedUpdateCount = 0;
-let rootWithNestedUpdates = null
+// let rootWithNestedUpdates = null
 
-const NESTED_PASSIVE_UPDATE_LIMIT = 50;
-let nestedPassiveUpdateCount = 0;
+// const NESTED_PASSIVE_UPDATE_LIMIT = 50;
+// let nestedPassiveUpdateCount = 0;
 
 // If two updates are scheduled within the same event, we should treat their
 // event times as simultaneous, even if the actual clock time has advanced
 // between the first and second call.
 let currentEventTime = NoTimestamp;
-let currentEventWipLanes = NoLanes;
+let currentEventWipLanes = 0;
 let currentEventPendingLanes = NoLanes;
 
 export function getCurrentPriority(){
@@ -172,16 +174,25 @@ export function requestUpdateLane(fiber){
   // Our heuristic for that is whenever we enter a concurrent work loop.
   //
   // We'll do the same for `currentEventPendingLanes` below.
+  if (currentEventWipLanes !== wipRootIncludedLanes){
+    console.error('requestUpdateLane1');
+  }
 
+  const isTransition = CurrentBatchConfig.transition;
+  if (isTransition){
+    console.error('requestUpdateLane2')
+  }
   // TODO: update normal priority to 100?
   const priority = getCurrentPriority();
   const LanePriority = PriorityToLanePriority(priority);
+
   let lane = findUpdateLane(LanePriority, currentEventWipLanes)
 
   return lane;
 }
 
 export function scheduleUpdateOnFiber(fiber, lane, eventTime){
+
   if (nestedUpdateCount > NESTED_UPDATE_LIMIT){
       console.error('Maximum update depth exceeded.')
   }
@@ -198,27 +209,17 @@ export function scheduleUpdateOnFiber(fiber, lane, eventTime){
   markRootUpdated(root, lane, eventTime);
 
   if (root === wipRoot){
-    console.log('scheduleUpdateOnFiber')
+    console.log('scheduleUpdateOnFiber2')
   }
 
-  // TODO: requestUpdateLanePriority also reads the priority. Pass the priority as an argument to that function and this one.
-  // TODO: update normal priority to 100?
-  const priority = getCurrentPriority();
-
-  if (lane === SyncLane){
-    console.log('scheduleUpdateOnFiber1', lane)
-  } else {
-    // Schedule a discrete update but only if it's not Sync.
-    if((executionContext & DiscreteEventContext) !== NoContext){
-      console.log('scheduleUpdateOnFiber2')
-    }
-    // Schedule other updates after in case the callback in sync.
-    ensureRootIsScheduled(root, eventTime);
-  }
+  // Schedule other updates after in case the callback is sync.
+  ensureRootIsScheduled(root, eventTime);
+  console.error('scheduleUpdateOnFiber')
 }
 
 function markUpdateLaneFromFiberToRoot(sourceFiber, lane){
   let node = sourceFiber;
+
   if (node.tag !== HostRoot){
     return null;
   }
@@ -238,6 +239,7 @@ function markUpdateLaneFromFiberToRoot(sourceFiber, lane){
 
 // Use this function to schedule a task for a root. There's only one task per root; if a task was already scheduled, we'll check to make sure the priority of the existing task is the same as the priority of the next level that the root has worked on. This function is called on every update, and right before existing a task.
 function ensureRootIsScheduled(root, currentTime){
+
   const existingCallbackNode = root.callbackNode;
 
   // Check if any lanes are being starved by other work. If so, mark them as expired so we know how and when to work on those next.
@@ -249,7 +251,7 @@ function ensureRootIsScheduled(root, currentTime){
     root === wipRoot ? wipRootRenderLanes : NoLanes,
   );
 
-
+ 
   if (nextLanes === NoLanes){
     console.log('ensureRootIsScheduled','nextLanes is NoLanes');
   }
@@ -260,7 +262,6 @@ function ensureRootIsScheduled(root, currentTime){
   }
 
   const newCallbackPriority = getNextLanesPriority();
-
   // Schedule a new callback.
   let newCallbackNode;
   if (newCallbackPriority !== DefaultLanePriority){
@@ -280,7 +281,6 @@ function ensureRootIsScheduled(root, currentTime){
 // This is the entry point for every concurrent task, i.e. anything that
 // goes through Scheduler.
 function performConcurrentWorkOnRoot(root){
-
   // Since we know we're in a Jeact event, we can clear the current
   // event time. The next update will compute a new event time.
   currentEventTime = NoTimestamp;
@@ -311,7 +311,8 @@ function performConcurrentWorkOnRoot(root){
   }
 
   let exitStatus = renderRootConcurrent(root, lanes);
-
+  console.error('performConcurrentWorkOnRoot', exitStatus);
+  return;
   // We now have a consistent tree. The next step is to commit it.
   const finishedWork = root.current.alternate;
   root.finishedWork = finishedWork;
@@ -358,12 +359,9 @@ function handleError(root, thrownValue){
 }
 
 function pushDispatcher(){
-  const prevDispatcher = JeactCurrentDispatcher.current;
-  JeactCurrentDispatcher.current = ContextOnlyDispatcher;
+  const prevDispatcher = CurrentDispatcher.current;
+  CurrentDispatcher.current = ContextOnlyDispatcher;
   if (prevDispatcher === null){
-    // The Jeact isomorphic package does not include a default dispatcher.
-    // Instead the first renderer will lazily attach one, in order to give
-    // nicer error messages.
     return ContextOnlyDispatcher;
   }
   return prevDispatcher;
@@ -381,6 +379,7 @@ export function markSkippedUpdateLanes(lane){
 }
 
 function renderRootConcurrent(root, lanes){
+
   executionContext |= RenderContext;
   const prevDispatcher = pushDispatcher();
 
@@ -401,7 +400,8 @@ function renderRootConcurrent(root, lanes){
       handleError(root, thrownValue)
     }
   // } while(true) // Why do while?
-
+  console.error('renderRootConcurrent');
+  return;
   popDispatcher(prevDispatcher);//?
 
   // Check if the tree has completed.
@@ -432,7 +432,6 @@ function performUnitOfWork(unitOfWork){
   const alternate = unitOfWork.alternate;
 
   let next = beginWork(alternate, unitOfWork, subtreeRenderLanes);
-
   unitOfWork.memoizedProps = unitOfWork.pendingProps;
   if (next == null){
     // If this doesn't spawn new work, complete the current work.
@@ -441,14 +440,13 @@ function performUnitOfWork(unitOfWork){
     // set wip to alternate.child and default the tag to 2;
     wip = next;
   }
-
+  CurrentOwner.current = null;
 }
 
 function completeUnitOfWork(unitOfWork){
   // Attempt to complete the current unit of work, then move to the next
   // sibling. If there are no more siblings, return to the parent fiber.
   let completedWork = unitOfWork;
-
   do {
     // The current, flushed, state of this fiber is the alternate. Ideally
     // nothing should rely on this, but relying on it here means that we don't

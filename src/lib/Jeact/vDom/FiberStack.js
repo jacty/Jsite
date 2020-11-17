@@ -1,11 +1,9 @@
-import { __ENV__ } from '../shared/Constants';
+import { __ENV__ } from '@Jeact/shared/Constants';
 
 const valueStack = [];
 let fiberStack;
 let index = -1;
-if (__ENV__){
-  fiberStack =[];
-}
+
 
 export function createCursor(defaultValue){
   return {

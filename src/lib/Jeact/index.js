@@ -1,6 +1,6 @@
-import {createElement} from '@Jeact/JeactElement'
-import {useState} from '@Jeact/JeactHooks';
-import { createRoot } from '@Jeact/vDom/root';
+import {createElement} from '@Jeact/Element'
+import {useState} from '@Jeact/Hooks';
+import { createRoot } from '@Jeact/vDom/Root';
 
 export {
   createElement,

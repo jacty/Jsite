@@ -15,11 +15,10 @@ import '@assets/styles/main.sass';
 import Interview from '@com/interview.jsx';
 import {Footer} from '@com/shared.jsx';
 
-React.createRoot(document.getElementById('root'));
-// .render(
+React.createRoot(document.getElementById('root')).render(
     <ErrorBoundary>
-        <Interview data = {data} />
+        {/*<Interview data = {data} />*/}
         <Footer />
     </ErrorBoundary>
-// // )
+)
 

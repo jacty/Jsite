@@ -1,30 +1,31 @@
-import {
-  __ENV__,
-  emptyContextObject,
-} from '../shared/Constants';
+// import {
+//   __ENV__,
+//   emptyContextObject,
+// } from '../shared/Constants';
 import {
   requestEventTime,
   requestUpdateLane,
   scheduleUpdateOnFiber
-} from './JeactFiberWorkLoop'
+} from '@Jeact/vDom/FiberWorkLoop'
 import {
   createUpdate,
   enqueueUpdate
-} from './JeactUpdateQueue';
+} from '@Jeact/vDom/UpdateQueue';
 
 function getContextForSubtree(parentComponent){
   if (!parentComponent){
-    return emptyContextObject;
+    return {};
   }
   console.log('getContextForSubtree', parentComponent)
 }
 
-export function updateContainer(element, container, parentComponent){
+export function updateContainer(element, container){
   const current = container.current;
+  
   const eventTime =requestEventTime();
   const lane = requestUpdateLane(current);
-
-  const context = getContextForSubtree(parentComponent);
+  const context = getContextForSubtree();
+  //TODO: Update pendingContext each time regardless context is null or not?
   if (container.context === null){
     container.context = context;
   } else {
@@ -36,7 +37,6 @@ export function updateContainer(element, container, parentComponent){
   update.payload =  { element };
 
   enqueueUpdate(current, update);
-
   scheduleUpdateOnFiber(current, lane, eventTime);
 
   return lane;

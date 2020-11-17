@@ -75,15 +75,15 @@
 // deterministic regardless of priority. Intermediate state may vary according
 // to system resources, but the final state is always the same.
 
-// import {
+import {
 //   __ENV__,
-//   UpdateState,
-//   NoLanes,
-// } from '../shared/Constants';
-// import {
-//   isSubsetOfLanes,
-// } from './JeactFiberLane';
-// import { markSkippedUpdateLanes } from './JeactFiberWorkLoop';
+  UpdateState,
+  NoLanes,
+} from '@Jeact/shared/Constants';
+import {
+  isSubsetOfLanes,
+} from '@Jeact/vDom/FiberLane';
+import { markSkippedUpdateLanes } from '@Jeact/vDom/FiberWorkLoop';
 
 // Global state that is reset at the beginning of calling `processUpdateQueue`.
 // It should only be read right after calling `processUpdateQueue`, via
@@ -183,8 +183,8 @@ export function processUpdateQueue(workInProgress, props, instance, renderLanes)
   let lastBaseUpdate = queue.lastBaseUpdate;
 
   // Check if there are pending updates. If so, transfer them to the base queue.
-  let pendingQueue = queue.pending;
 
+  let pendingQueue = queue.pending;
   if (pendingQueue !== null){
     queue.pending = null;
 
@@ -201,11 +201,6 @@ export function processUpdateQueue(workInProgress, props, instance, renderLanes)
     }
     lastBaseUpdate = lastPendingUpdate;
 
-    // If there's a current queue, and it's different from the base queue, then
-    // we need to transfer the updates to that queue, too. Because the base
-    // queue is a singly-linked list with no cycles, we can append to both
-    // lists and take advantage of structural sharing.
-    // TODO: Pass `current` as argument
     const current = workInProgress.alternate;
     if (current !== null){
       // This is always non-null on a ClassComponent or HostRoot
@@ -255,7 +250,6 @@ export function processUpdateQueue(workInProgress, props, instance, renderLanes)
             props,
             instance,
           );
-
           const callback = update.callback;
           if (callback !== null) {
             console.error('processUpdateQueue5');
@@ -269,10 +263,8 @@ export function processUpdateQueue(workInProgress, props, instance, renderLanes)
           } else {
             console.error('processUpdateQueue7');
           }
-
         }
       } while(true);
-
       if (newLastBaseUpdate === null){
         newBaseState = newState;
       }

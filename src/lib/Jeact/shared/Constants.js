@@ -11,6 +11,7 @@ export let JEACT_ELEMENT_TYPE = Symbol.for('jeact.element');
 export const FunctionComponent = 0;
 export const IndeterminateComponent = 2; // Before we know whether it is function or class
 export const HostRoot = 3; // Root of a host tree.
+export const HostComponent = 5;
 
 /* JeactFiberWorkLoop */
 export const NoContext = /*             */ 0b0000000;
@@ -23,6 +24,8 @@ export const emptyContextObject = {};
 
 /* JeactFiberLane */
 export const TotalLanes = 31;
+export const NoLanes=/*                          */ 0b0000000000000000000000000000000;
+export const NoLane =/*                          */ 0b0000000000000000000000000000000;
 export const SyncLane = /*                       */ 0b0000000000000000000000000000001;
 export const DefaultLanes = /*                   */ 0b0000000000000000000111000000000;
 export const NonIdleLanes = /*                   */ 0b0000111111111111111111111111111;

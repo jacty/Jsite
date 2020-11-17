@@ -1,6 +1,6 @@
-import {JeactCurrentDispatcher} from '@Jeact/shared/JeactSharedInternals';
+import {CurrentDispatcher} from '@Jeact/shared/internals';
 function resolveDispatcher(){
-    const dispatcher = JeactCurrentDispatcher.current;
+    const dispatcher = CurrentDispatcher.current;
     console.error('dispatcher', dispatcher);
     return dispatcher;
 }

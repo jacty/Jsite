@@ -8,7 +8,7 @@ import {
   ImmediatePriority,
   ImmediateSchedulePriority,
   NormalTimeout,
-} from '../shared/Constants';
+} from '@Jeact/shared/Constants';
 
 // Tasks are stored on a min heap.
 const taskQueue = [];
@@ -76,7 +76,7 @@ export function getCurrentSchedulePriority(){
 
 export function PriorityToLanePriority(priority){
   switch(priority){
-    case NormalPriority:
+    case NormalPriority://97
       return DefaultLanePriority;
     default:
       if(priority !== NoLanePriority){
@@ -142,12 +142,11 @@ function flushWork(hasTimeRemaining, initialTime){
 }
 
 function workLoop(hasTimeRemaining, initialTime){
-  let currentTime = initialTime;
 
+  let currentTime = initialTime;
   advanceTimers(currentTime);
 
   currentTask = peek(taskQueue);
-
   while(currentTask !== null){
     if(currentTask.expirationTime > currentTime &&
         (!hasTimeRemaining || shouldYieldToHost())
@@ -156,12 +155,12 @@ function workLoop(hasTimeRemaining, initialTime){
       break;
     }
     const callback = currentTask.callback;
+
     if (typeof callback === 'function'){
       currentTask.callback = null;
       currentPriority = currentTask.priority;
-
       const contiuationCallback = callback();
-      // console.error('workLoop', contiuationCallback);
+      console.error('workLoop', contiuationCallback);
     } else {
       console.log('workLoop2')
     }
@@ -179,14 +178,13 @@ function performWorkUntilDeadline(){
     const hasTimeRemaining = true;
     try{
       const hasMoreWork = scheduledHostCallback(hasTimeRemaining, currentTime);
-      // console.error('performWorkUntilDeadline', hasMoreWork);
+      console.error('performWorkUntilDeadline', hasMoreWork);
     } catch (error){
       // If a scheduler task throws, exit the current browser task so the error
       // can be observed.
       port.postMessage(null);
       throw error;
     }
-
   } else {
     console.error('performWorkUntilDeadline1')
     isMessageLoopRunning = false;

@@ -1,12 +1,12 @@
 import {
   Placement
-} from '../shared/Constants';
+} from '@Jeact/shared/Constants';
 import {
   JEACT_ELEMENT_TYPE,
-} from '../shared/JeactSymbols';
+} from '@Jeact/shared/Constants';
 import {
   createFiberFromElement
-} from './JeactFiber';
+} from '@Jeact/vDom/Fiber';
 
 function coerceRef(
   returnFiber,
@@ -36,6 +36,22 @@ function ChildReconciler(shouldTrackSideEffects){
     console.error('deleteRemainingChildren');
   }
 
+  function placeChild(
+    newFiber,
+    lastPlacedIndex,
+    newIndex
+  ){
+    newFiber.index = newIndex;
+    const current = newFiber.alternate;
+    if (current!==null){
+      console.error('placeChild1')
+    } else {
+      // This is an insertion.
+      newFiber.flags = Placement;
+      return lastPlacedIndex
+    }
+  }
+
   function placeSingleChild(newFiber){
     // This is a simpler for the single child case. We only need to do a
     // placement for inserting new children.
@@ -43,6 +59,67 @@ function ChildReconciler(shouldTrackSideEffects){
       newFiber.flags = Placement;
     }
     return newFiber;
+  }
+
+  function createChild(returnFiber, newChild, lanes){
+    if (typeof newChild === 'string' || typeof newChild === 'number'){
+      console.error('createChild1');
+    }
+    if(typeof newChild === 'object' && newChild !== null){
+      switch(newChild.$$typeof){
+        case JEACT_ELEMENT_TYPE:{
+          const created = createFiberFromElement(
+            newChild,
+            returnFiber.mode,
+            lanes,
+          );
+          created.ref = coerceRef(returnFiber, null, newChild);
+          created.return = returnFiber;
+          return created;
+        }
+      }
+    }
+
+    return null;
+  }
+
+  function reconcileChildrenArray(
+    returnFiber,
+    currentFirstChild,
+    newChildren,
+    lanes
+    ){
+    let resultingFirstChild = null;
+    let previousNewFiber = null;
+
+    let oldFiber = currentFirstChild;
+    let lastPlacedIndex = 0;
+    let newIdx = 0;
+    let nextOldFiber = null;
+    for (; oldFiber!==null && newIdx < newChildren.length; newIdx++){
+      console.error('reconcileChildrenArray1')
+    }
+    if (newIdx === newChildren.length){
+      console.error('reconcileChildrenArray2')
+    }
+    if (oldFiber === null){
+      // If we don't have any more existing children we can choose a fast path
+      // since the rest will all be insertions.
+      for (; newIdx < newChildren.length; newIdx++){
+        const newFiber = createChild(returnFiber, newChildren[newIdx], lanes);
+        if (newFiber === null){
+          console.error('reconcileChildrenArray3')
+        }
+        lastPlacedIndex = placeChild(newFiber, lastPlacedIndex, newIdx);
+        if(previousNewFiber === null){
+          resultingFirstChild = newFiber;
+        } else {
+          previousNewFiber.sibling = newFiber;
+        }
+        previousNewFiber = newFiber;
+      }
+      return resultingFirstChild;
+    }
   }
 
   function reconcileSingleElement(
@@ -75,7 +152,6 @@ function ChildReconciler(shouldTrackSideEffects){
     // not as a fragment. Nested arrays on the other hand will be treated as
     // fragment nodes. Recursion happens at the normal flow.
 
-
     // Handle object types
     const isObject = typeof newChild === 'object' && newChild !== null;
 
@@ -91,10 +167,20 @@ function ChildReconciler(shouldTrackSideEffects){
             ),
           );
         default:
-          console.error('reconcileChildFibers1', newChild.$$typeof)
+          if(!Array.isArray(newChild)){
+            console.error('reconcileChildFibers1', newChild.$$typeof)
+          }
       };
     }
 
+    if (Array.isArray(newChild)){
+      return reconcileChildrenArray(
+        returnFiber,
+        currentFirstChild,
+        newChild,
+        lanes,
+      );
+    }
     // Remaining cases are all treated as empty.
     return deleteRemainingChildren(returnFiber, currentFirstChild);
   }

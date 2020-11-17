@@ -1,7 +1,7 @@
-import {createCursor, push, pop} from './JeactFiberStack';
+import {createCursor, push, pop} from '@Jeact/vDom/FiberStack';
 import {
   getChildNamespace
-} from './DOMNamespaces';
+} from '@Jeact/vDom/DOMNamespaces';
 const NO_CONTEXT = {};
 const contextStackCursor = createCursor(NO_CONTEXT);
 const contextFiberStackCursor = createCursor(NO_CONTEXT);
@@ -50,4 +50,9 @@ export function popHostContainer(fiber){
   pop(contextStackCursor, fiber);
   pop(contextFiberStackCursor, fiber);
   pop(rootInstanceStackCursor, fiber);
+}
+
+export function pushHostContext(fiber){
+  // const rootInstance = requiredContext()
+  console.error('pushHostContext')
 }

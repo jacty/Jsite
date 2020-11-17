@@ -2,7 +2,7 @@ import {
   __ENV__,  
   JEACT_ELEMENT_TYPE,
 } from '@Jeact/shared/Constants';
-import {JeactCurrentOwner} from '@Jeact/Shared/JeactSharedInternals.js';
+import {CurrentOwner} from '@Jeact/Shared/internals.js';
 
 const hasOwnProperty = Object.prototype.hasOwnProperty;
 
@@ -97,7 +97,7 @@ export function createElement(type, config, children){
     ref,
     self,
     source,
-    JeactCurrentOwner.current,
+    CurrentOwner.current,
     props,
   );
 }

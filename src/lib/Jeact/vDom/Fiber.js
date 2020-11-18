@@ -1,9 +1,12 @@
 import {
-  StaticMask,
+  __ENV__,
+  NoFlags,
+  NoLanes,
+  // StaticMask,
   HostRoot,
-  IndeterminateComponent,
-  HostComponent,
-  HostText,
+  // IndeterminateComponent,
+  // HostComponent,
+  // HostText,
 } from '@Jeact/shared/Constants';
 
 let debugCounter = 1;
@@ -12,17 +15,17 @@ function FiberNode(tag, pendingProps, key, mode){
   /* Instance */
   this.tag = tag; // Decides which kind of component the fiber is
   this.key = key; // {key} attribute in lists' items
-  // this.elementType = null;
+  this.elementType = null;
   this.type = null;
   this.stateNode = null; // refer to FiberRootNode
 
   // Fiber
   this.return = null; // refer to parent
   this.child = null;
-  // this.sibling = null;
-  // this.index = 0;
+  this.sibling = null;
+  this.index = 0;
 
-  // this.ref = null;
+  this.ref = null;
 
   this.pendingProps = pendingProps;
   this.memoizedProps = null;
@@ -31,18 +34,31 @@ function FiberNode(tag, pendingProps, key, mode){
   this.dependencies = null;
 
   // Effects
-  this.flags = 0;
-  // this.subtreeFlags = 0;
-  // this.deletions = null;
+  this.flags = NoFlags;
+  this.nextEffect = null;
 
-  this.lanes = 0;
-  this.childLanes = 0;
+  this.firstEffect = null;
+  this.lastEffect = null;
+  this.subtreeFlags = NoFlags;
+  this.deletions = null;
 
-  this.alternate = null; // Kind of back up for lanes' operation in case we need to recover it after mistakes.
+  this.lanes = NoLanes;
+  this.childLanes = NoLanes;
+
+  this.alternate = null; 
+
+  if (__ENV__){
+    this._debugID = debugCounter++;
+    this._debugSource = null;
+    this._debugOwner = null;
+    this._debugNeedsRemount = false;
+    this._debugHookTypes = null;
+    Object.preventExtensions(this);
+  }
 
 }
 
-export const createFiber = function(tag, pendingProps=null, key=null){
+export const createFiber = function(tag=HostRoot, pendingProps=null, key=null){
   return new FiberNode(tag, pendingProps, key);
 };
 
@@ -54,7 +70,8 @@ function shouldConstruct(Component){
 // This is used to create an alternate fiber to do work on.
 // Why it is not a completed copy of current?
 export function createWorkInProgress(current, pendingProps=null){
-
+  console.error('createWorkInProgress');
+  return;
   let workInProgress = current.alternate;
   if (workInProgress === null){
     // We use a double buffering pooling technique because we know that we'll
@@ -101,6 +118,8 @@ export function createWorkInProgress(current, pendingProps=null){
 }
 
 export function createFiberFromTypeAndProps(element,lanes){
+  console.error('createFiberFromTypeAndProps');
+  return;
   const type = element.type;
   const pendingProps = element.props;
   const key = element.key;

@@ -1,3 +1,6 @@
+import {
+    markContainerAsRoot
+} from '@Jeact/vDom/DOMComponentTree';
 import { createFiberRoot } from '@Jeact/vDom/FiberRoot';
 import { updateContainer } from '@Jeact/vDom/FiberReconciler';
 
@@ -13,6 +16,9 @@ vRoot.prototype.render = function(children){
 
 function createRootImpl(container){
   const root = createFiberRoot(container);
+  markContainerAsRoot(root.current, container);
+  container.nodeType !== 1 ? console.error('createRootImpl'):'';
+
   return root;
 }
 

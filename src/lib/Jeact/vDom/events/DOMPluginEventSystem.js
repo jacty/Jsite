@@ -65,7 +65,8 @@ export function listenToNativeEvent(domEventName, isCapturePhaseListener, target
 }
 
 export function listenToAllSupportedEvents(container){
-
+  console.error('listenToAllSupportedEvents');
+  return;
   if (!container[listeningMarker]){
     container[listeningMarker] = true;
     allNativeEvents.forEach(domEventName => {

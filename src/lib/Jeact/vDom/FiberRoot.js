@@ -1,6 +1,7 @@
 import { createFiber } from '@Jeact/vDom/Fiber';
 import {initializeUpdateQueue} from '@Jeact/vDom/UpdateQueue.js';
 import {
+  __ENV__,
   NoTimestamp,
   HostRoot,
   noTimeout,
@@ -32,16 +33,19 @@ function FiberRootNode(containerInfo){
 
   this.entangledLanes = NoLanes;
   // this.entanglements = createLaneMap(0);
+
+  if(__ENV__){
+    this._debugRootType = 'createRoot()';
+  }
 }
 
 export function createFiberRoot(containerInfo){
   const root = new FiberRootNode(containerInfo);
-  const fiber = createFiber(HostRoot);//uninitializedFiber
-
+  
+  const fiber = createFiber();
   root.current = fiber;
   fiber.stateNode = root;
-  // if every fiber will have a initialized Update Queue, we can initialize it
-  // when create Fiber.
+
   initializeUpdateQueue(fiber);
 
   return root;

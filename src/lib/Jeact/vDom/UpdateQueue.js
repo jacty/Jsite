@@ -1,11 +1,11 @@
-import {
-  UpdateState,
-  NoLanes,
-} from '@Jeact/shared/Constants';
-import {
-  isSubsetOfLanes,
-} from '@Jeact/vDom/FiberLane';
-import { markSkippedUpdateLanes } from '@Jeact/vDom/FiberWorkLoop';
+// import {
+//   UpdateState,
+//   NoLanes,
+// } from '@Jeact/shared/Constants';
+// import {
+//   isSubsetOfLanes,
+// } from '@Jeact/vDom/FiberLane';
+// import { markSkippedUpdateLanes } from '@Jeact/vDom/FiberWorkLoop';
 
 
 export function initializeUpdateQueue(fiber){
@@ -20,6 +20,7 @@ export function initializeUpdateQueue(fiber){
 }
 
 export function createUpdate(eventTime, lane){
+ console.error('createUpdate');
   const update = {
     eventTime,
     lane,
@@ -32,6 +33,8 @@ export function createUpdate(eventTime, lane){
 }
 
 export function enqueueUpdate(fiber, update){
+  console.error('enqueueUpdate');
+  return;
   const updateQueue = fiber.updateQueue;
   let pending = updateQueue.pending;
   if (pending === null) {
@@ -44,7 +47,8 @@ export function enqueueUpdate(fiber, update){
 }
 
 function getStateFromUpdate(workInProgress, queue, update, nextProps, instance){
-
+  console.error('getStateFromUpdate');
+  return;
   const prevState = queue.baseState;
   switch (update.tag){
     case UpdateState: {
@@ -74,6 +78,8 @@ export function processUpdateQueue(
   props, 
   instance, 
   renderLanes){
+  console.error('processUpdateQueue');
+  return;
   // This is always non-null on a ClassComponent or HostRoot
   const queue = workInProgress.updateQueue;
 

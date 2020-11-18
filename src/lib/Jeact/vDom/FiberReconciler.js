@@ -1,12 +1,16 @@
 import {
-  requestEventTime,
-  requestUpdateLane,
-  scheduleUpdateOnFiber
-} from '@Jeact/vDom/FiberWorkLoop'
-import {
-  createUpdate,
-  enqueueUpdate
-} from '@Jeact/vDom/UpdateQueue';
+  __ENV__
+} from '@Jeact/shared/Constants';
+import {onScheduleRoot} from '@Jeact/vDom/FiberDevToolsHook';
+// import {
+//   requestEventTime,
+//   requestUpdateLane,
+//   scheduleUpdateOnFiber
+// } from '@Jeact/vDom/FiberWorkLoop'
+// import {
+//   createUpdate,
+//   enqueueUpdate
+// } from '@Jeact/vDom/UpdateQueue';
 
 function getContextForSubtree(parentComponent){
   if (!parentComponent){
@@ -16,6 +20,11 @@ function getContextForSubtree(parentComponent){
 }
 
 export function updateContainer(element, fiberRoot){
+  if (__ENV__){
+    onScheduleRoot(fiberRoot, element)
+  }
+  console.error('updateContainer');
+  return;
   const current = fiberRoot.current;
   const eventTime =requestEventTime();
   const lane = requestUpdateLane(current);

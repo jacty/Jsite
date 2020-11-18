@@ -3,7 +3,7 @@ import {
   Placement
 } from '@Jeact/shared/Constants';
 import {
-  createFiberFromElement,
+  createFiberFromTypeAndProps,
   createFiberFromText,
 } from '@Jeact/vDom/Fiber';
 
@@ -138,7 +138,7 @@ function ChildReconciler(shouldTrackSideEffects){
     while (child !== null){
       console.error('reconcileSingleElement1')
     }
-    const created = createFiberFromElement(element, returnFiber.mode, lanes);
+    const created = createFiberFromTypeAndProps(element, lanes);
     created.ref = coerceRef(returnFiber, currentFirstChild, element);
     created.return = returnFiber;
     

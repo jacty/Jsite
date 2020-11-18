@@ -24,7 +24,21 @@ export function getRootHostContext(rootContainerInstance){
   return namespace;
 }
 
-export function pushHostContainer(fiber, nextRootInstance){
+function requiredContext(cur){
+  if(cur===NO_CONTEXT){
+    console.error('Host context is missing!')
+  };
+  return cur;
+}
+
+export function getRootHostContainer(){
+  const rootInstance = requiredContext(rootInstanceStackCursor.current);
+  return rootInstance;
+}
+
+export function pushHostContainer(fiber){
+  const nextRootInstance = fiber.stateNode.containerInfo;
+
   // Push current root instance onto the stack;
   // This allows us to reset root when portals are popped.
   push(rootInstanceStackCursor, nextRootInstance);

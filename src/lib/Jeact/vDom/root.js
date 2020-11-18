@@ -1,6 +1,3 @@
-import {
-  __ENV__,
-} from '../shared/Constants';
 import { createFiberRoot } from '@Jeact/vDom/FiberRoot';
 import { updateContainer } from '@Jeact/vDom/FiberReconciler';
 
@@ -15,7 +12,6 @@ vRoot.prototype.render = function(children){
 
 
 function createRootImpl(container){
-  // Connect FiberRootNode to FiberNode and initialize UpdateQueue in FiberNode
   const root = createFiberRoot(container);
   return root;
 }

@@ -6,4 +6,3 @@ const didPerformWorkStackCursor = createCursor(false);
 export function hasContextChanged(){
   return didPerformWorkStackCursor.current;
 }
-

@@ -175,8 +175,6 @@ function pickArbitraryLaneIndex(lanes){
   return 31 - Math.clz32(lanes);
 }
 
-// To ensure consistency across multiple updates in the same event, this should
-// be a pure functions, so that it always returns the same lane for given inputs.
 export function findUpdateLane(lanePriority, wipLanes){
   switch (lanePriority) {
     case DefaultLanePriority: {//8
@@ -219,15 +217,6 @@ export function markRootUpdated(root, updateLane, eventTime){
 
   root.pendingLanes |= updateLane;
 
-  //TODO: Theoretically, any update to any lane can unblock any other lane. 
-  // But it's not practical to try every single possible combination. We need 
-  // a heuristic to decide which lanes to attempt to render, and in which 
-  // batches. For now, we use the same heuristic as in the old ExpirationTimes 
-  // model: retry any lane at equal or lower priority, but don't try updates 
-  // at higher priority without also including the lower priority updates. 
-  // This works well when considering updates across different priority 
-  // levels, but isn't sufficient for updates within the same priority, since 
-  // we want to treat those updates as parallel.
 
   // Unsuspend any update at equal or lower priority.
   const higherPriorityLanes = updateLane - 1; // Turns 0b1000 into 0b0111
@@ -237,8 +226,7 @@ export function markRootUpdated(root, updateLane, eventTime){
 
   const eventTimes = root.eventTimes;
   const index = pickArbitraryLaneIndex(updateLane);
-  // We can always overwrite an existing timestamp because we prefer the most
-  // recent event, and we assume time is monotonically increasing.
+
   eventTimes[index] = eventTime;
 }
 

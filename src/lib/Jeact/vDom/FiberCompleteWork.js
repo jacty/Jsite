@@ -1,22 +1,26 @@
 import {
-  IndeterminateComponent,
   FunctionComponent,
   HostText,
+  HostComponent,
 //   NoFlags,
 //   NoLanes,
   HostRoot,
 } from '@Jeact/shared/Constants';
-// import {
+import {
+  getRootHostContainer
 //   popHostContainer
-// } from './JeactFiberHostContext';
-// import { resetWorkInProgressVersions } from './JeactMutableSource';
+} from '@Jeact/vDom/FiberHostContext';
 // import {
 //   mergeLanes
 // } from './JeactFiberLane';
-function updateHostContainer(){
+import {
+  createElement
+} from '@Jeact/vDom/DOMComponent';
 
-};
+
 function bubbleProperties(completedWork){
+  console.error('bubbleProperties');
+  return;
   const didBailout =
     completedWork.alternate !== null &&
     completedWork.alternate.child === completedWork.child;
@@ -47,41 +51,77 @@ function bubbleProperties(completedWork){
   return didBailout;
 }
 
+function appendAllChildren(parent, workInProgress, needsVisibilityToggle, isHidden){
+  let node = workInProgress.child;
+  while (node!==null){
+    console.error('appendAllChildren1', node)
+  }
+}
+
 export function completeWork(
-  current,
   workInProgress,
   renderLanes
   ){
-  console.error('completedWork', current, workInProgress, renderLanes);
-  return;
+  const current = workInProgress.alternate;
   const newProps = workInProgress.pendingProps;
 
   switch(workInProgress.tag){
-    case IndeterminateComponent://TODO:remove IndeterminateComponent;
-    case FunctionComponent:
-      bubbleProperties(workInProgress)
-      return null;
-    case HostRoot:{
-      popHostContainer(workInProgress);
-      resetWorkInProgressVersions()
+    // case FunctionComponent:
+    //   bubbleProperties(workInProgress)
+    //   return null;
+    case HostRoot:{//3
       const fiberRoot = workInProgress.stateNode;
       if (fiberRoot.pendingContext){
         console.error('completeWork1')
       }
-      updateHostContainer(current, workInProgress);
-      bubbleProperties(workInProgress)
       return null;
     }
-    case HostText: {
-      const newText = newProps;
-      if(current){
-        console.error('HostText')
-      } else {
+    case HostComponent:{
+      const rootContainerInstance = getRootHostContainer();
+      const type = workInProgress.type;
+      if (current!== null){
+        console.error('completedWork2')
+      } else{
+        const instance = createInstance(
+          type,
+          newProps,
+          rootContainerInstance,
+          'currentHostContext',
+          workInProgress
+        );
 
+        appendAllChildren(instance, workInProgress, false, false);
+        workInProgress.stateNode = instance;
       }
-      console.error('HostText', workInProgress.stateNode);
+      return null;
     }
+    // case HostText: {
+    //   const newText = newProps;
+    //   if(current){
+    //     console.error('HostText')
+    //   } else {
+
+    //   }
+    //   console.error('HostText', workInProgress.stateNode);
+    // }
     default:
       console.error('completeWork', workInProgress.tag)
   }
+}
+
+export function createInstance(
+  type,
+  props, 
+  rootContainerInstance,
+  hostContext,
+  interalInstancedHandle
+){
+  const domElement = createElement(
+    type,
+    props,
+    rootContainerInstance,
+    'parentNamespace'
+  )
+
+  return domElement;
 }

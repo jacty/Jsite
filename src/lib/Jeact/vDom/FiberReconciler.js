@@ -15,27 +15,23 @@ function getContextForSubtree(parentComponent){
   console.log('getContextForSubtree', parentComponent)
 }
 
-export function updateContainer(element, container){
-  const current = container.current;
-  
+export function updateContainer(element, fiberRoot){
+  const current = fiberRoot.current;
   const eventTime =requestEventTime();
   const lane = requestUpdateLane(current);
   const context = getContextForSubtree();
 
-  if (container.context === null){
-    container.context = context;
+  if (fiberRoot.context === null){
+    fiberRoot.context = context;
   } else {
     console.log('updateContainer1')
   }
 
   const update = createUpdate(eventTime, lane);
+  update.payload =  { element }; // element is the key of payload;
 
-  update.payload =  { element };
-
-  enqueueUpdate(current, update);
+  enqueueUpdate(current, update);//update fiber.updateQueue.pending.
   scheduleUpdateOnFiber(current, lane, eventTime);
-
-  return lane;
 }
 
 

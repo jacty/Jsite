@@ -10,20 +10,19 @@ let debugCounter = 1;
 
 function FiberNode(tag, pendingProps, key, mode){
   /* Instance */
-  this.tag = tag;// Decides which kind of component the fiber is, e.g.
-                 // HostRoot, Unknown Component, Function Component etc.
+  this.tag = tag; // Decides which kind of component the fiber is
   this.key = key; // {key} attribute in lists' items
-  this.elementType = null;
+  // this.elementType = null;
   this.type = null;
   this.stateNode = null; // refer to FiberRootNode
 
   // Fiber
   this.return = null; // refer to parent
   this.child = null;
-  this.sibling = null;
-  this.index = 0;
+  // this.sibling = null;
+  // this.index = 0;
 
-  this.ref = null;
+  // this.ref = null;
 
   this.pendingProps = pendingProps;
   this.memoizedProps = null;
@@ -33,8 +32,8 @@ function FiberNode(tag, pendingProps, key, mode){
 
   // Effects
   this.flags = 0;
-  this.subtreeFlags = 0;
-  this.deletions = null;
+  // this.subtreeFlags = 0;
+  // this.deletions = null;
 
   this.lanes = 0;
   this.childLanes = 0;
@@ -55,6 +54,7 @@ function shouldConstruct(Component){
 // This is used to create an alternate fiber to do work on.
 // Why it is not a completed copy of current?
 export function createWorkInProgress(current, pendingProps=null){
+
   let workInProgress = current.alternate;
   if (workInProgress === null){
     // We use a double buffering pooling technique because we know that we'll
@@ -66,6 +66,7 @@ export function createWorkInProgress(current, pendingProps=null){
       pendingProps,
       current.key,
     );
+
     workInProgress.elementType = current.elementType;
     workInProgress.type = current.type;
     workInProgress.stateNode = current.stateNode;
@@ -83,7 +84,6 @@ export function createWorkInProgress(current, pendingProps=null){
   workInProgress.memoizedProps = current.memoizedProps;
   workInProgress.memoizedState = current.memoizedState;
   workInProgress.updateQueue = current.updateQueue;
-
   // Clone the dependencies object. This is mutated during the render phase,
   // so it cannot be shared with the current fiber.
   const currentDependencies = current.dependencies;
@@ -100,16 +100,12 @@ export function createWorkInProgress(current, pendingProps=null){
   return workInProgress;
 }
 
-export function createFiberFromTypeAndProps(
-  type,
-  key,
-  pendingProps,
-  owner,
-  mode,
-  lanes
-  ){
-  let fiberTag = IndeterminateComponent;
-  let resolvedType = type;
+export function createFiberFromTypeAndProps(element,lanes){
+  const type = element.type;
+  const pendingProps = element.props;
+  const key = element.key;
+
+  let fiberTag;
 
   if (typeof type === 'function'){
     if(shouldConstruct(type)){
@@ -121,36 +117,17 @@ export function createFiberFromTypeAndProps(
     console.error('createFiberFromTypeAndProps1')
   }
 
-  const fiber = createFiber(fiberTag, pendingProps, key, mode);
+  const fiber = createFiber(fiberTag, pendingProps, key);
 
-  fiber.elementType = type;
-  fiber.type = resolvedType;
+  fiber.type = type;
   fiber.lanes = lanes;
 
   return fiber;
 }
 
-export function createFiberFromElement(
-  element,
-  mode,
-  lanes
-){
-  let owner = null;
-  const type = element.type;
-  const key = element.key;
-  const pendingProps = element.props;
-  const fiber = createFiberFromTypeAndProps(
-    type,
-    key,
-    pendingProps,
-    owner,
-    mode,
-    lanes,
-  );
-  return fiber;
-}
-
 export function createFiberFromText(content, mode, lanes){
+  console.error('createFiberFromText');
+  return;
   const fiber = createFiber(HostText, content, null, mode);
   fiber.lanes = lanes;
   return fiber;

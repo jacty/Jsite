@@ -126,6 +126,7 @@ function advanceTimers(currentTime){
 }
 
 function flushWork(hasTimeRemaining, initialTime){
+
   // We'll need a host callback the next time work is scheduled.
   isHostCallbackScheduled = false;
   if (isHostTimeoutScheduled){
@@ -147,6 +148,7 @@ function workLoop(hasTimeRemaining, initialTime){
   advanceTimers(currentTime);
 
   currentTask = peek(taskQueue);
+ 
   while(currentTask !== null){
     if(currentTask.expirationTime > currentTime &&
         (!hasTimeRemaining || shouldYieldToHost())
@@ -159,8 +161,9 @@ function workLoop(hasTimeRemaining, initialTime){
     if (typeof callback === 'function'){
       currentTask.callback = null;
       currentPriority = currentTask.priority;
-      const contiuationCallback = callback();
-      console.error('workLoop', contiuationCallback);
+      const contiuationCallback = callback();//performConcurrentWorkOnRoot()
+      !!contiuationCallback ?
+        console.error('workLoop', contiuationCallback):'';
     } else {
       console.log('workLoop2')
     }
@@ -177,11 +180,11 @@ function performWorkUntilDeadline(){
     deadline = currentTime + yieldInterval;
     const hasTimeRemaining = true;
     try{
+      // scheduledHostCallback = flushwork;
       const hasMoreWork = scheduledHostCallback(hasTimeRemaining, currentTime);
-      console.error('performWorkUntilDeadline', hasMoreWork);
+      !!hasMoreWork?
+        console.error('performWorkUntilDeadline'):'';
     } catch (error){
-      // If a scheduler task throws, exit the current browser task so the error
-      // can be observed.
       port.postMessage(null);
       throw error;
     }
@@ -198,8 +201,8 @@ const channel = new MessageChannel();
 const port = channel.port2;
 channel.port1.onmessage = performWorkUntilDeadline;
 
-function requestHostCallback(callback){
-  scheduledHostCallback = callback;
+function requestHostCallback(flushWork){
+  scheduledHostCallback = flushWork;
   if (!isMessageLoopRunning){
     isMessageLoopRunning = true;
     port.postMessage(null);
@@ -207,6 +210,8 @@ function requestHostCallback(callback){
 }
 
 export function runWithPriority(priority,fn){
+ console.error('runWithPriority');
+ return;
   const schedulePriority = PriorityToSchedulePriority(priority);
 
   return fn();

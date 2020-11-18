@@ -2,7 +2,7 @@ import {
   __ENV__,  
   JEACT_ELEMENT_TYPE,
 } from '@Jeact/shared/Constants';
-import {CurrentOwner} from '@Jeact/Shared/internals.js';
+import {CurrentOwner} from '@Jeact/Shared/internals';
 
 const hasOwnProperty = Object.prototype.hasOwnProperty;
 
@@ -23,11 +23,9 @@ function hasValidKey(config){
   }
   return config.key !== undefined;
 }
-
-// Todo: Remove argument self.
+// self: to detect `this`
 const JeactElement = function(type, key, ref, self, source, owner, props){
   const element = {
-    // to identify if this is a Jeact Element.
     $$typeof: JEACT_ELEMENT_TYPE,
 
     // Built-in properties
@@ -39,52 +37,45 @@ const JeactElement = function(type, key, ref, self, source, owner, props){
     _owner: owner,
   };
 
+  if(__ENV__){
+    element._store = {};
+    Object.defineProperty(element, '_self', {
+      configurable: false,
+      enumerable: false,
+      writable: false,
+      value: self,
+    });
+    Object.defineProperty(element, '_source', {
+      configurable: false,
+      enumerable: false,
+      writable: false,
+      value: source,
+    });
+    Object.freeze(element.props);
+    Object.freeze(element);
+  }
   return element;
 }
 
 export function createElement(type, config, children){
-
-  let propName;
-
   const props = {};
 
   let key = null;
   let ref = null;
-  let self = null;
   let source = null;
-
   if (config != null) {
-    if (hasValidRef(config)){
-      console.error('createElement1');
-    }
-    if (hasValidKey(config)){
-      console.error('createElement1.1')
-    }
-    self = config.__self === undefined ? null : config.__self;
-    source = config.__source === undefined ? null : config.__source;
-    // Remaining properties are added to a new props object
-    for (propName in config){
-      if (hasOwnProperty.call(config, propName)){
-        props[propName] = config[propName];
-      }
-    }
+    console.error('createElement1')
   }
 
   const childrenLength = arguments.length - 2;
-
   if (childrenLength === 1){
-    props.children = children;
+    console.error('createElement2')
   } else if (childrenLength > 1){
-    const childArray = Array(childrenLength);
-    for (let i = 0; i < childrenLength; i++){
-      childArray[i] = arguments[i + 2];
-    }
-    props.children = childArray;
+    console.error('createElement3')
   }
 
-  // Resolve default props
   if (type && type.defaultProps) {
-    console.log('createElement2')
+    console.log('createElement4')
   }
   if (__ENV__){
     if (key || ref){

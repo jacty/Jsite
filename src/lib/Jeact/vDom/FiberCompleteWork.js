@@ -4,6 +4,7 @@ import {
   HostComponent,
 //   NoFlags,
 //   NoLanes,
+  Snapshot,
   HostRoot,
 } from '@Jeact/shared/Constants';
 import {
@@ -14,7 +15,8 @@ import {
 //   mergeLanes
 // } from './JeactFiberLane';
 import {
-  createElement
+  createElement,
+  setInitialDOMProperties,
 } from '@Jeact/vDom/DOMComponent';
 
 
@@ -74,6 +76,7 @@ export function completeWork(
       if (fiberRoot.pendingContext){
         console.error('completeWork1')
       }
+      workInProgress.flags |= Snapshot;
       return null;
     }
     case HostComponent:{
@@ -92,6 +95,7 @@ export function completeWork(
 
         appendAllChildren(instance, workInProgress, false, false);
         workInProgress.stateNode = instance;
+        finalizeInitialChildren(instance, type, newProps, rootContainerInstance, 'currentHostContext')
       }
       return null;
     }
@@ -124,4 +128,15 @@ export function createInstance(
   )
 
   return domElement;
+}
+
+export function finalizeInitialChildren(
+  domElement,
+  type,
+  props,
+  rootContainerInstance,
+  hostContext
+){
+  setInitialDOMProperties(domElement, type, props, rootContainerInstance);
+  return false;
 }

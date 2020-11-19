@@ -1,60 +1,57 @@
 import {
-  NoFlags,
+//   NoFlags,
   NoLanes,
-// // //   DiscreteEventContext,
+//   DiscreteEventContext,
   NoTimestamp,
-  HostRoot,
-  DefaultLanePriority,
-  NormalSchedulePriority,
-  NoPriority,
-  NormalPriority,
-  Incomplete,
-  noTimeout,
+//   HostRoot,
+//   DefaultLanePriority,
+//   NormalSchedulePriority,
+//   NoPriority,
+//   NormalPriority,
+//   Incomplete,
+//   noTimeout,
   NoContext,
   RenderContext,
   CommitContext,
 } from '@Jeact/shared/Constants';
-import {
-  CurrentBatchConfig,
-  CurrentOwner,
-// //   CurrentDispatcher
-} from '@Jeact/shared/internals';
-import {
-  getCurrentSchedulePriority,
-  PriorityToLanePriority,
-  shouldYieldToHost,
-  scheduleCallback
-} from '@Jeact/scheduler';
-import {
-  findUpdateLane,
-  mergeLanes,
-  getNextLanes,
-  getNextLanesPriority,
-  markStarvedLanesAsExpired,
-  markRootUpdated,
-  LanePriorityToPriority,
-} from '@Jeact/vDom/FiberLane';
-import {
-  createWorkInProgress
-} from '@Jeact/vDom/Fiber';
-// // import {
-// //   ContextOnlyDispatcher,
-// // } from '@Jeact/vDom/FiberHooks';
-import { beginWork } from '@Jeact/vDom/FiberBeginWork';
-import {
-  completeWork
-} from '@Jeact/vDom/FiberCompleteWork';
-// // import { invariant } from '@Jeact/shared/invariant';
+// import {
+//   CurrentBatchConfig,
+//   CurrentOwner,
+//   CurrentDispatcher
+// } from '@Jeact/shared/internals';
+// import {
+//   getCurrentSchedulePriority,
+//   PriorityToLanePriority,
+//   shouldYieldToHost,
+//   scheduleCallback
+// } from '@Jeact/scheduler';
+// import {
+//   findUpdateLane,
+//   mergeLanes,
+//   getNextLanes,
+//   getNextLanesPriority,
+//   markStarvedLanesAsExpired,
+//   markRootUpdated,
+//   LanePriorityToPriority,
+// } from '@Jeact/vDom/FiberLane';
+// import {
+//   createWorkInProgress
+// } from '@Jeact/vDom/Fiber';
+// import {
+//   ContextOnlyDispatcher,
+// } from '@Jeact/vDom/FiberHooks';
+// import { beginWork } from '@Jeact/vDom/FiberBeginWork';
+// import {
+//   completeWork
+// } from '@Jeact/vDom/FiberCompleteWork';
+// import { invariant } from '@Jeact/shared/invariant';
 
-const RootIncomplete = 0;
-// // // // const RootCompleted = 5;
+// const RootIncomplete = 0;
+// const RootCompleted = 5;
 
 let executionContext = NoContext;
-// The root we're working on
 let wipRoot = null;
-// The fiber we're working on
 let wip = null;
-// The lanes we're rendering
 let wipRootRenderLanes = NoLanes;
 
 // Stack that allows components to change the render lanes for its subtree
@@ -65,49 +62,45 @@ let wipRootRenderLanes = NoLanes;
 
 // Most things in the work loop should deal with wipRootRenderLanes.
 // Most things in begin/complete phases should deal with subtreeRenderLanes.
-export let subtreeRenderLanes = NoLanes;
+// export let subtreeRenderLanes = NoLanes;
 
-let wipRootExitStatus = RootIncomplete;
-let wipRootFatalError = null;
+// let wipRootExitStatus = RootIncomplete;
+// let wipRootFatalError = null;
 
 // "Included" lanes refer to lanes that were worked on during this render. It's
 // slightly different than `renderLanes` because `renderLanes` can change as you
 // enter and exit an Offscreen tree. This value is the combination of all render
 // lanes for the entire render phase.
-let wipRootIncludedLanes = NoLanes;
+// let wipRootIncludedLanes = NoLanes;
 // The work left over by components that were visited during this render. Only
 // includes unprocessed updates, not work in bailed out children.
-let wipRootSkippedLanes = NoLanes;
-let wipRootUpdatedLanes = NoLanes;
+// let wipRootSkippedLanes = NoLanes;
+// let wipRootUpdatedLanes = NoLanes;
 
-let wipRootPingedLanes = NoLanes;
-// // // The absolute time for when we should start giving up on rendering more and
-// prefer CPU suspense heuristic instead.
-let wipRootRenderTargetTime = Infinity;
-// // // // How long a render is supposed to take before we start following CPU suspense
-// heuristics and opt out of rendering more content.
-const RENDER_TIMEOUT = 500;
+// let wipRootPingedLanes = NoLanes;
+// let wipRootRenderTargetTime = Infinity;
+// const RENDER_TIMEOUT = 500;
 
 function resetRenderTimer(){
   wipRootRenderTargetTime = performance.now() + RENDER_TIMEOUT;
 }
 
-// // // // let rootWithPendingPassiveEffects = null;
-let pendingPassiveEffectsRenderPriority = NoPriority;
-// // // // let rootsWithPendingDiscreteUpdates = null;
+// let rootWithPendingPassiveEffects = null;
+// let pendingPassiveEffectsRenderPriority = NoPriority;
+// let rootsWithPendingDiscreteUpdates = null;
 
-// // // // Use these to prevent an infinite loop of nested updates
-// // // const NESTED_UPDATE_LIMIT = 50;
-// // // let nestedUpdateCount = 0;
-// // // // let rootWithNestedUpdates = null
+// Use these to prevent an infinite loop of nested updates
+// const NESTED_UPDATE_LIMIT = 50;
+// let nestedUpdateCount = 0;
+// let rootWithNestedUpdates = null
 
-// // // // const NESTED_PASSIVE_UPDATE_LIMIT = 50;
-// // // // let nestedPassiveUpdateCount = 0;
+// const NESTED_PASSIVE_UPDATE_LIMIT = 50;
+// let nestedPassiveUpdateCount = 0;
 
 
 let currentEventTime = NoTimestamp;
-let currentEventWipLanes = NoLanes;
-let currentEventPendingLanes = NoLanes;
+// let currentEventWipLanes = NoLanes;
+// let currentEventPendingLanes = NoLanes;
 
 export function getCurrentPriority(){
   switch(getCurrentSchedulePriority()){

@@ -2,11 +2,11 @@ import {
   __ENV__
 } from '@Jeact/shared/Constants';
 import {onScheduleRoot} from '@Jeact/vDom/FiberDevToolsHook';
-// import {
-//   requestEventTime,
+import {
+  requestEventTime,
 //   requestUpdateLane,
 //   scheduleUpdateOnFiber
-// } from '@Jeact/vDom/FiberWorkLoop'
+} from '@Jeact/vDom/FiberWorkLoop'
 // import {
 //   createUpdate,
 //   enqueueUpdate
@@ -23,10 +23,11 @@ export function updateContainer(element, fiberRoot){
   if (__ENV__){
     onScheduleRoot(fiberRoot, element)
   }
-  console.error('updateContainer');
-  return;
+
   const current = fiberRoot.current;
   const eventTime =requestEventTime();
+  console.error('updateContainer', eventTime);
+  return;
   const lane = requestUpdateLane(current);
   const context = getContextForSubtree();
 

@@ -1,5 +1,8 @@
 export function push(heap, node){
   const index = heap.length;
+  if(index>2){
+    console.error('push');
+  }
   heap.push(node);
   siftUp(heap, node, index);
 }

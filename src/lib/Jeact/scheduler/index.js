@@ -27,10 +27,8 @@ let isHostCallbackScheduled = false;
 let isHostTimeoutScheduled = false;
 
 export function scheduleCallback(priority, callback){
-  console.error('scheduleCallback');
-  return;
-  const schedulePriority = PriorityToSchedulePriority(priority)
 
+  const schedulePriority = PriorityToSchedulePriority(priority)
   const currentTime = performance.now();
 
   let startTime = currentTime;
@@ -59,7 +57,8 @@ export function scheduleCallback(priority, callback){
   } else {
     newTask.sortIndex = expirationTime;
     push(taskQueue, newTask);
-
+    console.error('scheduleCallback', taskQueue);
+    return;
     // Schedule a host callback, if needed. If we're already performing work,
     // wait until the next time we yield.
     if (!isHostCallbackScheduled && !isPerformingWork){

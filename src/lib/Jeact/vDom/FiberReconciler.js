@@ -1,16 +1,16 @@
 import {
   __ENV__
 } from '@Jeact/shared/Constants';
-import {onScheduleRoot} from '@Jeact/vDom/FiberDevToolsHook';
+import {onScheduleRoot} from '@Jeact/vDOM/FiberDevToolsHook';
 import {
   requestEventTime,
   requestUpdateLane,
 //   scheduleUpdateOnFiber
-} from '@Jeact/vDom/FiberWorkLoop'
-// import {
-//   createUpdate,
-//   enqueueUpdate
-// } from '@Jeact/vDom/UpdateQueue';
+} from '@Jeact/vDOM/FiberWorkLoop'
+import {
+  createUpdate,
+  enqueueUpdate
+} from '@Jeact/vDOM/UpdateQueue';
 
 function getContextForSubtree(parentComponent){
   if (!parentComponent){
@@ -27,9 +27,8 @@ export function updateContainer(element, fiberRoot){
   const current = fiberRoot.current;
   const eventTime =requestEventTime();
   const lane = requestUpdateLane(current);
+  
   const context = getContextForSubtree();
-  console.error('updateContainer', context);
-  return;
   if (fiberRoot.context === null){
     fiberRoot.context = context;
   } else {
@@ -40,7 +39,7 @@ export function updateContainer(element, fiberRoot){
   update.payload =  { element }; // element is the key of payload;
 
   enqueueUpdate(current, update);//update fiber.updateQueue.pending.
-  scheduleUpdateOnFiber(current, lane, eventTime);
+  // scheduleUpdateOnFiber(current, lane, eventTime);
 }
 
 

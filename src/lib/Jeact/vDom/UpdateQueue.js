@@ -1,7 +1,7 @@
-// import {
-//   UpdateState,
+import {
+  UpdateState,
 //   NoLanes,
-// } from '@Jeact/shared/Constants';
+} from '@Jeact/shared/Constants';
 // import {
 //   isSubsetOfLanes,
 // } from '@Jeact/vDom/FiberLane';
@@ -20,7 +20,6 @@ export function initializeUpdateQueue(fiber){
 }
 
 export function createUpdate(eventTime, lane){
- console.error('createUpdate');
   const update = {
     eventTime,
     lane,
@@ -33,8 +32,6 @@ export function createUpdate(eventTime, lane){
 }
 
 export function enqueueUpdate(fiber, update){
-  console.error('enqueueUpdate');
-  return;
   const updateQueue = fiber.updateQueue;
   let pending = updateQueue.pending;
   if (pending === null) {

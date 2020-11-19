@@ -57,8 +57,6 @@ export function scheduleCallback(priority, callback){
   } else {
     newTask.sortIndex = expirationTime;
     push(taskQueue, newTask);
-    console.error('scheduleCallback', taskQueue);
-    return;
     // Schedule a host callback, if needed. If we're already performing work,
     // wait until the next time we yield.
     if (!isHostCallbackScheduled && !isPerformingWork){
@@ -126,7 +124,6 @@ function advanceTimers(currentTime){
 }
 
 function flushWork(hasTimeRemaining, initialTime){
-
   // We'll need a host callback the next time work is scheduled.
   isHostCallbackScheduled = false;
   if (isHostTimeoutScheduled){
@@ -134,16 +131,20 @@ function flushWork(hasTimeRemaining, initialTime){
   }
 
   isPerformingWork = true;
+  const previousPriority = currentPriority;
   try{
      return workLoop(hasTimeRemaining, initialTime);
   } finally {
+    // flags may be set in workLoop should be reset finally.
     currentTask = null;
+    currentPriority = previousPriority;
     isPerformingWork = false;
   }
 }
 
 function workLoop(hasTimeRemaining, initialTime){
-
+  console.error('workLoop');
+  return;
   let currentTime = initialTime;
   advanceTimers(currentTime);
 
@@ -201,8 +202,8 @@ const channel = new MessageChannel();
 const port = channel.port2;
 channel.port1.onmessage = performWorkUntilDeadline;
 
-function requestHostCallback(flushWork){
-  scheduledHostCallback = flushWork;
+function requestHostCallback(callback){
+  scheduledHostCallback = callback;
   if (!isMessageLoopRunning){
     isMessageLoopRunning = true;
     port.postMessage(null);

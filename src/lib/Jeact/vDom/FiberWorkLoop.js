@@ -1,9 +1,10 @@
 import {
-//   NoFlags,
+  __ENV__,
+  NoFlags,
   NoLanes,
 //   DiscreteEventContext,
   NoTimestamp,
-//   HostRoot,
+  HostRoot,
 //   DefaultLanePriority,
   NormalSchedulePriority,
 //   NoPriority,
@@ -27,7 +28,7 @@ import {
 } from '@Jeact/scheduler';
 import {
   findUpdateLane,
-//   mergeLanes,
+  mergeLanes,
 //   getNextLanes,
 //   getNextLanesPriority,
 //   markStarvedLanesAsExpired,
@@ -149,10 +150,10 @@ export function requestUpdateLane(fiber){
 }
 
 export function scheduleUpdateOnFiber(fiber, lane, eventTime){
-
   // Update Fiber.lanes
   const root = markUpdateLaneFromFiberToRoot(fiber, lane);
-
+  console.error('scheduleUpdateOnFiber', root);
+  return;
   // update root.pendingLane, eventTimes etc.
   markRootUpdated(root, lane, eventTime);
 
@@ -161,22 +162,30 @@ export function scheduleUpdateOnFiber(fiber, lane, eventTime){
 
 }
 
-function markUpdateLaneFromFiberToRoot(sourceFiber, lane){
-  let node = sourceFiber;
-  if (node.tag !== HostRoot){
-    return null;
+function markUpdateLaneFromFiberToRoot(fiber, lane){
+  if (fiber.tag !== HostRoot){
+    console.error('markUpdateLaneFromFiberToRoot1')
   }
 
   //Update the source fiber's lanes
-  node.lanes = mergeLanes(node.lanes, lane);
+  fiber.lanes = mergeLanes(fiber.lanes, lane);
+  const alternate = fiber.alternate;
+  if (alternate!== null){
+    console.error('markUpdateLaneFromFiberToRoot2')
+  }
+  if (__ENV__){
+    if(alternate === null&& fiber.flags !== NoFlags){
+      console.error('markUpdateLaneFromFiberToRoot3', fiber.flags)
+    }
+  }
 
   // Walk the parent path to the root and update the child expiration time.
-  let parent = node.return;
+  let parent = fiber.return;
   if(parent!==null){
     console.log('markUpdateLaneFromFiberToRoot3', parent);
   }
 
-  return node.stateNode;
+  return fiber.stateNode;
 }
 
 // Use this function to schedule a task for a root. There's only one task per root; if a task was already scheduled, we'll check to make sure the priority of the existing task is the same as the priority of the next level that the root has worked on. This function is called on every update, and right before existing a task.
@@ -515,5 +524,4 @@ export function flushPassiveEffects(){
   }
   return false;
 }
-
 

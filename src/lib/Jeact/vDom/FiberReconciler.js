@@ -5,7 +5,7 @@ import {onScheduleRoot} from '@Jeact/vDOM/FiberDevToolsHook';
 import {
   requestEventTime,
   requestUpdateLane,
-//   scheduleUpdateOnFiber
+  scheduleUpdateOnFiber
 } from '@Jeact/vDOM/FiberWorkLoop'
 import {
   createUpdate,
@@ -39,7 +39,7 @@ export function updateContainer(element, fiberRoot){
   update.payload =  { element }; // element is the key of payload;
 
   enqueueUpdate(current, update);//update fiber.updateQueue.pending.
-  // scheduleUpdateOnFiber(current, lane, eventTime);
+  scheduleUpdateOnFiber(current, lane, eventTime);
 }
 
 

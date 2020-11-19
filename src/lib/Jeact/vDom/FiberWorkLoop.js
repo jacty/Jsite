@@ -240,7 +240,7 @@ function ensureRootIsScheduled(root, currentTime){
 // This is the entry point for every concurrent task, i.e. anything that
 // goes through Scheduler.
 function performConcurrentWorkOnRoot(root){
-  console.error('performConcurrentWorkOnRoot');
+  console.error('performConcurrentWorkOnRoot',arguments);
   return;
   // Since we know we're in a Jeact event, we can clear the current
   // event time. The next update will compute a new event time.

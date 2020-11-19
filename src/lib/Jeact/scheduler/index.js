@@ -17,6 +17,8 @@ const timerQueue = [];
 // Incrementing id counter. Used to maintain insertion order.
 let taskIdCount = 1;
 
+let isSchedulePaused = false;
+
 let currentTask = null;
 let currentPriority = NormalSchedulePriority;
 
@@ -143,26 +145,25 @@ function flushWork(hasTimeRemaining, initialTime){
 }
 
 function workLoop(hasTimeRemaining, initialTime){
-  console.error('workLoop');
-  return;
   let currentTime = initialTime;
   advanceTimers(currentTime);
-
   currentTask = peek(taskQueue);
- 
-  while(currentTask !== null){
+  while(currentTask !== null&!isSchedulePaused){
     if(currentTask.expirationTime > currentTime &&
         (!hasTimeRemaining || shouldYieldToHost())
       ){
+      // Has no time for current task.
       console.log('workLoop1')
       break;
     }
     const callback = currentTask.callback;
-
     if (typeof callback === 'function'){
       currentTask.callback = null;
       currentPriority = currentTask.priority;
-      const contiuationCallback = callback();//performConcurrentWorkOnRoot()
+      // will be push into argument lists ofcallback
+      const didUserCallbackTimeout = currentTask.expirationTime <= currentTime;
+      //performConcurrentWorkOnRoot()
+      const contiuationCallback = callback(didUserCallbackTimeout);
       !!contiuationCallback ?
         console.error('workLoop', contiuationCallback):'';
     } else {

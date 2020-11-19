@@ -32,7 +32,7 @@ import {
 //   getNextLanes,
 //   getNextLanesPriority,
 //   markStarvedLanesAsExpired,
-//   markRootUpdated,
+  markRootUpdated,
 //   LanePriorityToPriority,
 } from '@Jeact/vDom/FiberLane';
 // import {
@@ -79,6 +79,7 @@ let wipRootIncludedLanes = NoLanes;
 // let wipRootUpdatedLanes = NoLanes;
 
 // let wipRootPingedLanes = NoLanes;
+let mostRecentlyUpdatedRoot = null;
 // let wipRootRenderTargetTime = Infinity;
 // const RENDER_TIMEOUT = 500;
 
@@ -150,16 +151,25 @@ export function requestUpdateLane(fiber){
 }
 
 export function scheduleUpdateOnFiber(fiber, lane, eventTime){
-  // Update Fiber.lanes
+  // Update fiber.lanes
   const root = markUpdateLaneFromFiberToRoot(fiber, lane);
-  console.error('scheduleUpdateOnFiber', root);
-  return;
+  if (root === null){
+    console.error('scheduleUpdateOnFiber1')
+  }
   // update root.pendingLane, eventTimes etc.
   markRootUpdated(root, lane, eventTime);
+
+  if(wipRoot){
+    console.error('scheduleUpdateOnFiber2', wipRoot)
+  }
+  if(lane!==512||executionContext!==0){
+    console.error('scheduleUpdateOnFiber3')
+  }
 
   // Schedule other updates after in case the callback is sync.
   ensureRootIsScheduled(root, eventTime);
 
+  mostRecentlyUpdatedRoot = root;// should be used in requestUpdatelane for a transition.
 }
 
 function markUpdateLaneFromFiberToRoot(fiber, lane){

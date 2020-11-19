@@ -1,6 +1,7 @@
 import {
   NoLane,
   NoLanes,
+  NoLanePriority,
   NormalPriority,
   DefaultLanePriority,
   TransitionLanePriority,
@@ -37,12 +38,13 @@ export function getNextLanes(root, wipLanes){
 
   const pendingLanes = root.pendingLanes;
   if (pendingLanes === NoLanes){
+    console.error('getNextLanes1')
     highestLanePriority = NoLanePriority;
-    return 0;
+    return NoLanes;
   }
 
-  let nextLanes = 0;
-  let nextLanePriority = 0;
+  let nextLanes = NoLanes;
+  let nextLanePriority = NoLanePriority;
 
   const expiredLanes = root.expiredLanes;
   const suspendedLanes = root.suspendedLanes;
@@ -50,7 +52,7 @@ export function getNextLanes(root, wipLanes){
 
   // Check if any work has expired.
   if (expiredLanes !== NoLanes){
-    console.error('getNextLanes1')
+    console.error('getNextLanes2')
   } else {
     // Do not work on any idle work until all the non-idle work has finished,
     // even it the work is suspended.
@@ -61,7 +63,7 @@ export function getNextLanes(root, wipLanes){
         nextLanes = getHighestPriorityLanes(nonIdleUnblockedLanes);
         nextLanePriority = highestLanePriority;
       } else {
-        console.log('getNextLanes2')
+        console.log('getNextLanes3')
       }
     } else {
       // The only remaining work is Idle.
@@ -122,7 +124,6 @@ function computeExpirationTime(lane, currentTime){
 }
 
 export function markStarvedLanesAsExpired(root, currentTime){
-  //TODO: This gets called every time we yield. We can optimize by storing the earliest expiration time on the root. Then use that to quickly bail out of this function.
 
   const suspendedLanes = root.suspendedLanes;
   const pingedLanes = root.pingedLanes;
@@ -133,15 +134,11 @@ export function markStarvedLanesAsExpired(root, currentTime){
   while (lanes>0) {
     const index = pickArbitraryLaneIndex(lanes);
     const lane = 1 << index; // move 1 towards left for {index} bits.
-
     const expirationTime = expirationTimes[index];
     if (expirationTime === NoTimestamp){
-      // Found a pending lane with no expiration time. If it's not suspended,
-      // or if it's pinged, assume it's CPU-bound. Compute a new expiration
-      // time using the current time.
       if (
-        (lane & suspendedLanes) === 0 ||
-        (lane & pingedLanes) !== 0){
+        (lane & suspendedLanes) === NoLanes ||
+        (lane & pingedLanes) !== NoLanes){
         // Assumes timestamps are monotonically increasing.
         expirationTimes[index] = computeExpirationTime(lane, currentTime);
       }

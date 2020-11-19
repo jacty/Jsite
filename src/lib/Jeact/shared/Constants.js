@@ -42,6 +42,7 @@ export const ImmediateSchedulePriority = 1;
 export const NormalSchedulePriority = 3;
 
 /* LanePriorities */
+export const NoLanePriority = 0;
 export const DefaultLanePriority = 8;
 export const TransitionLanePriority = 6;
 export const SyncLanePriority = 15; //?

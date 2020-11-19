@@ -5,7 +5,6 @@ import {
 //   DiscreteEventContext,
   NoTimestamp,
   HostRoot,
-//   DefaultLanePriority,
   NormalSchedulePriority,
 //   NoPriority,
   NormalPriority,
@@ -24,17 +23,17 @@ import {
   getCurrentSchedulePriority,
   PriorityToLanePriority,
 //   shouldYieldToHost,
-//   scheduleCallback
+  scheduleCallback
 } from '@Jeact/scheduler';
 import {
   findUpdateLane,
   mergeLanes,
-//   getNextLanes,
-//   getNextLanesPriority,
-//   markStarvedLanesAsExpired,
+  getNextLanes,
+  getNextLanesPriority,
+  markStarvedLanesAsExpired,
   markRootUpdated,
-//   LanePriorityToPriority,
-} from '@Jeact/vDom/FiberLane';
+  LanePriorityToPriority,
+} from '@Jeact/vDOM/FiberLane';
 // import {
 //   createWorkInProgress
 // } from '@Jeact/vDom/Fiber';
@@ -201,8 +200,9 @@ function markUpdateLaneFromFiberToRoot(fiber, lane){
 // Use this function to schedule a task for a root. There's only one task per root; if a task was already scheduled, we'll check to make sure the priority of the existing task is the same as the priority of the next level that the root has worked on. This function is called on every update, and right before existing a task.
 function ensureRootIsScheduled(root, currentTime){
   const existingCallbackNode = root.callbackNode;
-
+  // update root.expirationTime
   markStarvedLanesAsExpired(root, currentTime);
+
   // Determine the next lanes to work on, and their priority.
   const nextLanes = getNextLanes(
     root,
@@ -223,7 +223,7 @@ function ensureRootIsScheduled(root, currentTime){
 
   // Schedule a new callback.
   let newCallbackNode;
-  if (newCallbackPriority !== DefaultLanePriority){
+  if (newCallbackPriority !== 8){// DefaultLanePriority:8
     console.log('ensureRootIsScheduled1')
   } else {
     const priority = LanePriorityToPriority(newCallbackPriority);
@@ -240,7 +240,8 @@ function ensureRootIsScheduled(root, currentTime){
 // This is the entry point for every concurrent task, i.e. anything that
 // goes through Scheduler.
 function performConcurrentWorkOnRoot(root){
-
+  console.error('performConcurrentWorkOnRoot');
+  return;
   // Since we know we're in a Jeact event, we can clear the current
   // event time. The next update will compute a new event time.
   currentEventTime = NoTimestamp;

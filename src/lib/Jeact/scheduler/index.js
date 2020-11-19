@@ -27,7 +27,8 @@ let isHostCallbackScheduled = false;
 let isHostTimeoutScheduled = false;
 
 export function scheduleCallback(priority, callback){
-
+  console.error('scheduleCallback');
+  return;
   const schedulePriority = PriorityToSchedulePriority(priority)
 
   const currentTime = performance.now();

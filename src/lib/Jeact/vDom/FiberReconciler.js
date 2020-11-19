@@ -4,7 +4,7 @@ import {
 import {onScheduleRoot} from '@Jeact/vDom/FiberDevToolsHook';
 import {
   requestEventTime,
-//   requestUpdateLane,
+  requestUpdateLane,
 //   scheduleUpdateOnFiber
 } from '@Jeact/vDom/FiberWorkLoop'
 // import {
@@ -26,11 +26,10 @@ export function updateContainer(element, fiberRoot){
 
   const current = fiberRoot.current;
   const eventTime =requestEventTime();
-  console.error('updateContainer', eventTime);
-  return;
   const lane = requestUpdateLane(current);
   const context = getContextForSubtree();
-
+  console.error('updateContainer', context);
+  return;
   if (fiberRoot.context === null){
     fiberRoot.context = context;
   } else {

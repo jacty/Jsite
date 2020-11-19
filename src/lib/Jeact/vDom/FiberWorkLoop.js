@@ -5,35 +5,35 @@ import {
   NoTimestamp,
 //   HostRoot,
 //   DefaultLanePriority,
-//   NormalSchedulePriority,
+  NormalSchedulePriority,
 //   NoPriority,
-//   NormalPriority,
+  NormalPriority,
 //   Incomplete,
 //   noTimeout,
   NoContext,
   RenderContext,
   CommitContext,
 } from '@Jeact/shared/Constants';
-// import {
-//   CurrentBatchConfig,
+import {
+  CurrentBatchConfig,
 //   CurrentOwner,
 //   CurrentDispatcher
-// } from '@Jeact/shared/internals';
-// import {
-//   getCurrentSchedulePriority,
-//   PriorityToLanePriority,
+} from '@Jeact/shared/internals';
+import {
+  getCurrentSchedulePriority,
+  PriorityToLanePriority,
 //   shouldYieldToHost,
 //   scheduleCallback
-// } from '@Jeact/scheduler';
-// import {
-//   findUpdateLane,
+} from '@Jeact/scheduler';
+import {
+  findUpdateLane,
 //   mergeLanes,
 //   getNextLanes,
 //   getNextLanesPriority,
 //   markStarvedLanesAsExpired,
 //   markRootUpdated,
 //   LanePriorityToPriority,
-// } from '@Jeact/vDom/FiberLane';
+} from '@Jeact/vDom/FiberLane';
 // import {
 //   createWorkInProgress
 // } from '@Jeact/vDom/Fiber';
@@ -71,7 +71,7 @@ let wipRootRenderLanes = NoLanes;
 // slightly different than `renderLanes` because `renderLanes` can change as you
 // enter and exit an Offscreen tree. This value is the combination of all render
 // lanes for the entire render phase.
-// let wipRootIncludedLanes = NoLanes;
+let wipRootIncludedLanes = NoLanes;
 // The work left over by components that were visited during this render. Only
 // includes unprocessed updates, not work in bailed out children.
 // let wipRootSkippedLanes = NoLanes;
@@ -99,7 +99,7 @@ function resetRenderTimer(){
 
 
 let currentEventTime = NoTimestamp;
-// let currentEventWipLanes = NoLanes;
+let currentEventWipLanes = NoLanes;
 // let currentEventPendingLanes = NoLanes;
 
 export function getCurrentPriority(){
@@ -131,7 +131,6 @@ export function requestEventTime(){
 }
 
 export function requestUpdateLane(fiber){
-
   if (currentEventWipLanes !== wipRootIncludedLanes){
     console.error('requestUpdateLane1');
   }

@@ -26,3 +26,16 @@ const temp = {};
  });
 
 Object.assign(objects, temp);
+
+// Clone object which clones getter and setter function instead of their values only.
+export function clone(to, from){
+    for (var property in from){
+        if (!from.hasOwnProperty(property)) continue;
+        Object.defineProperty(
+            to,
+            property,
+            Object.getOwnPropertyDescriptor(from, property)
+        );
+    }
+    return to;
+}

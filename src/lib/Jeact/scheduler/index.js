@@ -153,7 +153,7 @@ function workLoop(hasTimeRemaining, initialTime){
         (!hasTimeRemaining || shouldYieldToHost())
       ){
       // Has no time for current task.
-      console.log('workLoop1')
+      console.log('workLoop1',currentTask.expirationTime, currentTime, hasTimeRemaining, performance.now(), deadline)
       break;
     }
     const callback = currentTask.callback;

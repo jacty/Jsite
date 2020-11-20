@@ -376,7 +376,7 @@ function performUnitOfWork(unitOfWork){
     setCurrentDebugFiberInDev(unitOfWork);    
   }
   let next = beginWork(unitOfWork, subtreeRenderLanes);
-  console.error('performUnitOfWork');
+  console.error('performUnitOfWork', next);
   return;
   unitOfWork.memoizedProps = unitOfWork.pendingProps;
   if (next == null){

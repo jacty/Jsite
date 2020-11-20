@@ -6,7 +6,7 @@ import {
 import {
   isSubsetOfLanes,
 } from '@Jeact/vDOM/FiberLane';
-// import { markSkippedUpdateLanes } from '@Jeact/vDom/FiberWorkLoop';
+import { markSkippedUpdateLanes } from '@Jeact/vDOM/FiberWorkLoop';
 
 let hasForceUpdate = false;
 let currentlyProcessingQueue;
@@ -90,6 +90,8 @@ export function processUpdateQueue(workInProgress, props, instance, renderLanes)
   // This is always non-null on a ClassComponent or HostRoot
   const queue = workInProgress.updateQueue;
   
+
+  
   hasForceUpdate = false;
   if (__ENV__){
     currentlyProcessingQueue = queue.pending;
@@ -147,7 +149,7 @@ export function processUpdateQueue(workInProgress, props, instance, renderLanes)
 
       let update = firstBaseUpdate;
 
-      // do {
+      do {
         const updateLane = update.lane;
         const updateEventTime = update.eventTime;
         if(!isSubsetOfLanes(renderLanes, updateLane)){
@@ -166,7 +168,7 @@ export function processUpdateQueue(workInProgress, props, instance, renderLanes)
             props,
             instance,
           );
-    console.error('processUpdateQueue', newState);return;
+
           const callback = update.callback;
           if (callback !== null) {
             console.error('processUpdateQueue5');
@@ -177,12 +179,12 @@ export function processUpdateQueue(workInProgress, props, instance, renderLanes)
         if (update=== null){
           pendingQueue = queue.pending;
           if (pendingQueue === null){
-            // break;
+            break;
           } else {
             console.error('processUpdateQueue7');
           }
         }
-      // } while(true);
+      } while(true);
 
       if (newLastBaseUpdate === null){
         newBaseState = newState;
@@ -192,15 +194,7 @@ export function processUpdateQueue(workInProgress, props, instance, renderLanes)
       queue.firstBaseUpdate = newFirstBaseUpdate;
       queue.lastBaseUpdate = newLastBaseUpdate;
 
-      // Set the remaining expiration time to be whatever is remaining in the queue.
-      // This should be fine because the only two other things that contribute
-      // to expiration time are props and context. We're already in the middle
-      // of the begin phase by the time we start processing the queue, so
-      // we've already dealt with the props. Context in components that
-      // specify shouldComponentUpdate is tricky. but we'll have to account
-      // for that regardless.
       markSkippedUpdateLanes(newLanes);
-
       workInProgress.lanes = newLanes;
       workInProgress.memoizedState = newState;
   }

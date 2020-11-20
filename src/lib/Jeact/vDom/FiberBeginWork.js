@@ -26,7 +26,7 @@ import {
 import {
   mountChildFibers,
   reconcileChildFibers,
-} from '@Jeact/vDom/ChildFiber';
+} from '@Jeact/vDOM/ChildFiber';
 import {
   processUpdateQueue,
   cloneUpdateQueue,
@@ -111,14 +111,11 @@ function updateHostRoot(workInProgress, renderLanes){
   cloneUpdateQueue(workInProgress);
   //update wip.lanes, wip.memoizedState;
   processUpdateQueue(workInProgress, nextProps, null, renderLanes);
-  return;
   const nextState = workInProgress.memoizedState;
   const nextChildren = nextState.element;
-
   if (nextChildren === prevChildren){
     console.error('updateHostRoot1')
   }
-  // const root = workInProgress.stateNode;
 
   reconcileChildren(workInProgress, nextChildren, renderLanes);
   return workInProgress.child;

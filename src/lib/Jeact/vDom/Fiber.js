@@ -5,7 +5,7 @@ import {
   // StaticMask,
   HostRoot,
   // IndeterminateComponent,
-  // HostComponent,
+  HostComponent,
   // HostText,
 } from '@Jeact/shared/Constants';
 
@@ -123,9 +123,8 @@ export function createWorkInProgress(current, pendingProps=null){
   return workInProgress;
 }
 
-export function createFiberFromTypeAndProps(element,lanes){
-  console.error('createFiberFromTypeAndProps');
-  return;
+export function createFiberFromTypeAndProps(element,lanes, owner){
+
   const type = element.type;
   const pendingProps = element.props;
   const key = element.key;
@@ -133,9 +132,7 @@ export function createFiberFromTypeAndProps(element,lanes){
   let fiberTag;
 
   if (typeof type === 'function'){
-    if(shouldConstruct(type)){
-      console.error('createFiberFromTypeAndProps2')
-    }
+    console.error('createFiberFromTypeAndProps1', type);
   } else if(typeof type === 'string'){
     fiberTag = HostComponent;
   } else {
@@ -143,10 +140,27 @@ export function createFiberFromTypeAndProps(element,lanes){
   }
 
   const fiber = createFiber(fiberTag, pendingProps, key);
-
+  fiber.elementType = type;
   fiber.type = type;
   fiber.lanes = lanes;
 
+  if (__ENV__){
+    fiber._debugOwner = owner;
+  }
+
+  return fiber;
+}
+
+export function createFiberFromElement(element, lanes){
+  let owner = null;
+  if (__ENV__){
+    owner = element._owner;
+  }
+  const fiber = createFiberFromTypeAndProps(element, lanes, owner);
+  if (__ENV__){
+    fiber._debugSource = element._source;
+    fiber._debugOwner = element._owner;
+  }
   return fiber;
 }
 

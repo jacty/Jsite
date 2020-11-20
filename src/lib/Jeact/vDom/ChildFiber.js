@@ -3,9 +3,9 @@ import {
   Placement
 } from '@Jeact/shared/Constants';
 import {
-  createFiberFromTypeAndProps,
-  createFiberFromText,
-} from '@Jeact/vDom/Fiber';
+  createFiberFromElement,
+  // createFiberFromText,
+} from '@Jeact/vDOM/Fiber';
 
 function coerceRef(
   returnFiber,
@@ -138,7 +138,7 @@ function ChildReconciler(shouldTrackSideEffects){
     while (child !== null){
       console.error('reconcileSingleElement1')
     }
-    const created = createFiberFromTypeAndProps(element, lanes);
+    const created = createFiberFromElement(element, lanes);
     created.ref = coerceRef(returnFiber, currentFirstChild, element);
     created.return = returnFiber;
     
@@ -150,7 +150,7 @@ function ChildReconciler(shouldTrackSideEffects){
   function reconcileChildFibers(
     returnFiber,
     currentFirstChild,
-    newChild,
+    newChild,// from payload.element
     lanes){
     // This function is not recursive.
     // If the top level item is an array, we treat it as a set of children,
@@ -159,7 +159,6 @@ function ChildReconciler(shouldTrackSideEffects){
 
     // Handle object types
     const isObject = typeof newChild === 'object' && newChild !== null;
-
     if (isObject){
       switch(newChild.$$typeof){
         case JEACT_ELEMENT_TYPE:
@@ -177,7 +176,8 @@ function ChildReconciler(shouldTrackSideEffects){
           }
       };
     }
-
+    console.error('reconcileChildFibers');
+    return;
     if (Array.isArray(newChild)){
       return reconcileChildrenArray(
         returnFiber,

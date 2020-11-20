@@ -19,9 +19,9 @@ import {
 // } from '@Jeact/vDom/FiberNewContext';
 // import { renderWithHooks } from '@Jeact/vDom/FiberHooks';
 import {
-//   pushHostContext,
+  pushHostContext,
   pushHostContainer
-} from '@Jeact/vDom/FiberHostContext';
+} from '@Jeact/vDOM/FiberHostContext';
 
 import {
   mountChildFibers,
@@ -95,14 +95,17 @@ function updateFunctionComponent(
   return workInProgress.child;
 }
 
-
+function demo(){
+  console.error('demo!!!!!')
+  return;
+}
 function updateHostRoot(workInProgress, renderLanes){
   const root = workInProgress.stateNode;
   if (!root.pendingContext&!root.context){
     console.error('updateHostRoot1');
-    pushHostContainer(workInProgress);
   }
 
+  pushHostContainer(workInProgress);
 
   const nextProps = workInProgress.pendingProps;
   const prevState = workInProgress.memoizedState;
@@ -122,6 +125,9 @@ function updateHostRoot(workInProgress, renderLanes){
 }
 
 function updateHostComponent(workInProgress,renderLanes){
+  pushHostContext(workInProgress);
+  console.error('updateHostComponent', workInProgress.alternate);
+  return;
   const current = workInProgress.alternate;  
   const type = workInProgress.type;
   const nextProps = workInProgress.pendingProps;
@@ -216,8 +222,8 @@ export function beginWork(workInProgress, renderLanes){
     // }
     case HostRoot://3
       return updateHostRoot(workInProgress, renderLanes);
-    // case HostComponent://5
-      // return updateHostComponent(workInProgress, renderLanes);
+    case HostComponent://5
+      return updateHostComponent(workInProgress, renderLanes);
     // case HostText:
       // return updateHostText(alternate, workInProgress);
     default:

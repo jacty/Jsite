@@ -1,7 +1,10 @@
-import {createCursor, push, pop} from '@Jeact/vDom/FiberStack';
+import {
+  __ENV__
+} from '@Jeact/shared/Constants';
+import {createCursor, push, pop} from '@Jeact/vDOM/FiberStack';
 import {
   getChildNamespace
-} from '@Jeact/vDom/DOMNamespaces';
+} from '@Jeact/vDOM/DOMNamespaces';
 const NO_CONTEXT = {};
 const contextStackCursor = createCursor(NO_CONTEXT);
 const contextFiberStackCursor = createCursor(NO_CONTEXT);
@@ -21,7 +24,13 @@ export function getRootHostContext(rootContainerInstance){
       break;
     }
   }
+
   return namespace;
+}
+
+export function getChildHostContext(parentHostContext, type, rootContainerInstance){
+  const parentNamespace = parentHostContext;
+  return getChildNamespace(parentNamespace, type);
 }
 
 function requiredContext(cur){
@@ -37,27 +46,27 @@ export function getRootHostContainer(){
 }
 
 export function pushHostContainer(fiber){
-  const nextRootInstance = fiber.stateNode.containerInfo;
 
+  const nextRootInstance = fiber.stateNode.containerInfo;
   // Push current root instance onto the stack;
   // This allows us to reset root when portals are popped.
-  push(rootInstanceStackCursor, nextRootInstance);
+  push(rootInstanceStackCursor, nextRootInstance, fiber);
 
   // Track the context and the Fiber that provided it.
   // This enables us to pop only Fibers that provide unique contexts.
-  push(contextFiberStackCursor, fiber);
+  push(contextFiberStackCursor, fiber, fiber);
 
   // Finally, we need to push the host context to the stack.
   // However, we can't just call getRootHostContext() and push it because
   // we'd have a different number of entries on the stack depending on
   // whether getRootHostContext() throws somewhere in renderer code or not.
   // So we push an empty value first. This lets us safely unwind on errors.
-  push(contextStackCursor, NO_CONTEXT);
+  push(contextStackCursor, NO_CONTEXT, fiber);
   const nextRootContext = getRootHostContext(nextRootInstance);
 
   // Now that we know this function doesn't throw, replace it.
-  pop(contextStackCursor);
-  push(contextStackCursor, nextRootContext);
+  pop(contextStackCursor, fiber);
+  push(contextStackCursor, nextRootContext, fiber);
 }
 
 export function popHostContainer(fiber){
@@ -67,6 +76,13 @@ export function popHostContainer(fiber){
 }
 
 export function pushHostContext(fiber){
-  // const rootInstance = requiredContext()
-  console.error('pushHostContext')
+  const rootInstance = requiredContext(
+    rootInstanceStackCursor.current,
+  );
+  const context = requiredContext(contextStackCursor.current);
+  const nextContext = getChildHostContext(context, fiber.type, rootInstance);
+  if (context === nextContext){
+    return;
+  }
+  console.error('pushHostContext1')
 }

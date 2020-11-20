@@ -16,7 +16,7 @@ import {
 } from '@Jeact/shared/Constants';
 import {
   CurrentBatchConfig,
-//   CurrentOwner,
+  CurrentOwner,
   CurrentDispatcher
 } from '@Jeact/shared/internals';
 import {
@@ -363,9 +363,9 @@ function renderRootConcurrent(root, lanes){
 
 function workLoopConcurrent(){
   // Perform work until Scheduler asks us to yield
-  // while(wip !== null && !shouldYieldToHost()){
+  while(wip !== null && !shouldYieldToHost()){
     performUnitOfWork(wip);
-  // }
+  }
 }
 
 function performUnitOfWork(unitOfWork){
@@ -382,12 +382,11 @@ function performUnitOfWork(unitOfWork){
     resetCurrentDebugFiberInDev()
   }
 
-  console.error('performUnitOfWork', next);
-  return;
   unitOfWork.memoizedProps = unitOfWork.pendingProps;
   if (next == null){
     // If this doesn't spawn new work, complete the current work.
-    completeUnitOfWork(unitOfWork);
+    console.error('performUnitOfWork1')
+    // completeUnitOfWork(unitOfWork);
   } else {
     wip = next;
   }

@@ -20,6 +20,9 @@ import {
   CurrentDispatcher
 } from '@Jeact/shared/internals';
 import {
+  setCurrentDebugFiberInDev
+} from '@Jeact/dev/CurrentFiber'
+import {
   getCurrentSchedulePriority,
   PriorityToLanePriority,
   shouldYieldToHost,
@@ -369,9 +372,11 @@ function performUnitOfWork(unitOfWork){
   // nothing should rely on this, but relying on it here means that we don't
   // need an additional field on the work in progress.
   const current = unitOfWork.alternate;
-  // setCurrentDebugFiberInDEV(unitOfWork);
+  if(__ENV__){
+    setCurrentDebugFiberInDev(unitOfWork);    
+  }
   // let next = beginWork(unitOfWork, subtreeRenderLanes);
-  console.error('performUnitOfWork',current);
+  console.error('performUnitOfWork');
   return;
   unitOfWork.memoizedProps = unitOfWork.pendingProps;
   if (next == null){

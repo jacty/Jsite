@@ -1,3 +1,4 @@
+import { __ENV__ } from '@Jeact/shared/Constants';
 /**
  * Keeps track of the current owner.
  *
@@ -27,3 +28,8 @@ export const CurrentDispatcher = {
   current: null,
 };
 
+export const DebugCurrentFrame = {};
+
+if (__ENV__){
+    DebugCurrentFrame.getCurrentStack = null;
+}

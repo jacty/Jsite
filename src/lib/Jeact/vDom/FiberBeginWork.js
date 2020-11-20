@@ -1,9 +1,19 @@
 import {
+  __ENV__,
+  HostRoot,
+  HostComponent,
+  NoLanes,
+//   FunctionComponent,
+//   PerformedWork,
+
+  // HostText,
+} from '@Jeact/shared/Constants';
+import {
   includesSomeLane,
 } from '@Jeact/vDom/FiberLane';
 import {
   hasContextChanged,
-} from '@Jeact/vDom/FiberContext';
+} from '@Jeact/vDOM/FiberContext';
 // import {
 //   prepareToReadContext
 // } from '@Jeact/vDom/FiberNewContext';
@@ -12,21 +22,15 @@ import {
 //   pushHostContext,
   pushHostContainer
 } from '@Jeact/vDom/FiberHostContext';
-import {
-  HostRoot,
-// //   NoLanes,
-//   FunctionComponent,
-//   PerformedWork,
-  HostComponent,
-  // HostText,
-} from '@Jeact/shared/Constants';
+
 import {
   mountChildFibers,
   reconcileChildFibers,
 } from '@Jeact/vDom/ChildFiber';
 import {
   processUpdateQueue,
-} from '@Jeact/vDom/UpdateQueue';
+  cloneUpdateQueue,
+} from '@Jeact/vDOM/UpdateQueue';
 // import {
 //   markSkippedUpdateLanes,
 // } from '@Jeact/vDom/FiberWorkLoop';
@@ -93,10 +97,18 @@ function updateFunctionComponent(
 
 
 function updateHostRoot(workInProgress, renderLanes){
-  pushHostContainer(workInProgress);
+  const root = workInProgress.stateNode;
+  if (!root.pendingContext&!root.context){
+    console.error('updateHostRoot1');
+    pushHostContainer(workInProgress);
+  }
+
+
   const nextProps = workInProgress.pendingProps;
   const prevState = workInProgress.memoizedState;
   const prevChildren = prevState !== null ? prevState.element : null;
+  cloneUpdateQueue(workInProgress);//To make updateQueue in wip and wip.alternate point to different objects in memory.
+  return;
   //update wip.lanes, wip.memoizedState;
   processUpdateQueue(workInProgress, nextProps, null, renderLanes);
 
@@ -106,7 +118,7 @@ function updateHostRoot(workInProgress, renderLanes){
   if (nextChildren === prevChildren){
     console.error('updateHostRoot1')
   }
-  const root = workInProgress.stateNode;
+  // const root = workInProgress.stateNode;
 
   reconcileChildren(workInProgress, nextChildren, renderLanes);
   return workInProgress.child;
@@ -135,11 +147,21 @@ export function beginWork(workInProgress, renderLanes){
   const alternate = workInProgress.alternate;
   const updateLanes = workInProgress.lanes;
 
+  if (__ENV__){
+    if(workInProgress._debugNeedsRemount){
+      console.error('beginWork1')
+    }
+  }
+
   if (alternate !== null){
     const oldProps = alternate.memoizedProps;
     const newProps = workInProgress.pendingProps;
-
-    if (oldProps !== newProps || hasContextChanged()){
+    if (
+      oldProps !== newProps || 
+      hasContextChanged() ||
+      // Force a re-render if the implementation changed due to hot reload:
+      (__ENV__ ? workInProgress.type !== alternate.type : false)
+      ){
       console.error('beginWork1')
     } else if(!includesSomeLane(renderLanes, updateLanes)){
       console.error('beginWork2', workInProgress);
@@ -167,6 +189,8 @@ export function beginWork(workInProgress, renderLanes){
   } else {
     didReceiveUpdate = false;
   }
+   
+  workInProgress.lanes = NoLanes; // Why?   
 
   switch (workInProgress.tag){
     // case IndeterminateComponent:{//2
@@ -195,8 +219,8 @@ export function beginWork(workInProgress, renderLanes){
     // }
     case HostRoot://3
       return updateHostRoot(workInProgress, renderLanes);
-    case HostComponent://5
-      return updateHostComponent(workInProgress, renderLanes);
+    // case HostComponent://5
+      // return updateHostComponent(workInProgress, renderLanes);
     // case HostText:
       // return updateHostText(alternate, workInProgress);
     default:

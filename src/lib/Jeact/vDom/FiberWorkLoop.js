@@ -43,7 +43,7 @@ import {
 import {
   ContextOnlyDispatcher,
 } from '@Jeact/vDOM/FiberHooks';
-// import { beginWork } from '@Jeact/vDom/FiberBeginWork';
+import { beginWork } from '@Jeact/vDOM/FiberBeginWork';
 // import {
 //   completeWork
 // } from '@Jeact/vDom/FiberCompleteWork';
@@ -375,7 +375,7 @@ function performUnitOfWork(unitOfWork){
   if(__ENV__){
     setCurrentDebugFiberInDev(unitOfWork);    
   }
-  // let next = beginWork(unitOfWork, subtreeRenderLanes);
+  let next = beginWork(unitOfWork, subtreeRenderLanes);
   console.error('performUnitOfWork');
   return;
   unitOfWork.memoizedProps = unitOfWork.pendingProps;

@@ -19,6 +19,21 @@ export function initializeUpdateQueue(fiber){
   fiber.updateQueue = queue;
 }
 
+export function cloneUpdateQueue(workInProgress){
+  const queue = workInProgress.updateQueue;
+  const currentQueue = workInProgress.alternate.updateQueue;
+  if (queue === currentQueue){
+    const clone = {
+      baseState: currentQueue.baseState,
+      firstBaseUpdate: currentQueue.firstBaseUpdate,
+      lastBaseUpdate: currentQueue.lastBaseUpdate,
+      pending: currentQueue.pending,
+      effects: currentQueue.effects,
+    };
+    workInProgress.updateQueue = clone;
+  }
+}
+
 export function createUpdate(eventTime, lane){
   const update = {
     eventTime,

@@ -78,7 +78,7 @@ export function createElement(type, config, children){
     console.log('createElement4')
   }
   if (__ENV__){
-    if (key || ref){
+    if (key || ref || source){
       console.error('createElement3')
     }
   }

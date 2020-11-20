@@ -27,7 +27,7 @@ export function updateContainer(element, fiberRoot){
   const current = fiberRoot.current;
   const eventTime =requestEventTime();
   const lane = requestUpdateLane(current);
-  
+
   const context = getContextForSubtree();
   if (fiberRoot.context === null){
     fiberRoot.context = context;

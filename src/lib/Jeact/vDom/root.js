@@ -1,8 +1,8 @@
 import {
     markContainerAsRoot
-} from '@Jeact/vDom/DOMComponentTree';
-import { createFiberRoot } from '@Jeact/vDom/FiberRoot';
-import { updateContainer } from '@Jeact/vDom/FiberReconciler';
+} from '@Jeact/vDOM/DOMComponentTree';
+import { createFiberRoot } from '@Jeact/vDOM/FiberRoot';
+import { updateContainer } from '@Jeact/vDOM/FiberReconciler';
 
 function vRoot(container){
   this._internalRoot = createRootImpl(container);

@@ -20,7 +20,8 @@ import {
   CurrentDispatcher
 } from '@Jeact/shared/internals';
 import {
-  setCurrentDebugFiberInDev
+  setCurrentDebugFiberInDev,
+  resetCurrentDebugFiberInDev,
 } from '@Jeact/dev/CurrentFiber'
 import {
   getCurrentSchedulePriority,
@@ -376,6 +377,11 @@ function performUnitOfWork(unitOfWork){
     setCurrentDebugFiberInDev(unitOfWork);    
   }
   let next = beginWork(unitOfWork, subtreeRenderLanes);
+
+  if(__ENV__){
+    resetCurrentDebugFiberInDev()
+  }
+
   console.error('performUnitOfWork', next);
   return;
   unitOfWork.memoizedProps = unitOfWork.pendingProps;

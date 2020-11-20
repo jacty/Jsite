@@ -6,10 +6,10 @@ import {
   NoTimestamp,
   HostRoot,
   NormalSchedulePriority,
-//   NoPriority,
+  NoPriority,
   NormalPriority,
 //   Incomplete,
-//   noTimeout,
+  noTimeout,
   NoContext,
   RenderContext,
   CommitContext,
@@ -17,12 +17,12 @@ import {
 import {
   CurrentBatchConfig,
 //   CurrentOwner,
-//   CurrentDispatcher
+  CurrentDispatcher
 } from '@Jeact/shared/internals';
 import {
   getCurrentSchedulePriority,
   PriorityToLanePriority,
-//   shouldYieldToHost,
+  shouldYieldToHost,
   scheduleCallback
 } from '@Jeact/scheduler';
 import {
@@ -34,19 +34,19 @@ import {
   markRootUpdated,
   LanePriorityToPriority,
 } from '@Jeact/vDOM/FiberLane';
-// import {
-//   createWorkInProgress
-// } from '@Jeact/vDom/Fiber';
-// import {
-//   ContextOnlyDispatcher,
-// } from '@Jeact/vDom/FiberHooks';
+import {
+  createWorkInProgress
+} from '@Jeact/vDOM/Fiber';
+import {
+  ContextOnlyDispatcher,
+} from '@Jeact/vDOM/FiberHooks';
 // import { beginWork } from '@Jeact/vDom/FiberBeginWork';
 // import {
 //   completeWork
 // } from '@Jeact/vDom/FiberCompleteWork';
 // import { invariant } from '@Jeact/shared/invariant';
 
-// const RootIncomplete = 0;
+const RootIncomplete = 0;
 // const RootCompleted = 5;
 
 let executionContext = NoContext;
@@ -54,40 +54,27 @@ let wipRoot = null;
 let wip = null;
 let wipRootRenderLanes = NoLanes;
 
-// Stack that allows components to change the render lanes for its subtree
-// This is a superset of the lanes we started working on at the root. The only
-// case where it's different from `wipRootRenderLanes` is when we
-// enter a subtree that is hidden and needs to be unhidden: Suspense and
-// Offscreen component.
+export let subtreeRenderLanes = NoLanes;
 
-// Most things in the work loop should deal with wipRootRenderLanes.
-// Most things in begin/complete phases should deal with subtreeRenderLanes.
-// export let subtreeRenderLanes = NoLanes;
+let wipRootExitStatus = RootIncomplete;
+let wipRootFatalError = null;
 
-// let wipRootExitStatus = RootIncomplete;
-// let wipRootFatalError = null;
-
-// "Included" lanes refer to lanes that were worked on during this render. It's
-// slightly different than `renderLanes` because `renderLanes` can change as you
-// enter and exit an Offscreen tree. This value is the combination of all render
-// lanes for the entire render phase.
 let wipRootIncludedLanes = NoLanes;
-// The work left over by components that were visited during this render. Only
-// includes unprocessed updates, not work in bailed out children.
-// let wipRootSkippedLanes = NoLanes;
-// let wipRootUpdatedLanes = NoLanes;
 
-// let wipRootPingedLanes = NoLanes;
+let wipRootSkippedLanes = NoLanes;
+let wipRootUpdatedLanes = NoLanes;
+
+let wipRootPingedLanes = NoLanes;
 let mostRecentlyUpdatedRoot = null;
-// let wipRootRenderTargetTime = Infinity;
-// const RENDER_TIMEOUT = 500;
+let wipRootRenderTargetTime = Infinity;
+const RENDER_TIMEOUT = 500;
 
 function resetRenderTimer(){
   wipRootRenderTargetTime = performance.now() + RENDER_TIMEOUT;
 }
 
 // let rootWithPendingPassiveEffects = null;
-// let pendingPassiveEffectsRenderPriority = NoPriority;
+let pendingPassiveEffectsRenderPriority = NoPriority;
 // let rootsWithPendingDiscreteUpdates = null;
 
 // Use these to prevent an infinite loop of nested updates
@@ -101,7 +88,7 @@ function resetRenderTimer(){
 
 let currentEventTime = NoTimestamp;
 let currentEventWipLanes = NoLanes;
-// let currentEventPendingLanes = NoLanes;
+let currentEventPendingLanes = NoLanes;
 
 export function getCurrentPriority(){
   switch(getCurrentSchedulePriority()){
@@ -240,23 +227,22 @@ function ensureRootIsScheduled(root, currentTime){
 // This is the entry point for every concurrent task, i.e. anything that
 // goes through Scheduler.
 function performConcurrentWorkOnRoot(root){
-  console.error('performConcurrentWorkOnRoot',arguments);
-  return;
   // Since we know we're in a Jeact event, we can clear the current
   // event time. The next update will compute a new event time.
   currentEventTime = NoTimestamp;
   currentEventWipLanes = NoLanes;
   currentEventPendingLanes = NoLanes;
 
-  if(
-      (executionContext & (RenderContext | CommitContext)) !== NoContext
-    ){console.error('performConcurrentWorkOnRoot1')};
+  if(executionContext !== NoContext){
+    console.error('performConcurrentWorkOnRoot1')
+  };
 
   // Flush any pending passive effects before deciding which lanes to work on,
   // in case they schedule additional work.
+  const originalCallbackNode = root.callbackNode;
   const didFlushPassiveEffects = flushPassiveEffects();
   if (didFlushPassiveEffects){
-    console.log('performConcurrentWorkOnRoot')
+    console.log('performConcurrentWorkOnRoot2')
   }
 
   // Determine the next expiration time to work on, using the fields stored on the root.
@@ -264,6 +250,9 @@ function performConcurrentWorkOnRoot(root){
     root,
     root === wipRoot ? wipRootRenderLanes : NoLanes,
   );
+  if (lanes === NoLanes){
+    console.error('performConcurrentWorkOnRoot3')
+  }
 
   let exitStatus = renderRootConcurrent(root, lanes);
   !!exitStatus?
@@ -289,7 +278,6 @@ function performConcurrentWorkOnRoot(root){
 // }
 
 function prepareFreshStack(root, lanes){
-
   root.finishedWork = null;
   root.finishedLanes = NoLanes;
 
@@ -301,7 +289,6 @@ function prepareFreshStack(root, lanes){
     console.log('prepareFreshStack2');
   }
   wipRoot = root;
-
   wip = createWorkInProgress(root.current);
   wipRootRenderLanes = subtreeRenderLanes =
     wipRootIncludedLanes = lanes;
@@ -310,24 +297,26 @@ function prepareFreshStack(root, lanes){
   wipRootSkippedLanes = NoLanes;
   wipRootUpdatedLanes = NoLanes;
   wipRootPingedLanes = NoLanes;
+
 }
 
-// function handleError(root, thrownValue){
-//   console.error('handleError', thrownValue);
-// }
+function handleError(root, thrownValue){
+  console.error('handleError', thrownValue);
+}
 
-// function pushDispatcher(){
-//   const prevDispatcher = CurrentDispatcher.current;
-//   CurrentDispatcher.current = ContextOnlyDispatcher;
-//   if (prevDispatcher === null){
-//     return ContextOnlyDispatcher;
-//   }
-//   return prevDispatcher;
-// }
+function pushDispatcher(){
+  const prevDispatcher = CurrentDispatcher.current;
+  CurrentDispatcher.current = ContextOnlyDispatcher;
+  if (prevDispatcher === null){
+    return ContextOnlyDispatcher;
+  }
+  return prevDispatcher;
+}
 
 // function popDispatcher(prevDispatcher){
 //   JeactCurrentDispatcher.current = prevDispatcher;
 // }
+
 
 export function markSkippedUpdateLanes(lane){
   wipRootSkippedLanes = mergeLanes(
@@ -337,17 +326,23 @@ export function markSkippedUpdateLanes(lane){
 }
 
 function renderRootConcurrent(root, lanes){
+  if (executionContext!==0){//debug
+    console.error('renderRootConcurrent1')
+  }
+  const prevExecutionContext = executionContext;
   executionContext |= RenderContext;
- 
+  const prevDispatcher = pushDispatcher();
+
   if (wipRoot !== root || wipRootRenderLanes !== lanes){
     resetRenderTimer();
-
-    // set root.current to wip
+    // create a new Node by copying root.current
     prepareFreshStack(root, lanes);
   }
 
-  workLoopConcurrent();
-
+  workLoopConcurrent()
+  
+  console.error('renderRootConcurrent');
+  return;
   // Check if the tree has completed.
   if ( wip !== null){
     // Still work remaining.
@@ -364,17 +359,20 @@ function renderRootConcurrent(root, lanes){
 
 function workLoopConcurrent(){
   // Perform work until Scheduler asks us to yield
-  while(wip !== null && !shouldYieldToHost()){
+  // while(wip !== null && !shouldYieldToHost()){
     performUnitOfWork(wip);
-  }
+  // }
 }
 
 function performUnitOfWork(unitOfWork){
   // The current, flushed, state of this fiber is the alternate. Ideally
   // nothing should rely on this, but relying on it here means that we don't
   // need an additional field on the work in progress.
-  let next = beginWork(unitOfWork, subtreeRenderLanes);
-
+  const current = unitOfWork.alternate;
+  // setCurrentDebugFiberInDEV(unitOfWork);
+  // let next = beginWork(unitOfWork, subtreeRenderLanes);
+  console.error('performUnitOfWork',current);
+  return;
   unitOfWork.memoizedProps = unitOfWork.pendingProps;
   if (next == null){
     // If this doesn't spawn new work, complete the current work.

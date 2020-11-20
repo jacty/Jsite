@@ -70,8 +70,6 @@ function shouldConstruct(Component){
 // This is used to create an alternate fiber to do work on.
 // Why it is not a completed copy of current?
 export function createWorkInProgress(current, pendingProps=null){
-  console.error('createWorkInProgress');
-  return;
   let workInProgress = current.alternate;
   if (workInProgress === null){
     // We use a double buffering pooling technique because we know that we'll
@@ -83,7 +81,6 @@ export function createWorkInProgress(current, pendingProps=null){
       pendingProps,
       current.key,
     );
-
     workInProgress.elementType = current.elementType;
     workInProgress.type = current.type;
     workInProgress.stateNode = current.stateNode;
@@ -113,6 +110,15 @@ export function createWorkInProgress(current, pendingProps=null){
   workInProgress.sibling = current.sibling;
   workInProgress.index = current.index;
   workInProgress.ref = current.ref;
+
+  if(__ENV__){
+    workInProgress._debugNeedsRemount = current._debugNeedsRemount;
+    switch(workInProgress.tag){
+      default:
+        workInProgress.tag!==3?console.error('createWorkInProgress3'):'';
+        break;
+    }
+  }
 
   return workInProgress;
 }

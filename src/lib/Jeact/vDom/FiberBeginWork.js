@@ -107,11 +107,11 @@ function updateHostRoot(workInProgress, renderLanes){
   const nextProps = workInProgress.pendingProps;
   const prevState = workInProgress.memoizedState;
   const prevChildren = prevState !== null ? prevState.element : null;
-  cloneUpdateQueue(workInProgress);//To make updateQueue in wip and wip.alternate point to different objects in memory.
-  return;
+  //To make updateQueue in wip and wip.alternate point to different objects in memory.
+  cloneUpdateQueue(workInProgress);
   //update wip.lanes, wip.memoizedState;
   processUpdateQueue(workInProgress, nextProps, null, renderLanes);
-
+  return;
   const nextState = workInProgress.memoizedState;
   const nextChildren = nextState.element;
 

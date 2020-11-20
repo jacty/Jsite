@@ -1,12 +1,15 @@
 import {
+  __ENV__,
   UpdateState,
-//   NoLanes,
+  NoLanes,
 } from '@Jeact/shared/Constants';
-// import {
-//   isSubsetOfLanes,
-// } from '@Jeact/vDom/FiberLane';
+import {
+  isSubsetOfLanes,
+} from '@Jeact/vDOM/FiberLane';
 // import { markSkippedUpdateLanes } from '@Jeact/vDom/FiberWorkLoop';
 
+let hasForceUpdate = false;
+let currentlyProcessingQueue;
 
 export function initializeUpdateQueue(fiber){
   const queue = {
@@ -58,10 +61,8 @@ export function enqueueUpdate(fiber, update){
   updateQueue.pending = update;
 }
 
-function getStateFromUpdate(workInProgress, queue, update, nextProps, instance){
-  console.error('getStateFromUpdate');
-  return;
-  const prevState = queue.baseState;
+function getStateFromUpdate(workInProgress, queue, update, prevState, nextProps, instance){
+
   switch (update.tag){
     case UpdateState: {
       const payload = update.payload;
@@ -85,29 +86,28 @@ function getStateFromUpdate(workInProgress, queue, update, nextProps, instance){
   return prevState;
 }
 
-export function processUpdateQueue(
-  workInProgress, 
-  props, 
-  instance, 
-  renderLanes){
-  console.error('processUpdateQueue');
-  return;
+export function processUpdateQueue(workInProgress, props, instance, renderLanes){
   // This is always non-null on a ClassComponent or HostRoot
   const queue = workInProgress.updateQueue;
+  
+  hasForceUpdate = false;
+  if (__ENV__){
+    currentlyProcessingQueue = queue.pending;
+  }
+
 
   let firstBaseUpdate = queue.firstBaseUpdate;
   let lastBaseUpdate = queue.lastBaseUpdate;
 
   // Check if there are pending updates. If so, transfer them to the base queue.
-
   let pendingQueue = queue.pending;
   if (pendingQueue !== null){
     queue.pending = null;
 
+    // Disconnect the pointer between first and last.
     const lastPendingUpdate = pendingQueue;
     const firstPendingUpdate = lastPendingUpdate.next;
     lastPendingUpdate.next = null;
-
     // Append pending updates to base queue
     if (lastBaseUpdate === null){
       firstBaseUpdate = firstPendingUpdate;
@@ -136,7 +136,7 @@ export function processUpdateQueue(
   // These values may change as we process the queue.
   if (firstBaseUpdate !== null){
       // Iterate through the list of updates to compute the result.
-      let newState;
+      let newState = queue.baseState;
       // TODO: Don't need to accumulate this. Instead, we can remove
       // renderLanes from the original lanes.
       let newLanes = NoLanes;
@@ -146,7 +146,8 @@ export function processUpdateQueue(
       let newLastBaseUpdate = null;
 
       let update = firstBaseUpdate;
-      do {
+
+      // do {
         const updateLane = update.lane;
         const updateEventTime = update.eventTime;
         if(!isSubsetOfLanes(renderLanes, updateLane)){
@@ -161,9 +162,11 @@ export function processUpdateQueue(
             workInProgress,
             queue,
             update,
+            newState,
             props,
             instance,
           );
+    console.error('processUpdateQueue', newState);return;
           const callback = update.callback;
           if (callback !== null) {
             console.error('processUpdateQueue5');
@@ -174,12 +177,12 @@ export function processUpdateQueue(
         if (update=== null){
           pendingQueue = queue.pending;
           if (pendingQueue === null){
-            break;
+            // break;
           } else {
             console.error('processUpdateQueue7');
           }
         }
-      } while(true);
+      // } while(true);
 
       if (newLastBaseUpdate === null){
         newBaseState = newState;

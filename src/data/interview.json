@@ -1,4 +1,6 @@
 [
 {"header":"What is the difference between `null` and `undefined`?",
- "content":"<p>Basically they both mean the same thing. However, semantically, `null` means empty but `undefined` means the values are not defined yet. Apart from that, there are some tricky parts we need to know:<pre><code>null == undefined</code> <span class='comments'>// true</span><code>null === undefined</code> <span class='comments'>// false.</span><code>Number(null)</code><span class='comments'>// 0</span><code>Number(undefined)</code><span class='comments'>// NaN</span></pre> </p>"}
+ "content":"<p>Basically they both mean the same thing. However, semantically, `null` means empty but `undefined` means the values are not defined yet. Apart from that, there are some tricky parts we need to know:<pre><code>null == undefined</code> <span class='comments'>// true</span><code>null === undefined</code> <span class='comments'>// false.</span><code>Number(null)</code><span class='comments'>// 0</span><code>Number(undefined)</code><span class='comments'>// NaN</span></pre> </p>"},
+ {"header":"Methods those will change the array after operation:",
+ "content":"<p>pop(),push(),shift(),unshift(),reverse(),splice()</p>"}
 ]

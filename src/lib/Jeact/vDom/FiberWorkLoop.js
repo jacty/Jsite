@@ -14,6 +14,13 @@ import {
   RenderContext,
   CommitContext,
   PerformedWork,
+  Placement,
+  Update, 
+  Deletion,
+  Snapshot,
+  Passive,
+  ContentReset,
+  Ref,
 } from '@Jeact/shared/Constants';
 import {
   CurrentBatchConfig,
@@ -55,6 +62,9 @@ import {
 import {
   resetContextDependencies
 } from '@Jeact/vDOM/FiberNewContext';
+import {
+  commitBeforeMutationEffectOnFiber,
+} from '@Jeact/vDOM/FiberCommitWork';
 
 const RootIncomplete = 0;
 const RootFatalErrored = 1;
@@ -550,14 +560,57 @@ function commitRootImpl(root, renderPriority){
     CurrentOwner.current = null;
 
     nextEffect = firstEffect;
-    console.error('commitRootImpl', nextEffect)
-    // do{
+    do{
       commitBeforeMutationEffects();
-    // } while(nextEffect !== null);
+    } while(nextEffect !== null);
 
+    nextEffect = firstEffect
+    // do {
+      commitMutationEffects(root, renderPriority);
+    // } while (nextEffect !== null);
+    console.error('commitRootImpl', nextEffect)
   }
+}
 
-  
+function commitBeforeMutationEffects(){
+  while (nextEffect !== null){
+    const current = nextEffect.alternate;
+
+    const flags = nextEffect.flags;
+    if ((flags & Snapshot) !== NoFlags){
+      setCurrentDebugFiberInDev(nextEffect);
+      commitBeforeMutationEffectOnFiber(nextEffect);// Seems it do nothing actually..
+      resetCurrentDebugFiberInDev()
+    }
+    if ((flags & Passive) !== NoFlags){
+      console.error('commitBeforeMutationEffects2')
+    }
+    nextEffect = nextEffect.nextEffect;
+  }
+}
+
+function commitMutationEffects(root, renderPriority){
+  if (nextEffect !== null){
+    setCurrentDebugFiberInDev(nextEffect);
+    const flags = nextEffect.flags;
+    if(flags & ContentReset){
+      console.error('commitMutationEffects1')
+    }
+    if (flags & Ref){
+      console.error('commitMutationEffects2')
+    }
+    const primaryFlags = flags & (Placement | Update | Deletion);
+    switch(primaryFlags){
+      case Placement:{
+        // commitPlacement(nextEffect);
+        nextEffect.flags &= ~Placement;
+        break;
+      }
+      default:
+        console.error('commitMutationEffects3')
+      console.error('commitMutationEffects', Placement);
+    }
+  }
 
 }
 

@@ -75,6 +75,11 @@ export function popHostContainer(fiber){
   pop(rootInstanceStackCursor, fiber);
 }
 
+export function getHostContext(){
+  const context = requiredContext(contextStackCursor.current);
+  return context;
+}
+
 export function pushHostContext(fiber){
   const rootInstance = requiredContext(
     rootInstanceStackCursor.current,
@@ -85,4 +90,11 @@ export function pushHostContext(fiber){
     return;
   }
   console.error('pushHostContext1')
+}
+
+export function popHostContext(fiber){
+  if (contextFiberStackCursor.current !== fiber){
+    return;
+  }
+  console.error('popHostContext')
 }

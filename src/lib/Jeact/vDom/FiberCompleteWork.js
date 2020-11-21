@@ -2,22 +2,19 @@ import {
   FunctionComponent,
   HostText,
   HostComponent,
-//   NoFlags,
-//   NoLanes,
   Snapshot,
   HostRoot,
 } from '@Jeact/shared/Constants';
 import {
-  getRootHostContainer
-//   popHostContainer
-} from '@Jeact/vDom/FiberHostContext';
-// import {
-//   mergeLanes
-// } from './JeactFiberLane';
+  getRootHostContainer,
+  popHostContext,
+  getHostContext,
+} from '@Jeact/vDOM/FiberHostContext';
+
 import {
-  createElement,
-  setInitialDOMProperties,
-} from '@Jeact/vDom/DOMComponent';
+  createInstance,
+  finalizeInitialChildren
+} from '@Jeact/vDOM/FiberHost';
 
 
 function bubbleProperties(completedWork){
@@ -71,31 +68,50 @@ export function completeWork(
     // case FunctionComponent:
     //   bubbleProperties(workInProgress)
     //   return null;
-    case HostRoot:{//3
-      const fiberRoot = workInProgress.stateNode;
-      if (fiberRoot.pendingContext){
-        console.error('completeWork1')
-      }
-      workInProgress.flags |= Snapshot;
-      return null;
-    }
-    case HostComponent:{
+    // case HostRoot:{//3
+    //   const fiberRoot = workInProgress.stateNode;
+    //   if (fiberRoot.pendingContext){
+    //     console.error('completeWork1')
+    //   }
+    //   workInProgress.flags |= Snapshot;
+    //   return null;
+    // }
+    case HostComponent:{//5
+      popHostContext(workInProgress);
       const rootContainerInstance = getRootHostContainer();
       const type = workInProgress.type;
       if (current!== null){
-        console.error('completedWork2')
+        console.error('completeWork2')
       } else{
+        if(!newProps){
+          workInProgress.stateNode === null
+          ? console.error('completeWork3'):''
+        }
+
+        const currentHostContext = getHostContext();
         const instance = createInstance(
           type,
           newProps,
           rootContainerInstance,
-          'currentHostContext',
+          currentHostContext,
           workInProgress
         );
-
         appendAllChildren(instance, workInProgress, false, false);
+
         workInProgress.stateNode = instance;
-        finalizeInitialChildren(instance, type, newProps, rootContainerInstance, 'currentHostContext')
+        if(finalizeInitialChildren(
+            instance,
+            type,
+            newProps, 
+            rootContainerInstance
+          )){
+            console.error('completeWork4')
+          markUpdate(workInProgress)
+        }
+
+        if(workInProgress.ref !== null){
+          console.error('completeWork5')
+        }
       }
       return null;
     }
@@ -113,30 +129,4 @@ export function completeWork(
   }
 }
 
-export function createInstance(
-  type,
-  props, 
-  rootContainerInstance,
-  hostContext,
-  interalInstancedHandle
-){
-  const domElement = createElement(
-    type,
-    props,
-    rootContainerInstance,
-    'parentNamespace'
-  )
 
-  return domElement;
-}
-
-export function finalizeInitialChildren(
-  domElement,
-  type,
-  props,
-  rootContainerInstance,
-  hostContext
-){
-  setInitialDOMProperties(domElement, type, props, rootContainerInstance);
-  return false;
-}

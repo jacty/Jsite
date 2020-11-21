@@ -2,17 +2,17 @@ import {
   __ENV__,
   NoFlags,
   NoLanes,
-//   DiscreteEventContext,
   NoTimestamp,
   HostRoot,
   NormalSchedulePriority,
   NoPriority,
   NormalPriority,
-//   Incomplete,
+  Incomplete,
   noTimeout,
   NoContext,
   RenderContext,
   CommitContext,
+  PerformedWork,
 } from '@Jeact/shared/Constants';
 import {
   CurrentBatchConfig,
@@ -45,13 +45,12 @@ import {
   ContextOnlyDispatcher,
 } from '@Jeact/vDOM/FiberHooks';
 import { beginWork } from '@Jeact/vDOM/FiberBeginWork';
-// import {
-//   completeWork
-// } from '@Jeact/vDom/FiberCompleteWork';
-// import { invariant } from '@Jeact/shared/invariant';
+import {
+  completeWork
+} from '@Jeact/vDOM/FiberCompleteWork';
 
 const RootIncomplete = 0;
-// const RootCompleted = 5;
+const RootCompleted = 5;
 
 let executionContext = NoContext;
 let wipRoot = null;
@@ -342,8 +341,10 @@ function renderRootConcurrent(root, lanes){
     // create a new Node by copying root.current
     prepareFreshStack(root, lanes);
   }
-
-  workLoopConcurrent()
+  do {
+    workLoopConcurrent()
+    break;
+  } while (true);
   
   console.error('renderRootConcurrent');
   return;
@@ -385,8 +386,7 @@ function performUnitOfWork(unitOfWork){
   unitOfWork.memoizedProps = unitOfWork.pendingProps;
   if (next == null){
     // If this doesn't spawn new work, complete the current work.
-    console.error('performUnitOfWork1')
-    // completeUnitOfWork(unitOfWork);
+    completeUnitOfWork(unitOfWork);
   } else {
     wip = next;
   }
@@ -395,31 +395,48 @@ function performUnitOfWork(unitOfWork){
 
 function completeUnitOfWork(unitOfWork){
 
-  // Attempt to complete the current unit of work, then move to the next
-//   // sibling. If there are no more siblings, return to the parent fiber.
   let completedWork = unitOfWork;
   do {
-    // The current, flushed, state of this fiber is the alternate. Ideally
-    // nothing should rely on this, but relying on it here means that we don't
-    // need an additional field on the work in progress.
-    const current = completedWork.alternate;
     const returnFiber = completedWork.return;
-
     // Check if the work completed or if something threw.
     if ((completedWork.flags & Incomplete) === NoFlags){
+      setCurrentDebugFiberInDev(completedWork);
       // Process alternate.child
       let next = completeWork(completedWork, subtreeRenderLanes);
+      resetCurrentDebugFiberInDev();
       if (next !== null){
         console.error('completeUnitOfWork1', next)
+      }
+
+      resetChildLanes(completedWork);
+
+      if(returnFiber !== null &&
+          (returnFiber.flags & Incomplete) === NoFlags
+        ){
+        if (returnFiber.firstEffect === null){
+          returnFiber.firstEffect = completedWork.firstEffect;
+        }
+        if (completedWork.lastEffect !== null){
+          console.error('completeUnitOfWork2')
+        }
+        const flags = completedWork.flags;
+        if (flags > PerformedWork){
+          if(returnFiber.lastEffect !== null){
+            console.error('completeUnitOfWork3')
+          } else {
+            returnFiber.firstEffect = completedWork;
+          }
+          returnFiber.lastEffect = completedWork;
+        }
       }
     } else {
       console.error('completeUnitOfWork2')
     }
 
-//     const siblingFiber = completedWork.sibling;
-//     if (siblingFiber !== null) {
-//       console.error('completeUnitOfWork3');
-//     }
+    const siblingFiber = completedWork.sibling;
+    if (siblingFiber !== null) {
+      console.error('completeUnitOfWork3');
+    }
 
     // Otherwise, return to the parent.
     completedWork = returnFiber;
@@ -427,10 +444,20 @@ function completeUnitOfWork(unitOfWork){
     wip = completedWork;
   } while (completedWork !== null);
 
-//   // We've reached the root.
-//   if (wipRootExitStatus === RootIncomplete) {
-//     wipRootExitStatus = RootCompleted;
-//   }
+  // We've reached the root.
+  if (wipRootExitStatus === RootIncomplete) {
+    wipRootExitStatus = RootCompleted;
+  }
+}
+
+function resetChildLanes(completedWork){
+  let newChildLanes = NoLanes;
+  let child = completedWork.child;
+  if (child!== null){
+    console.error('resetChildLanes', child) 
+  }
+
+  completedWork.childLanes = newChildLanes;
 }
 
 // function commitRoot(root){

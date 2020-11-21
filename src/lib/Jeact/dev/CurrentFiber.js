@@ -10,14 +10,19 @@ function getCurrentFiberStackInDev(){
 
 export function resetCurrentDebugFiberInDev(){
     // alternate of resetCurrentFiber()
-    DebugCurrentFrame.getCurrentStack = null;
-    current = null;
-    isRendering = false;
+    if (__ENV__){
+        DebugCurrentFrame.getCurrentStack = null;
+        current = null;
+        isRendering = false;   
+    }
+
 }
 
 export function setCurrentDebugFiberInDev(fiber){
     // alternate of setCurrentFiber()
-    DebugCurrentFrame.getCurrentStack = getCurrentFiberStackInDev;
-    current = fiber;
-    isRendering = false; 
+    if (__ENV__){
+        DebugCurrentFrame.getCurrentStack = getCurrentFiberStackInDev;
+        current = fiber;
+        isRendering = false;         
+    }
 }

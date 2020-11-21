@@ -66,6 +66,16 @@ export function reconcileChildren(workInProgress, nextChildren, renderLanes){
   }
 }
 
+function markRef(current, workInProgress){
+  const ref = workInProgress.ref;
+  if (
+    (current === null && ref !== null) ||
+    (current !== null && current.ref !== ref)
+  ){
+    workInProgress.flags |= Ref;
+  }
+}
+
 function updateFunctionComponent(
   current,
   workInProgress,
@@ -95,10 +105,6 @@ function updateFunctionComponent(
   return workInProgress.child;
 }
 
-function demo(){
-  console.error('demo!!!!!')
-  return;
-}
 function updateHostRoot(workInProgress, renderLanes){
   const root = workInProgress.stateNode;
   if (!root.pendingContext&!root.context){
@@ -126,9 +132,9 @@ function updateHostRoot(workInProgress, renderLanes){
 
 function updateHostComponent(workInProgress,renderLanes){
   pushHostContext(workInProgress);
-  console.error('updateHostComponent', workInProgress.alternate);
-  return;
-  const current = workInProgress.alternate;  
+
+  const current = workInProgress.alternate; 
+
   const type = workInProgress.type;
   const nextProps = workInProgress.pendingProps;
   const prevProps = current !== null ? current.memoizedProps : null;
@@ -141,6 +147,8 @@ function updateHostComponent(workInProgress,renderLanes){
   } else if(prevProps !== null && shouldSetTextContent(type, prevProps)){
     console.error('updateHostComponent2')
   }
+  markRef(current, workInProgress);
+
   reconcileChildren(workInProgress, nextChildren, renderLanes);
   return workInProgress.child;
 }
@@ -149,7 +157,6 @@ function updateHostComponent(workInProgress,renderLanes){
 export function beginWork(workInProgress, renderLanes){
   const alternate = workInProgress.alternate;
   const updateLanes = workInProgress.lanes;
-
   if (__ENV__){
     if(workInProgress._debugNeedsRemount){
       console.error('beginWork1')

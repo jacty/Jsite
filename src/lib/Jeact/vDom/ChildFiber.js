@@ -176,8 +176,7 @@ function ChildReconciler(shouldTrackSideEffects){
           }
       };
     }
-    console.error('reconcileChildFibers');
-    return;
+
     if (Array.isArray(newChild)){
       return reconcileChildrenArray(
         returnFiber,
@@ -185,6 +184,15 @@ function ChildReconciler(shouldTrackSideEffects){
         newChild,
         lanes,
       );
+    }
+
+    if(typeof newChild === 'undefined'){
+      switch(returnFiber.tag){
+        default:
+          returnFiber.tag !== 5? console.error('reconcileChildFibers2'):'';
+      }
+    } else{
+      console.error('reconcileChildFibers3', newChild)
     }
     // Remaining cases are all treated as empty.
     return deleteRemainingChildren(returnFiber, currentFirstChild);

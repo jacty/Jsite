@@ -9,6 +9,7 @@ import {
   getRootHostContainer,
   popHostContext,
   getHostContext,
+  popHostContainer,
 } from '@Jeact/vDOM/FiberHostContext';
 
 import {
@@ -68,14 +69,17 @@ export function completeWork(
     // case FunctionComponent:
     //   bubbleProperties(workInProgress)
     //   return null;
-    // case HostRoot:{//3
-    //   const fiberRoot = workInProgress.stateNode;
-    //   if (fiberRoot.pendingContext){
-    //     console.error('completeWork1')
-    //   }
-    //   workInProgress.flags |= Snapshot;
-    //   return null;
-    // }
+    case HostRoot:{//3
+      popHostContainer(workInProgress);
+      const fiberRoot = workInProgress.stateNode;
+      if (fiberRoot.pendingContext){
+        console.error('completeWork1')
+      }
+      if(current === null || current.child === null){
+        workInProgress.flags |= Snapshot;
+      }
+      return null;
+    }
     case HostComponent:{//5
       popHostContext(workInProgress);
       const rootContainerInstance = getRootHostContainer();

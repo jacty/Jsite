@@ -211,9 +211,14 @@ function requestHostCallback(callback){
 }
 
 export function runWithPriority(priority,fn){
- console.error('runWithPriority');
- return;
   const schedulePriority = PriorityToSchedulePriority(priority);
 
-  return fn();
+  priority = NormalPriority;
+  const previousPriority = currentPriority;
+  currentPriority = priority;
+  try {
+    return fn()
+  } finally{
+    currentPriority = previousPriority;
+  }
 }

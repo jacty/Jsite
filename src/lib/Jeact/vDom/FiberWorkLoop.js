@@ -5,6 +5,7 @@ import {
   NoTimestamp,
   HostRoot,
   NormalSchedulePriority,
+  ImmediatePriority,
   NoPriority,
   NormalPriority,
   Incomplete,
@@ -27,7 +28,8 @@ import {
   getCurrentSchedulePriority,
   PriorityToLanePriority,
   shouldYieldToHost,
-  scheduleCallback
+  scheduleCallback,
+  runWithPriority,
 } from '@Jeact/scheduler';
 import {
   findUpdateLane,
@@ -37,6 +39,8 @@ import {
   markStarvedLanesAsExpired,
   markRootUpdated,
   LanePriorityToPriority,
+  includesSomeLane,
+  markRootFinished,
 } from '@Jeact/vDOM/FiberLane';
 import {
   createWorkInProgress
@@ -48,8 +52,13 @@ import { beginWork } from '@Jeact/vDOM/FiberBeginWork';
 import {
   completeWork
 } from '@Jeact/vDOM/FiberCompleteWork';
+import {
+  resetContextDependencies
+} from '@Jeact/vDOM/FiberNewContext';
 
 const RootIncomplete = 0;
+const RootFatalErrored = 1;
+const RootErrored = 2;
 const RootCompleted = 5;
 
 let executionContext = NoContext;
@@ -76,9 +85,11 @@ function resetRenderTimer(){
   wipRootRenderTargetTime = performance.now() + RENDER_TIMEOUT;
 }
 
-// let rootWithPendingPassiveEffects = null;
+let nextEffect = null;
+
+let rootWithPendingPassiveEffects = null;
 let pendingPassiveEffectsRenderPriority = NoPriority;
-// let rootsWithPendingDiscreteUpdates = null;
+let rootsWithPendingDiscreteUpdates = null;
 
 // Use these to prevent an infinite loop of nested updates
 // const NESTED_UPDATE_LIMIT = 50;
@@ -258,27 +269,38 @@ function performConcurrentWorkOnRoot(root){
   }
 
   let exitStatus = renderRootConcurrent(root, lanes);
-  !!exitStatus?
-    console.error('performConcurrentWorkOnRoot', exitStatus):'';
+  
+  if (includesSomeLane(wipRootIncludedLanes, wipRootUpdatedLanes)){
+    console.error('performConcurrentWorkOnRoot4')
+  } else if(exitStatus !== RootIncomplete){
+    if(exitStatus === RootErrored){
+      console.error('performConcurrentWorkOnRoot5')
+    }
+    if (exitStatus === RootFatalErrored){
+      console.error('performConcurrentWorkOnRoot6')
+    }
+
+    // now we have a consistent tree.
+    const finishedWork = root.current.alternate
+    root.finishedWork = finishedWork;
+    root.finishedLanes = lanes;
+    finishConcurrentRender(root, exitStatus, lanes);
+  }
+  console.error('performConcurrentWorkOnRoot', root);
   return;
-//   // We now have a consistent tree. The next step is to commit it.
-//   const finishedWork = root.current.alternate;
-//   root.finishedWork = finishedWork;
-//   root.finishedLanes = lanes;
-//   finishConcurrentRender(root, exitStatus, lanes);
 }
 
-// function finishConcurrentRender(root, exitStatus, lanes){
-//   switch (exitStatus){
-//     case RootCompleted:{
-//       commitRoot(root);
-//       break;
-//     }
-//     default:{
-//       console.error('finishConcurrentRender', exitStatus)
-//     }
-//   }
-// }
+function finishConcurrentRender(root, exitStatus, lanes){
+  switch (exitStatus){
+    case RootCompleted:{
+      commitRoot(root);
+      break;
+    }
+    default:{
+      console.error('finishConcurrentRender', exitStatus)
+    }
+  }
+}
 
 function prepareFreshStack(root, lanes){
   root.finishedWork = null;
@@ -316,9 +338,9 @@ function pushDispatcher(){
   return prevDispatcher;
 }
 
-// function popDispatcher(prevDispatcher){
-//   JeactCurrentDispatcher.current = prevDispatcher;
-// }
+function popDispatcher(prevDispatcher){
+  CurrentDispatcher.current = prevDispatcher;
+}
 
 
 export function markSkippedUpdateLanes(lane){
@@ -345,9 +367,11 @@ function renderRootConcurrent(root, lanes){
     workLoopConcurrent()
     break;
   } while (true);
-  
-  console.error('renderRootConcurrent');
-  return;
+  resetContextDependencies();
+
+  popDispatcher(prevDispatcher);
+  executionContext = prevExecutionContext;
+
   // Check if the tree has completed.
   if ( wip !== null){
     // Still work remaining.
@@ -454,114 +478,88 @@ function resetChildLanes(completedWork){
   let newChildLanes = NoLanes;
   let child = completedWork.child;
   if (child!== null){
-    console.error('resetChildLanes', child) 
+    newChildLanes = mergeLanes(
+      newChildLanes,
+      mergeLanes(child.lanes, child.childLanes)
+    );
+    child = child.sibling;
   }
 
   completedWork.childLanes = newChildLanes;
 }
 
-// function commitRoot(root){
-//   const renderPriority = getCurrentPriority();
+function commitRoot(root){
+  const renderPriority = getCurrentPriority();
+  runWithPriority(
+    ImmediatePriority,
+    commitRootImpl.bind(null, root, renderPriority),
+  );
+  return null;
+}
 
-//   runWithPriority(
-//     ImmediatePriority,
-//     commitRootImpl.bind(null, root, renderPriority),
-//   );
-//   return null;
-// }
+function commitRootImpl(root, renderPriority){
+  // Debug
+  rootWithPendingPassiveEffects !== null ?
+    console.error('commitRootImpl1'):'';
 
-// function commitRootImpl(root, renderPriority){
-//   // Debug
-//   rootWithPendingPassiveEffects !== null ?
-//     console.error('commitRootImpl1'):'';
+  const finishedWork = root.finishedWork;
+  const lanes = root.finishedLanes;
 
-//   do {
-//     flushPassiveEffects();
-//   } while (rootWithPendingPassiveEffects!==null);
+  if (finishedWork === null){
+    console.error('commitRootImpl2');
+  }
 
-//   //TODO: Check if flushPassiveEffects() above will change executionContext.
-//   // If it changes, move this condition before do while condition.
-//   if((executionContext & (RenderContext | CommitContext)) === NoContext){
-//     console.error('Something is wrong here.');
-//   }
+  root.finishedWork = null;
+  root.finishedLanes = NoLanes;
 
-//   const finishedWork = root.finishedWork;
-//   const lanes = root.finishedLanes;
+  if (finishedWork === root.current){
+    console.error('The same tree is being committed!')
+  }
 
-//   if (finishedWork === null){
-//     console.error('commitRootImpl1:finishedWork shouldn\'t be null');
-//   }
+  root.callbackNode = null;
 
-//   root.finishedWork = null;
-//   root.finishedLanes = NoLanes;
+  let remainingLanes = mergeLanes(finishedWork.lanes, finishedWork.childLanes);
+  markRootFinished(root, remainingLanes);
 
-//   if (finishedWork === root.current){
-//     console.error('The same tree is being committed!')
-//   }
+  if (rootsWithPendingDiscreteUpdates !== null){
+    console.error('commitRootImpl3')
+  }
 
-//   // Why?
-//   root.callbackNode = null;
+  if (root === wipRoot) {
+    console.error('commitRootImpl4')
+  }
 
-//   let remainingLanes = mergeLanes(finishedWork.lanes, finishedWork.childLanes);
-//   markRootFinished(root, remainingLanes);
+  // Get the list of effects.
+  let firstEffect;
+  if (finishedWork.flags > PerformedWork){
+    if (finishedWork.lastEffect !== null){
+      finishedWork.lastEffect.nextEffect = finishedWork;
+      firstEffect = finishedWork.firstEffect;
+    } else {
+      // firstEffect = finishedWork;
+      console.error('commitRootImpl6')
+    }
+  } else {
+    console.error('commitRootImpl7');
+  }
 
-//   if (rootsWithPendingDiscreteUpdates !== null){
-//     console.error('commitRootImpl3')
-//   }
+  if(firstEffect!==null){
+    const prevExecutionContext = executionContext;
+    executionContext |= CommitContext;
 
-//   if (root === wipRoot) {
-//     console.error('commitRootImpl4')
-//   }
+    CurrentOwner.current = null;
 
-//   const rootDoesHavePassiveEffects =
-//     (finishedWork.subtreeFlags & PassiveMask) !== NoFlags ||
-//     (finishedWork.flags & PassiveMask) !== NoFlags;
-//   if (rootDoesHavePassiveEffects){
-//     console.error('commitRootImpl5');
-//   }
+    nextEffect = firstEffect;
+    console.error('commitRootImpl', nextEffect)
+    // do{
+      commitBeforeMutationEffects();
+    // } while(nextEffect !== null);
 
-//   const subtreeHasEffects =
-//     (finishedWork.subtreeFlags &
-//       (BeforeMutationMask | MutationMask | LayoutMask | PassiveMask)) !==
-//     NoFlags;
-//   const rootHasEffect =
-//     (finishedWork.flags &
-//       (BeforeMutationMask | MutationMask | LayoutMask | PassiveMask)) !==
-//   NoFlags;
+  }
 
-//   if(subtreeHasEffects || rootHasEffect){
-//     // The commit phase is broken into several sub-phases. We do a separate
-//     // pass of the effect list for each phase: all mutation effects come
-//     // before all layout effects, and so on.
+  
 
-//     // The first phase a "before mutation" phase. We use this phase to read the
-//     // state of the host tree right before we mutate it. This is where
-//     // getSnapshotBeforeUpdate is called.
-//     commitBeforeMutationEffects(finishedWork);
-
-//     // The next phase is the mutation phase, where we mutate the host tree.
-//     commitMutationEffects(finishedWork, root, renderPriority)
-//     root.current = finishedWork;
-
-//     commitLayoutEffects(finishedWork, root);
-
-//   } else {
-//     console.error('commitRootImpl2')
-//   }
-//   remainingLanes = root.pendingLanes;
-//   if (remainingLanes !== NoLanes){
-//     console.error('commitRootImpl3');
-//   }
-//   if (remainingLanes === SyncLane){
-//     console.error('commitRootImpl5')
-//   } else {
-//     nestedUpdateCount = 0;
-//   }
-
-//   ensureRootIsScheduled(root, performance.now());
-
-//   return null;
-// }
+}
 
 export function flushPassiveEffects(){
   // Returns whether passive effects were flushed.

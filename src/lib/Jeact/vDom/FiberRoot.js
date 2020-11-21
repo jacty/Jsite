@@ -32,7 +32,7 @@ function FiberRootNode(containerInfo){
   this.finishedLanes = 0;
 
   this.entangledLanes = NoLanes;
-  // this.entanglements = createLaneMap(0);
+  this.entanglements = createLaneMap(0);
 
   if(__ENV__){
     this._debugRootType = 'createRoot()';

@@ -229,12 +229,12 @@ export function markRootUpdated(root, updateLane, eventTime){
 
 export function markRootFinished(root, remainingLanes){
   const noLongerPendingLanes = root.pendingLanes & ~remainingLanes;
-  // Why? To reset pendingLanes to 0 to define the state is finished?
+
   root.pendingLanes = remainingLanes;
 
   root.suspendedLanes = 0;
   root.pingedLanes = 0;
-
+  
   root.expiredLanes &= remainingLanes;
   root.mutableReadLanes &= remainingLanes;
   root.entangledLanes &= remainingLanes;

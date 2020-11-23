@@ -38,7 +38,6 @@ export function getNextLanes(root, wipLanes){
 
   const pendingLanes = root.pendingLanes;
   if (pendingLanes === NoLanes){
-    console.error('getNextLanes1')
     highestLanePriority = NoLanePriority;
     return NoLanes;
   }

@@ -228,7 +228,10 @@ function ensureRootIsScheduled(root, currentTime){
   );
 
   if (nextLanes === NoLanes){
-    console.log('ensureRootIsScheduled1');
+    if (existingCallbackNode !== null){
+      console.log('ensureRootIsScheduled1', existingCallbackNode);
+    }
+    return;
   }
 
   // Check if there's an existing task we may be able to reuse it.
@@ -303,8 +306,11 @@ function performConcurrentWorkOnRoot(root){
     root.finishedLanes = lanes;
     finishConcurrentRender(root, exitStatus, lanes);
   }
-  console.error('performConcurrentWorkOnRoot', root);
-  return;
+  ensureRootIsScheduled(root, performance.now());
+  if (root.callbackNode === originalCallbackNode){
+    console.error('performConcurrentWorkOnRoot7')
+  }
+  return null;
 }
 
 function finishConcurrentRender(root, exitStatus, lanes){

@@ -222,3 +222,7 @@ export function runWithPriority(priority,fn){
     currentPriority = previousPriority;
   }
 }
+
+export function requestPaint(){
+  needsPaint = true;
+}

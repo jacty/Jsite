@@ -18,6 +18,10 @@ function shouldAutoFocusHostComponent(type, props){
   return false;
 }
 
+export function resetAfterCommit(containerInfo){
+  
+}
+
 export function createInstance(
   type,
   props, 
@@ -46,4 +50,8 @@ export function finalizeInitialChildren(
 ){
   setInitialProperties(domElement, type, props, rootContainerInstance);
   return shouldAutoFocusHostComponent(type, props);
+}
+
+export function appendChildToContainer(container, child){
+  container.appendChild(child);
 }

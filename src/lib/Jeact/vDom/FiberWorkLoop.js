@@ -21,6 +21,7 @@ import {
   Passive,
   ContentReset,
   Ref,
+  Callback,
 } from '@Jeact/shared/Constants';
 import {
   CurrentBatchConfig,
@@ -37,6 +38,7 @@ import {
   shouldYieldToHost,
   scheduleCallback,
   runWithPriority,
+  requestPaint
 } from '@Jeact/scheduler';
 import {
   findUpdateLane,
@@ -64,7 +66,11 @@ import {
 } from '@Jeact/vDOM/FiberNewContext';
 import {
   commitBeforeMutationEffectOnFiber,
+  commitPlacement,
 } from '@Jeact/vDOM/FiberCommitWork';
+import {
+  resetAfterCommit,
+} from '@Jeact/vDOM/FiberHost';
 
 const RootIncomplete = 0;
 const RootFatalErrored = 1;
@@ -97,6 +103,7 @@ function resetRenderTimer(){
 
 let nextEffect = null;
 
+let rootDoesHavePassiveEffects = false;
 let rootWithPendingPassiveEffects = null;
 let pendingPassiveEffectsRenderPriority = NoPriority;
 let rootsWithPendingDiscreteUpdates = null;
@@ -565,10 +572,38 @@ function commitRootImpl(root, renderPriority){
     } while(nextEffect !== null);
 
     nextEffect = firstEffect
-    // do {
+    do {
       commitMutationEffects(root, renderPriority);
-    // } while (nextEffect !== null);
-    console.error('commitRootImpl', nextEffect)
+    } while (nextEffect !== null);
+    resetAfterCommit(root.containerInfo);
+    root.current = finishedWork;
+    nextEffect = firstEffect;
+    do{
+      commitLayoutEffects(root, lanes);
+    } while(nextEffect!==null);
+    nextEffect = null;
+    requestPaint();
+    executionContext = prevExecutionContext;
+  } else {
+    console.error('commitRootImpl8')
+  }
+  const rootDidHavePassiveEffects = rootDoesHavePassiveEffects;
+  if (rootDidHavePassiveEffects){
+    console.error('commitRootImpl9')
+  } else {
+    nextEffect = firstEffect;
+    while (nextEffect !== null){
+      const nextNextEffect = nextEffect.nextEffect;
+      nextEffect.nextEffect = null;
+      if (nextEffect.flags & Deletion){
+        console.error('commitRootImpl10')
+      }
+      nextEffect = nextNextEffect;
+    }
+    remainingLanes = root.pendingLanes;
+
+    ensureRootIsScheduled(root, performance.now());
+    return null;
   }
 }
 
@@ -590,7 +625,7 @@ function commitBeforeMutationEffects(){
 }
 
 function commitMutationEffects(root, renderPriority){
-  if (nextEffect !== null){
+  while (nextEffect !== null){
     setCurrentDebugFiberInDev(nextEffect);
     const flags = nextEffect.flags;
     if(flags & ContentReset){
@@ -601,17 +636,34 @@ function commitMutationEffects(root, renderPriority){
     }
     const primaryFlags = flags & (Placement | Update | Deletion);
     switch(primaryFlags){
-      case Placement:{
-        // commitPlacement(nextEffect);
+      case Placement:{//2
+        commitPlacement(nextEffect);
         nextEffect.flags &= ~Placement;
         break;
       }
       default:
-        console.error('commitMutationEffects3')
-      console.error('commitMutationEffects', Placement);
-    }
-  }
+        primaryFlags !== 0 ?
+        console.error('commitMutationEffects3', primaryFlags):0;
+     }
 
+    resetCurrentDebugFiberInDev();
+    nextEffect = nextEffect.nextEffect;
+  }
+}
+
+function commitLayoutEffects(root, committedLanes){
+  while(nextEffect!== null){
+    setCurrentDebugFiberInDev(nextEffect);
+    const flags = nextEffect.flags;
+    if (flags & (Update | Callback)){
+      console.error('commitLayoutEffects1')
+    }
+    if (flags & Ref){
+      console.error('commitLayoutEffects2')
+    }
+    resetCurrentDebugFiberInDev();
+    nextEffect = nextEffect.nextEffect;
+  }
 }
 
 export function flushPassiveEffects(){

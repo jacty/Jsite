@@ -1,7 +1,6 @@
 import {
   __ENV__
 } from '@Jeact/shared/Constants';
-import {onScheduleRoot} from '@Jeact/vDOM/FiberDevToolsHook';
 import {
   requestEventTime,
   requestUpdateLane,
@@ -20,10 +19,6 @@ function getContextForSubtree(parentComponent){
 }
 
 export function updateContainer(element, fiberRoot){
-  if (__ENV__){
-    onScheduleRoot(fiberRoot, element)
-  }
-
   const current = fiberRoot.current;
   const eventTime =requestEventTime();
   const lane = requestUpdateLane(current);

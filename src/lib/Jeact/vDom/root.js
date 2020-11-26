@@ -6,19 +6,18 @@ function vRoot(container){
 }
 
 vRoot.prototype.render = function(children){
-  const root = this._Root;
-
-  updateContainer(children, root);
+  updateContainer(children, this._Root);
 };
 
 
 function createRootImpl(container){
   // 1.Create FiberRoot and Fiber.
   // 2.Connect them to each other.
-  // 3.InitializeUpateQueue.
+
   const root = createFiberRoot(container);
 
   container.nodeType !== 1 ? console.error('createRootImpl'):'';
+
   return root;
 }
 

@@ -29,7 +29,13 @@ function FiberNode(tag){
 
   this.pendingProps = null;
   this.memoizedProps = null;
-  this.updateQueue = null;
+  this.updateQueue = {
+    baseState: this.memoizedState,
+    firstBaseUpdate: null,
+    lastBaseUpdate: null,
+    pending: null,
+    effects: null,
+  };
   this.memoizedState = null; // As baseState in update queue.
   this.dependencies = null;
 

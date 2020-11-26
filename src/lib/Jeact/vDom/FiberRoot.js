@@ -1,5 +1,4 @@
 import { createFiber } from '@Jeact/vDom/Fiber';
-import {initializeUpdateQueue} from '@Jeact/vDom/UpdateQueue.js';
 import {
   __ENV__,
   NoTimestamp,
@@ -39,8 +38,5 @@ export function createFiberRoot(container){
   const fiber = createFiber();
   root.current = fiber;
   fiber.stateNode = root;
-
-  initializeUpdateQueue(fiber);
-
   return root;
 }

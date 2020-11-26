@@ -10,6 +10,7 @@ function vRoot(container){
 
 vRoot.prototype.render = function(children){
   const root = this._Root;
+
   updateContainer(children, root);
 };
 

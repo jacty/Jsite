@@ -11,17 +11,6 @@ import { markSkippedUpdateLanes } from '@Jeact/vDOM/FiberWorkLoop';
 let hasForceUpdate = false;
 let currentlyProcessingQueue;
 
-export function initializeUpdateQueue(fiber){
-  const queue = {
-    baseState: fiber.memoizedState,
-    firstBaseUpdate: null,
-    lastBaseUpdate: null,
-    pending: null,
-    effects: null,
-  };
-  fiber.updateQueue = queue;
-}
-
 export function cloneUpdateQueue(workInProgress){
   const queue = workInProgress.updateQueue;
   const currentQueue = workInProgress.alternate.updateQueue;

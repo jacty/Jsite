@@ -159,7 +159,7 @@ function workLoop(hasTimeRemaining, initialTime){
     if (typeof callback === 'function'){
       currentTask.callback = null;
       currentPriority = currentTask.priority;
-      // will be push into argument lists ofcallback
+      // will be push into argument lists of callback
       const didUserCallbackTimeout = currentTask.expirationTime <= currentTime;
       //performConcurrentWorkOnRoot()
       const contiuationCallback = callback(didUserCallbackTimeout);

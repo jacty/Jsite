@@ -6,9 +6,6 @@ const internalContainerInstanceKey = '__JeactContainer$' + randomKey;
 export function precacheFiberNode(hostInst, node){
     node[internalInstanceKey] = hostInst;
 }
-export function markContainerAsRoot(hostRoot, node){
-  node[internalContainerInstanceKey] = hostRoot;
-}
 
 export function updateFiberProps(node, props){
     node[internalPropsKey] = props;

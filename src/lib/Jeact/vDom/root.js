@@ -1,6 +1,3 @@
-import {
-    markContainerAsRoot
-} from '@Jeact/vDOM/DOMComponentTree';
 import { createFiberRoot } from '@Jeact/vDOM/FiberRoot';
 import { updateContainer } from '@Jeact/vDOM/FiberReconciler';
 
@@ -20,9 +17,8 @@ function createRootImpl(container){
   // 2.Connect them to each other.
   // 3.InitializeUpateQueue.
   const root = createFiberRoot(container);
-  markContainerAsRoot(root.current, container);
-  container.nodeType !== 1 ? console.error('createRootImpl'):'';
 
+  container.nodeType !== 1 ? console.error('createRootImpl'):'';
   return root;
 }
 

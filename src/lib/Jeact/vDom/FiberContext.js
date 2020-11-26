@@ -1,4 +1,4 @@
-import { createCursor } from '@Jeact/vDom/FiberStack';
+import { createCursor } from '@Jeact/vDOM/FiberStack';
 
 // A cursor to a boolean indicating whether the context has changed.
 const didPerformWorkStackCursor = createCursor(false);

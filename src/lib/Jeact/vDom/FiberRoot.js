@@ -1,4 +1,4 @@
-import { createFiber } from '@Jeact/vDom/Fiber';
+import { createFiber } from '@Jeact/vDOM/Fiber';
 import {
   __ENV__,
   NoTimestamp,
@@ -8,7 +8,7 @@ import {
 } from '@Jeact/shared/Constants';
 import {
   createLaneMap,
-} from '@Jeact/vDom/FiberLane'
+} from '@Jeact/vDOM/FiberLane'
 
 
 function FiberRootNode(containerInfo){

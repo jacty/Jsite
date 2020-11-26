@@ -3,21 +3,13 @@ import {
   HostRoot,
   HostComponent,
   NoLanes,
-//   FunctionComponent,
-//   PerformedWork,
-
-  // HostText,
 } from '@Jeact/shared/Constants';
 import {
   includesSomeLane,
-} from '@Jeact/vDom/FiberLane';
+} from '@Jeact/vDOM/FiberLane';
 import {
   hasContextChanged,
 } from '@Jeact/vDOM/FiberContext';
-// import {
-//   prepareToReadContext
-// } from '@Jeact/vDom/FiberNewContext';
-// import { renderWithHooks } from '@Jeact/vDom/FiberHooks';
 import {
   pushHostContext,
   pushHostContainer
@@ -31,9 +23,6 @@ import {
   processUpdateQueue,
   cloneUpdateQueue,
 } from '@Jeact/vDOM/UpdateQueue';
-// import {
-//   markSkippedUpdateLanes,
-// } from '@Jeact/vDom/FiberWorkLoop';
 
 let didReceiveUpdate = false;
 

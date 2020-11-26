@@ -20,7 +20,6 @@ function FiberRootNode(containerInfo){
   this.context = null;
   this.pendingContext = null;
   this.callbackNode = null;
-  // this.callbackPriority = 0;
   this.eventTimes = createLaneMap(0);
   this.expirationTimes = createLaneMap(NoTimestamp);
 
@@ -28,19 +27,14 @@ function FiberRootNode(containerInfo){
   this.suspendedLanes = NoLanes;
   this.pingedLanes = NoLanes;
   this.expiredLanes = NoLanes;
-  // this.mutableReadLanes = 0;
   this.finishedLanes = 0;
 
   this.entangledLanes = NoLanes;
   this.entanglements = createLaneMap(0);
-
-  if(__ENV__){
-    this._debugRootType = 'createRoot()';
-  }
 }
 
-export function createFiberRoot(containerInfo){
-  const root = new FiberRootNode(containerInfo);
+export function createFiberRoot(container){
+  const root = new FiberRootNode(container);
   
   const fiber = createFiber();
   root.current = fiber;

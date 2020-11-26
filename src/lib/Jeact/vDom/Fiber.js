@@ -11,10 +11,10 @@ import {
 
 let debugCounter = 1;
 
-function FiberNode(tag, pendingProps, key, mode){
+function FiberNode(tag){
   /* Instance */
   this.tag = tag; // Decides which kind of component the fiber is
-  this.key = key; // {key} attribute in lists' items
+  this.key = null; // {key} attribute in lists' items
   this.elementType = null;
   this.type = null;
   this.stateNode = null; // refer to FiberRootNode
@@ -27,7 +27,7 @@ function FiberNode(tag, pendingProps, key, mode){
 
   this.ref = null;
 
-  this.pendingProps = pendingProps;
+  this.pendingProps = null;
   this.memoizedProps = null;
   this.updateQueue = null;
   this.memoizedState = null; // As baseState in update queue.
@@ -58,8 +58,8 @@ function FiberNode(tag, pendingProps, key, mode){
 
 }
 
-export const createFiber = function(tag=HostRoot, pendingProps=null, key=null){
-  return new FiberNode(tag, pendingProps, key);
+export const createFiber = function(tag=HostRoot){
+  return new FiberNode(tag);
 };
 
 function shouldConstruct(Component){

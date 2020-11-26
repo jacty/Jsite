@@ -96,9 +96,6 @@ function updateFunctionComponent(
 
 function updateHostRoot(workInProgress, renderLanes){
   const root = workInProgress.stateNode;
-  if (!root.pendingContext&!root.context){
-    console.error('updateHostRoot1');
-  }
 
   pushHostContainer(workInProgress);
 

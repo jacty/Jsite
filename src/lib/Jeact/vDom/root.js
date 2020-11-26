@@ -5,11 +5,11 @@ import { createFiberRoot } from '@Jeact/vDOM/FiberRoot';
 import { updateContainer } from '@Jeact/vDOM/FiberReconciler';
 
 function vRoot(container){
-  this._internalRoot = createRootImpl(container);
+  this._Root = createRootImpl(container);
 }
 
 vRoot.prototype.render = function(children){
-  const root = this._internalRoot;
+  const root = this._Root;
   updateContainer(children, root);
 };
 

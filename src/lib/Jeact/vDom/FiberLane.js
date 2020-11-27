@@ -82,7 +82,7 @@ export function getNextLanes(root, wipLanes){
   // it and we'll lose our progress. We should only do this if the new lanes
   // are higher priority.
   if(wipLanes !== NoLanes){
-    console.log('getNextLanes4')
+    console.log('getNextLanes4', wipLanes)
   }
 
   // Check for entangled lanes and add them to the batch.

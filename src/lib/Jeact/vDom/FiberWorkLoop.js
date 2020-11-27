@@ -108,14 +108,6 @@ let rootWithPendingPassiveEffects = null;
 let pendingPassiveEffectsRenderPriority = NoPriority;
 let rootsWithPendingDiscreteUpdates = null;
 
-// Use these to prevent an infinite loop of nested updates
-// const NESTED_UPDATE_LIMIT = 50;
-// let nestedUpdateCount = 0;
-// let rootWithNestedUpdates = null
-
-// const NESTED_PASSIVE_UPDATE_LIMIT = 50;
-// let nestedPassiveUpdateCount = 0;
-
 
 let currentEventTime = NoTimestamp;
 let currentEventWipLanes = NoLanes;
@@ -194,7 +186,6 @@ function markUpdateLaneFromFiberToRoot(fiber, lane){
     console.error('markUpdateLaneFromFiberToRoot1')
   }
 
-  //Update the source fiber's lanes
   fiber.lanes = mergeLanes(fiber.lanes, lane);
   const alternate = fiber.alternate;
   if (alternate!== null){
@@ -345,7 +336,6 @@ function prepareFreshStack(root, lanes){
   wipRootSkippedLanes = NoLanes;
   wipRootUpdatedLanes = NoLanes;
   wipRootPingedLanes = NoLanes;
-
 }
 
 function handleError(root, thrownValue){
@@ -383,13 +373,12 @@ function renderRootConcurrent(root, lanes){
 
   if (wipRoot !== root || wipRootRenderLanes !== lanes){
     resetRenderTimer();
-    // create a new Node by copying root.current
+    // create a new Node by cloning root.current and set it to wip.
     prepareFreshStack(root, lanes);
   }
-  do {
-    workLoopConcurrent()
-    break;
-  } while (true);
+
+  workLoopConcurrent()
+
   resetContextDependencies();
 
   popDispatcher(prevDispatcher);
@@ -420,10 +409,10 @@ function performUnitOfWork(unitOfWork){
   // The current, flushed, state of this fiber is the alternate. Ideally
   // nothing should rely on this, but relying on it here means that we don't
   // need an additional field on the work in progress.
-  const current = unitOfWork.alternate;
   if(__ENV__){
     setCurrentDebugFiberInDev(unitOfWork);    
   }
+
   let next = beginWork(unitOfWork, subtreeRenderLanes);
 
   if(__ENV__){

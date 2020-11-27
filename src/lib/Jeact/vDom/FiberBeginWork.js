@@ -2,6 +2,7 @@ import {
   __ENV__,
   HostRoot,
   HostComponent,
+  FunctionComponent,
   NoLanes,
 } from '@Jeact/shared/Constants';
 import {
@@ -96,13 +97,11 @@ function updateFunctionComponent(
 
 function updateHostRoot(workInProgress, renderLanes){
   const root = workInProgress.stateNode;
-
   pushHostContainer(workInProgress);
-
   const nextProps = workInProgress.pendingProps;
   const prevState = workInProgress.memoizedState;
   const prevChildren = prevState !== null ? prevState.element : null;
-  //To make updateQueue in wip and wip.alternate point to different objects in memory.
+  //To make updateQueue in wip and wip.alternate point to different objects in memory. but why?
   cloneUpdateQueue(workInProgress);
   //update wip.lanes, wip.memoizedState;
   processUpdateQueue(workInProgress, nextProps, null, renderLanes);
@@ -111,7 +110,6 @@ function updateHostRoot(workInProgress, renderLanes){
   if (nextChildren === prevChildren){
     console.error('updateHostRoot1')
   }
-
   reconcileChildren(workInProgress, nextChildren, renderLanes);
   return workInProgress.child;
 }
@@ -148,7 +146,6 @@ export function beginWork(workInProgress, renderLanes){
       console.error('beginWork1')
     }
   }
-
   if (alternate !== null){
     const oldProps = alternate.memoizedProps;
     const newProps = workInProgress.pendingProps;
@@ -197,8 +194,8 @@ export function beginWork(workInProgress, renderLanes){
     //     renderLanes,
     //   );
     // }
-    // case FunctionComponent:{//0
-    //   console.error('FunctionComponent')
+    case FunctionComponent:{//0
+      console.error('FunctionComponent', workInProgress)
     //   const Component = workInProgress.type;
     //   const unresolvedProps = workInProgress.pendingProps;
     //   const resolvedProps =
@@ -212,7 +209,7 @@ export function beginWork(workInProgress, renderLanes){
     //     resolvedProps,
     //     renderLanes,
     //   );
-    // }
+    }
     case HostRoot://3
       return updateHostRoot(workInProgress, renderLanes);
     case HostComponent://5

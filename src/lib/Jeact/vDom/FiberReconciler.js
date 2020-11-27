@@ -16,7 +16,7 @@ export function updateContainer(element, fiberRoot){
   const current = fiberRoot.current;
   const eventTime =requestEventTime();
   const lane = requestUpdateLane(current);
-
+  
   const update = createUpdate(eventTime, lane);
   update.payload =  { element }; // element is the key of payload;
 

@@ -2,11 +2,9 @@ import {
   __ENV__,
   NoFlags,
   NoLanes,
-  // StaticMask,
   HostRoot,
-  // IndeterminateComponent,
   HostComponent,
-  // HostText,
+  FunctionComponent,
 } from '@Jeact/shared/Constants';
 
 let debugCounter = 1;
@@ -64,19 +62,16 @@ function FiberNode(tag){
 
 }
 
-export const createFiber = function(tag=HostRoot){
+export const createFiber = function(tag=HostRoot, pendingProps, key){
   return new FiberNode(tag);
 };
 
-function shouldConstruct(Component){
-  const prototype = Component.prototype;
-  return !!(prototype && prototype.isJeactComponent);
-}
-
 // This is used to create an alternate fiber to do work on.
 // Why it is not a completed copy of current?
-export function createWorkInProgress(current, pendingProps=null){
+export function createWorkInProgress(current){
+  //TODO: Optimize the clone part using a function to iterate.
   let workInProgress = current.alternate;
+
   if (workInProgress === null){
     // We use a double buffering pooling technique because we know that we'll
     // only ever need at most two versions of a tree. We pool the "other"
@@ -84,8 +79,6 @@ export function createWorkInProgress(current, pendingProps=null){
     // than totally clone to avoid allocating extra objects for things that are never updated. It also allows us to reclaim the extra memory if needed.
     workInProgress = createFiber(
       current.tag,
-      pendingProps,
-      current.key,
     );
     workInProgress.elementType = current.elementType;
     workInProgress.type = current.type;
@@ -130,7 +123,6 @@ export function createWorkInProgress(current, pendingProps=null){
 }
 
 export function createFiberFromTypeAndProps(element,lanes, owner){
-
   const type = element.type;
   const pendingProps = element.props;
   const key = element.key;
@@ -138,7 +130,7 @@ export function createFiberFromTypeAndProps(element,lanes, owner){
   let fiberTag;
 
   if (typeof type === 'function'){
-    console.error('createFiberFromTypeAndProps1', type);
+    fiberTag = FunctionComponent;
   } else if(typeof type === 'string'){
     fiberTag = HostComponent;
   } else {

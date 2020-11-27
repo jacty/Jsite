@@ -159,7 +159,7 @@ function workLoop(hasTimeRemaining, initialTime){
     if (typeof callback === 'function'){
       currentTask.callback = null;
       currentPriority = currentTask.priority;
-      // will be push into argument lists of callback
+      // will be pushed into argument lists of callback
       const didUserCallbackTimeout = currentTask.expirationTime <= currentTime;
       //performConcurrentWorkOnRoot()
       const contiuationCallback = callback(didUserCallbackTimeout);
@@ -184,7 +184,7 @@ function performWorkUntilDeadline(){
       // scheduledHostCallback = flushwork;
       const hasMoreWork = scheduledHostCallback(hasTimeRemaining, currentTime);
       !!hasMoreWork?
-        console.error('performWorkUntilDeadline'):'';
+        console.error('performWorkUntilDeadline', hasMoreWork):'';
     } catch (error){
       port.postMessage(null);
       throw error;

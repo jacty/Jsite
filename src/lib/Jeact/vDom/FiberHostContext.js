@@ -46,7 +46,6 @@ export function getRootHostContainer(){
 }
 
 export function pushHostContainer(fiber){
-
   const nextRootInstance = fiber.stateNode.containerInfo;
   // Push current root instance onto the stack;
   // This allows us to reset root when portals are popped.

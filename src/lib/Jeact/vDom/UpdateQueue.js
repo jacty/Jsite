@@ -76,12 +76,11 @@ function getStateFromUpdate(workInProgress, queue, update, prevState, nextProps,
 }
 
 export function processUpdateQueue(workInProgress, props, instance, renderLanes){
-  // This is always non-null on a ClassComponent or HostRoot
-  const queue = workInProgress.updateQueue;
-  
 
-  
+  const queue = workInProgress.updateQueue;
+
   hasForceUpdate = false;
+
   if (__ENV__){
     currentlyProcessingQueue = queue.pending;
   }
@@ -140,7 +139,6 @@ export function processUpdateQueue(workInProgress, props, instance, renderLanes)
 
       do {
         const updateLane = update.lane;
-        const updateEventTime = update.eventTime;
         if(!isSubsetOfLanes(renderLanes, updateLane)){
           console.error('processUpdateQueue3')
         } else {
@@ -157,7 +155,6 @@ export function processUpdateQueue(workInProgress, props, instance, renderLanes)
             props,
             instance,
           );
-
           const callback = update.callback;
           if (callback !== null) {
             console.error('processUpdateQueue5');

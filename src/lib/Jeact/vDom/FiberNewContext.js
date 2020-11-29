@@ -14,6 +14,8 @@ export function prepareToReadContext(
   renderLanes
   ){
   currentlyRenderingFiber = workInProgress;
+  lastContextDependency = null;
+  lastContextWithAllBitsObserved = null;
   const dependencies = workInProgress.dependencies;
   if (dependencies!==null){
     console.error('prepareToReadContext1');

@@ -71,7 +71,11 @@ export function createElement(type, config, children){
   if (childrenLength === 1){
     console.error('createElement2')
   } else if (childrenLength > 1){
-    console.error('createElement3')
+    const childArray = Array(childrenLength);
+    for (let i = 0; i < childrenLength; i++){
+      childArray[i] = arguments[i + 2];
+    }
+    props.children = childArray;
   }
 
   if (type && type.defaultProps) {

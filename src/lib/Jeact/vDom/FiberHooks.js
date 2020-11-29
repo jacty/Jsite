@@ -6,10 +6,10 @@ import {
 } from '@Jeact/shared/internals';
 
 // These are set right before calling the component.
-// let renderLanes = NoLanes;
+let renderLanes = NoLanes;
 // The work-in-progress fiber. named it differently to distinguish it from
 // the work-in-progress hook.
-// let currentlyRenderingFiber = null;
+let currentlyRenderingFiber = null;
 // Where an update was scheduled only during the current render pass. This
 // gets reset after each attempt.
 // TODO: Maybe there's some way to consolidate this with
@@ -24,10 +24,8 @@ export function renderWithHooks(
   secondArg,
   nextRenderLanes
   ){
-
-  workInProgress.memoizedState = null;
-  workInProgress.updateQueue = null;
-  workInProgress.lanes = NoLanes;
+  renderLanes = nextRenderLanes;
+  currentlyRenderingFiber = workInProgress;
 
   CurrentDispatcher.current =
     current === null || current.memoizedState === null

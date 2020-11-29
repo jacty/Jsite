@@ -4,6 +4,7 @@ import {
   HostComponent,
   FunctionComponent,
   NoLanes,
+  PerformedWork,
 } from '@Jeact/shared/Constants';
 import {
   includesSomeLane,
@@ -11,6 +12,9 @@ import {
 import {
   hasContextChanged,
 } from '@Jeact/vDOM/FiberContext';
+import {
+  prepareToReadContext
+} from '@Jeact/vDOM/FiberNewContext';
 import {
   pushHostContext,
   pushHostContainer
@@ -24,6 +28,7 @@ import {
   processUpdateQueue,
   cloneUpdateQueue,
 } from '@Jeact/vDOM/UpdateQueue';
+import {renderWithHooks} from '@Jeact/vDOM/FiberHooks';
 
 let didReceiveUpdate = false;
 
@@ -73,8 +78,11 @@ function updateFunctionComponent(
   nextProps,
   renderLanes
   ){
-  console.error('updateFunctionComponent');
-  return;
+  if (__ENV__){
+    if (workInProgress.type !== workInProgress.elementType){
+      console.error('updateFunctionComponent1');
+    }
+  }
   let context;
   prepareToReadContext(workInProgress, renderLanes);
   let nextChildren = renderWithHooks(
@@ -87,10 +95,10 @@ function updateFunctionComponent(
     )
 
   if (current!==null){
-    console.error('updateFunctionComponent')
+    console.error('updateFunctionComponent2')
   };
-  workInProgress.flags |= PerformedWork;
 
+  workInProgress.flags |= PerformedWork;
   reconcileChildren(current, workInProgress, nextChildren, renderLanes);
   return workInProgress.child;
 }
@@ -195,20 +203,19 @@ export function beginWork(workInProgress, renderLanes){
     //   );
     // }
     case FunctionComponent:{//0
-      console.error('FunctionComponent', workInProgress)
-    //   const Component = workInProgress.type;
-    //   const unresolvedProps = workInProgress.pendingProps;
-    //   const resolvedProps =
-    //     workInProgress.elementType === Component
-    //     ? unresolvedProps
-    //     : resolveDefaultProps(Component, unresolvedProps);
-    //   return updateFunctionComponent(
-    //     alternate,
-    //     workInProgress,
-    //     Component,
-    //     resolvedProps,
-    //     renderLanes,
-    //   );
+      const Component = workInProgress.type;
+      const unresolvedProps = workInProgress.pendingProps;
+      const resolvedProps =
+        workInProgress.elementType === Component
+        ? unresolvedProps
+        : resolveDefaultProps(Component, unresolvedProps);
+      return updateFunctionComponent(
+        alternate,
+        workInProgress,
+        Component,
+        resolvedProps,
+        renderLanes,
+      );
     }
     case HostRoot://3
       return updateHostRoot(workInProgress, renderLanes);

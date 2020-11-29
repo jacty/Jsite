@@ -328,6 +328,7 @@ function prepareFreshStack(root, lanes){
     console.log('prepareFreshStack2');
   }
   wipRoot = root;
+
   wip = createWorkInProgress(root.current);
   wipRootRenderLanes = subtreeRenderLanes =
     wipRootIncludedLanes = lanes;

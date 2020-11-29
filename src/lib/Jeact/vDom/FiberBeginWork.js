@@ -100,6 +100,7 @@ function updateFunctionComponent(
 
   workInProgress.flags |= PerformedWork;
   reconcileChildren(workInProgress, nextChildren, renderLanes);
+
   return workInProgress.child;
 }
 

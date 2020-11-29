@@ -156,7 +156,7 @@ function ChildReconciler(shouldTrackSideEffects){
     // If the top level item is an array, we treat it as a set of children,
     // not as a fragment. Nested arrays on the other hand will be treated as
     // fragment nodes. Recursion happens at the normal flow.
-
+    
     // Handle object types
     const isObject = typeof newChild === 'object' && newChild !== null;
     if (isObject){
@@ -176,7 +176,9 @@ function ChildReconciler(shouldTrackSideEffects){
           }
       };
     }
-
+    if(typeof newChild === 'string' || typeof newChild === 'number'){
+      console.error('reconcileChildFibers4')
+    }
     if (Array.isArray(newChild)){
       return reconcileChildrenArray(
         returnFiber,
@@ -185,7 +187,7 @@ function ChildReconciler(shouldTrackSideEffects){
         lanes,
       );
     }
-
+    console.error('reconcileChildFibers5');
     if(typeof newChild === 'undefined'){
       switch(returnFiber.tag){
         default:

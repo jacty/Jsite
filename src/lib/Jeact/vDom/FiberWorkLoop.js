@@ -215,7 +215,7 @@ function ensureRootIsScheduled(root, currentTime){
   // Determine the next lanes to work on, and their priority.
   const nextLanes = getNextLanes(
     root,
-    root === wipRoot ? wipRootRenderLanes : NoLanes,
+    root === wipRoot ? console.error('ensureRootIsScheduled0', root, wipRoot) : NoLanes,
   );
 
   if (nextLanes === NoLanes){
@@ -273,7 +273,7 @@ function performConcurrentWorkOnRoot(root){
   // Determine the next expiration time to work on, using the fields stored on the root.
   let lanes = getNextLanes(
     root,
-    root === wipRoot ? wipRootRenderLanes : NoLanes,
+    root === wipRoot ?  console.error('ensureRootIsScheduled0', root, wipRoot) : NoLanes,
   );
   if (lanes === NoLanes){
     console.error('performConcurrentWorkOnRoot3')

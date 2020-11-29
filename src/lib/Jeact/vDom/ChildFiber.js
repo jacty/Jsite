@@ -4,7 +4,7 @@ import {
 } from '@Jeact/shared/Constants';
 import {
   createFiberFromElement,
-  // createFiberFromText,
+  createFiberFromText,
 } from '@Jeact/vDOM/Fiber';
 
 function coerceRef(
@@ -41,6 +41,10 @@ function ChildReconciler(shouldTrackSideEffects){
     newIndex
   ){
     newFiber.index = newIndex;
+    if (!shouldTrackSideEffects){
+      return lastPlacedIndex;
+    }
+    console.error('placeChild1');return;
     const current = newFiber.alternate;
     if (current!==null){
       console.error('placeChild1')
@@ -64,13 +68,13 @@ function ChildReconciler(shouldTrackSideEffects){
     if (typeof newChild === 'string' || typeof newChild === 'number'){
       const created = createFiberFromText(
         ''+ newChild,
-        returnFiber.mode,
         lanes,
       );
       created.return = returnFiber;
       return created;
     }
     if(typeof newChild === 'object' && newChild !== null){
+      console.error('createChild1');return;
       switch(newChild.$$typeof){
         case JEACT_ELEMENT_TYPE:{
           const created = createFiberFromElement(
@@ -113,7 +117,7 @@ function ChildReconciler(shouldTrackSideEffects){
       for (; newIdx < newChildren.length; newIdx++){
         const newFiber = createChild(returnFiber, newChildren[newIdx], lanes);
         if (newFiber === null){
-          console.error('reconcileChildrenArray3')
+          continue;
         }
         lastPlacedIndex = placeChild(newFiber, lastPlacedIndex, newIdx);
         if(previousNewFiber === null){

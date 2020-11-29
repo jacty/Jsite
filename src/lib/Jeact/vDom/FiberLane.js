@@ -5,12 +5,10 @@ import {
   NormalPriority,
   DefaultLanePriority,
   TransitionLanePriority,
-//   SyncLanePriority,
   DefaultLanes,
   NonIdleLanes,
   TotalLanes,
   NoTimestamp,
-//   NormalSchedulePriority,
 } from '@Jeact/shared/Constants';
 
 // Used by getHighestPriorityLanes and getNextLanes:
@@ -51,7 +49,8 @@ export function getNextLanes(root, wipLanes){
 
   // Check if any work has expired.
   if (expiredLanes !== NoLanes){
-    console.error('getNextLanes2')
+    nextLanes = expiredLanes;
+    nextLanePriority = highestLanePriority;
   } else {
     // Do not work on any idle work until all the non-idle work has finished,
     // even it the work is suspended.
@@ -81,8 +80,9 @@ export function getNextLanes(root, wipLanes){
   // If we're already in the middle of a render, switching lanes will interrupt
   // it and we'll lose our progress. We should only do this if the new lanes
   // are higher priority.
-  if(wipLanes !== NoLanes){
-    console.log('getNextLanes4', wipLanes)
+  if(wipLanes !== NoLanes &&
+      wipLanes !== nextLanes){
+    console.error('getNextLanes4', wipLanes, nextLanes)
   }
 
   // Check for entangled lanes and add them to the batch.

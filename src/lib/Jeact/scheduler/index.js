@@ -148,7 +148,7 @@ function workLoop(hasTimeRemaining, initialTime){
   let currentTime = initialTime;
   advanceTimers(currentTime);
   currentTask = peek(taskQueue);
-  while(currentTask !== null&!isSchedulePaused){
+  while(currentTask !== null && !isSchedulePaused){
     if(currentTask.expirationTime > currentTime &&
         (!hasTimeRemaining || shouldYieldToHost())
       ){
@@ -163,12 +163,30 @@ function workLoop(hasTimeRemaining, initialTime){
       const didUserCallbackTimeout = currentTask.expirationTime <= currentTime;
       //performConcurrentWorkOnRoot()
       const contiuationCallback = callback(didUserCallbackTimeout);
-      !!contiuationCallback ?
-        console.error('workLoop', contiuationCallback):'';
+      currentTime = performance.now();
+      if(typeof contiuationCallback === 'function'){
+        currentTask.callback = contiuationCallback;
+      } else {
+        // the last task in queue?
+        if (currentTask === peek(taskQueue)){
+          pop(taskQueue);
+        }
+      }
+      advanceTimers(currentTime);
     } else {
-      console.log('workLoop2')
+      pop(taskQueue);
     }
-    break;
+    currentTask = peek(taskQueue);
+  }
+  // Return whether there's additional work.
+  if (currentTask !== null){
+    return true;
+  } else {
+    const firstTimer = peek(timerQueue);
+    if (firstTimer!== null){
+      console.error('workLoop3');
+    }
+    return false;
   }
 }
 
@@ -181,10 +199,16 @@ function performWorkUntilDeadline(){
     deadline = currentTime + yieldInterval;
     const hasTimeRemaining = true;
     try{
-      // scheduledHostCallback = flushwork;
+      // scheduledHostCallback = flushWork;
       const hasMoreWork = scheduledHostCallback(hasTimeRemaining, currentTime);
-      !!hasMoreWork?
-        console.error('performWorkUntilDeadline', hasMoreWork):'';
+      if (!hasMoreWork){
+        isMessageLoopRunning = false;
+        scheduledHostCallback = null;
+      } else {
+        // If there's more work, schedule the next message event at the end
+        // of the preceding one.
+        port.postMessage(null);
+      }
     } catch (error){
       port.postMessage(null);
       throw error;

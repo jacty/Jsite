@@ -19,7 +19,6 @@ import {
   pushHostContext,
   pushHostContainer
 } from '@Jeact/vDOM/FiberHostContext';
-
 import {
   mountChildFibers,
   reconcileChildFibers,
@@ -164,7 +163,7 @@ export function beginWork(workInProgress, renderLanes){
       // Force a re-render if the implementation changed due to hot reload:
       (__ENV__ ? workInProgress.type !== alternate.type : false)
       ){
-      console.error('beginWork1')
+      console.error('beginWork1', workInProgress)
     } else if(!includesSomeLane(renderLanes, updateLanes)){
       console.error('beginWork2', workInProgress);
       return;

@@ -53,7 +53,7 @@ function bubbleProperties(completedWork){
 
 function appendAllChildren(parent, workInProgress, needsVisibilityToggle, isHidden){
   let node = workInProgress.child;
-  while (node!==null){
+  if (node!==null){
     console.error('appendAllChildren1', node)
   }
 }

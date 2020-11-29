@@ -209,6 +209,7 @@ function markUpdateLaneFromFiberToRoot(fiber, lane){
 // Use this function to schedule a task for a root. There's only one task per root; if a task was already scheduled, we'll check to make sure the priority of the existing task is the same as the priority of the next level that the root has worked on. This function is called on every update, and right before existing a task.
 function ensureRootIsScheduled(root, currentTime){
   const existingCallbackNode = root.callbackNode;
+
   // update root.expirationTime
   markStarvedLanesAsExpired(root, currentTime);
 
@@ -224,8 +225,8 @@ function ensureRootIsScheduled(root, currentTime){
     }
     return;
   }
-
-  // Check if there's an existing task we may be able to reuse it.
+  
+  // Check if there's an existing task. We may be able to reuse it.
   if (existingCallbackNode !== null){
     return;
   }
@@ -272,7 +273,7 @@ function performConcurrentWorkOnRoot(root){
   // Determine the next expiration time to work on, using the fields stored on the root.
   let lanes = getNextLanes(
     root,
-    root === wipRoot ?  console.error('ensureRootIsScheduled0', root, wipRoot) : NoLanes,
+    root === wipRoot ? wipRootRenderLanes : NoLanes,
   );
   if (lanes === NoLanes){
     console.error('performConcurrentWorkOnRoot3')

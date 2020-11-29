@@ -3,6 +3,7 @@ import {
   NoFlags,
   NoLanes,
   HostRoot,
+  HostText,
   HostComponent,
   FunctionComponent,
 } from '@Jeact/shared/Constants';
@@ -62,7 +63,7 @@ function FiberNode(tag, pendingProps, key){
 
 }
 
-export const createFiber = function(tag=HostRoot, pendingProps, key){
+export const createFiber = function(tag=HostRoot, pendingProps=null, key){
   return new FiberNode(tag, pendingProps, key);
 };
 
@@ -138,6 +139,7 @@ export function createFiberFromTypeAndProps(element,lanes, owner){
   }
 
   const fiber = createFiber(fiberTag, pendingProps, key);
+
   fiber.elementType = type;
   fiber.type = type;
   fiber.lanes = lanes;
@@ -162,10 +164,8 @@ export function createFiberFromElement(element, lanes){
   return fiber;
 }
 
-export function createFiberFromText(content, mode, lanes){
-  console.error('createFiberFromText');
-  return;
-  const fiber = createFiber(HostText, content, null, mode);
+export function createFiberFromText(content, lanes){
+  const fiber = createFiber(HostText, content, null);
   fiber.lanes = lanes;
   return fiber;
 }

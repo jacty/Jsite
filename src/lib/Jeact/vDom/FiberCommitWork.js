@@ -1,5 +1,6 @@
 import{
  HostRoot,
+ HostText,
  ContentReset,
  HostComponent,
 } from '@Jeact/shared/Constants';
@@ -72,7 +73,7 @@ export function commitPlacement(finishedWork){
 
 function insertOrAppendPlacementNodeIntoContainer(node, before, parent){
     const tag = node.tag;
-    const isHost = tag === HostComponent || console.error('insertOrAppendPlacementNodeIntoContainer1');
+    const isHost = tag === HostComponent || tag === HostText;
     if (isHost){
         const stateNode = isHost ? node.stateNode : console.error('insertOrAppendPlacementNodeIntoContainer2');
         if (before){
@@ -81,6 +82,15 @@ function insertOrAppendPlacementNodeIntoContainer(node, before, parent){
             appendChildToContainer(parent, stateNode);
         }
     } else {
-        console.error('insertOrAppendPlacementNodeIntoContainer4');
+        const child = node.child;
+        if (child !== null){
+            insertOrAppendPlacementNodeIntoContainer(child, before, parent);
+            let sibling = child.sibling;
+            while(sibling !== null){
+                insertOrAppendPlacementNodeIntoContainer(sibling, before, parent);
+                sibling = sibling.sibling;
+            }
+        }
+        
     }
 }

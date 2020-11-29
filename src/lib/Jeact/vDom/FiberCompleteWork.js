@@ -14,7 +14,9 @@ import {
 
 import {
   createInstance,
-  finalizeInitialChildren
+  createTextInstance,
+  appendInitialChild,
+  finalizeInitialChildren,
 } from '@Jeact/vDOM/FiberHost';
 
 
@@ -53,8 +55,25 @@ function bubbleProperties(completedWork){
 
 function appendAllChildren(parent, workInProgress, needsVisibilityToggle, isHidden){
   let node = workInProgress.child;
-  if (node!==null){
-    console.error('appendAllChildren1', node)
+  while (node!==null){
+    if (node.tag === HostComponent || node.tag === HostText){
+      appendInitialChild(parent, node.stateNode)
+    } else if (node.child !== null){
+      node.child.return = node;
+      node = node.child;
+      continue;
+    }
+    if (node === workInProgress){
+      return;
+    }
+    while (node.sibling === null){
+      if (node.return === null || node.return === workInProgress){
+        return;
+      }
+      node = node.return;
+    }
+    node.sibling.return = node.return;
+    node = node.sibling;
   }
 }
 
@@ -64,11 +83,9 @@ export function completeWork(
   ){
   const current = workInProgress.alternate;
   const newProps = workInProgress.pendingProps;
-
   switch(workInProgress.tag){
-    // case FunctionComponent:
-    //   bubbleProperties(workInProgress)
-    //   return null;
+    case FunctionComponent:
+      return null;
     case HostRoot:{//3
       popHostContainer(workInProgress);
       const fiberRoot = workInProgress.stateNode;
@@ -119,17 +136,27 @@ export function completeWork(
       }
       return null;
     }
-    // case HostText: {
-    //   const newText = newProps;
-    //   if(current){
-    //     console.error('HostText')
-    //   } else {
-
-    //   }
-    //   console.error('HostText', workInProgress.stateNode);
-    // }
+    case HostText: {
+      const newText = newProps;
+      if(current){
+        console.error('HostText1')
+      } else {
+        if (typeof newText !== 'string'){
+          console.error('HostText2', newText)
+        }
+        const rootContainerInstance = getRootHostContainer();
+        const currentHostContext = getHostContext();
+        workInProgress.stateNode = createTextInstance(
+          newText,
+          rootContainerInstance,
+          currentHostContext,
+          workInProgress,
+        );
+      }
+      return null;
+    }
     default:
-      console.error('completeWork', workInProgress.tag)
+      console.error('completeWork', workInProgress)
   }
 }
 

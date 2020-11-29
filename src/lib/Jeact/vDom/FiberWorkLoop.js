@@ -473,7 +473,8 @@ function completeUnitOfWork(unitOfWork){
 
     const siblingFiber = completedWork.sibling;
     if (siblingFiber !== null) {
-      console.error('completeUnitOfWork3');
+      wip = siblingFiber;
+      return;
     }
 
     // Otherwise, return to the parent.

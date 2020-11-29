@@ -1,3 +1,8 @@
+
+function getOwnerDocumentFromRootContainer(rootContainerElement){
+    return rootContainerElement.ownerDocument;
+}
+
 function setInitialDOMProperties(tag, domElement, rootContainerElement, nextProps){
     for (const propKey in nextProps){
         console.error('setInitialDOMProperties', propKey)
@@ -13,6 +18,9 @@ export function createElement(type,props,rootContainerElement,parentNamespace){
     return domElement;
 }
 
+export function createTextNode(text, rootContainerElement){
+    return getOwnerDocumentFromRootContainer(rootContainerElement).createTextNode(text);
+}
 export function setInitialProperties(domElement,tag,rawprops,rootContainerElement){
     let props;
     switch(tag){

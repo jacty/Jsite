@@ -1,5 +1,6 @@
 import {
   createElement,
+  createTextNode,
   setInitialProperties,
 } from '@Jeact/vDOM/DOMComponent';
 import {
@@ -41,6 +42,10 @@ export function createInstance(
   return domElement;
 }
 
+export function appendInitialChild(parentInstance, child){
+  parentInstance.appendChild(child);
+}
+
 export function finalizeInitialChildren(
   domElement,
   type,
@@ -50,6 +55,12 @@ export function finalizeInitialChildren(
 ){
   setInitialProperties(domElement, type, props, rootContainerInstance);
   return shouldAutoFocusHostComponent(type, props);
+}
+
+export function createTextInstance(text, rootContainerInstance, hostContext, interalInstancedHandle){
+  const textNode = createTextNode(text, rootContainerInstance);
+  precacheFiberNode(interalInstancedHandle, textNode)
+  return textNode;
 }
 
 export function appendChildToContainer(container, child){

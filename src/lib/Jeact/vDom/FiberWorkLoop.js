@@ -215,7 +215,7 @@ function ensureRootIsScheduled(root, currentTime){
   // Determine the next lanes to work on, and their priority.
   const nextLanes = getNextLanes(
     root,
-    root === wipRoot ? console.error('ensureRootIsScheduled0', root, wipRoot) : NoLanes,
+    root === wipRoot ? wipRootRenderLanes : NoLanes,
   );
 
   if (nextLanes === NoLanes){
@@ -227,7 +227,6 @@ function ensureRootIsScheduled(root, currentTime){
 
   // Check if there's an existing task we may be able to reuse it.
   if (existingCallbackNode !== null){
-    console.error('ensureRootIsScheduled2')
     return;
   }
 

@@ -298,7 +298,8 @@ function performConcurrentWorkOnRoot(root){
   }
   ensureRootIsScheduled(root, performance.now());
   if (root.callbackNode === originalCallbackNode){
-    console.error('performConcurrentWorkOnRoot7')
+    // Continue expired tasks.
+    return performConcurrentWorkOnRoot.bind(null, root);
   }
   return null;
 }

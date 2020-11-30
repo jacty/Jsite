@@ -10,16 +10,16 @@ import {
 
 let debugCounter = 1;
 
-function FiberNode(tag, pendingProps, key){
+function FiberNode(tag, pendingProps=null, key){
   /* Instance */
   this.tag = tag; // Decides which kind of component the fiber is
   this.key = key; // {key} attribute in lists' items
   this.elementType = null;
   this.type = null;
-  this.stateNode = null; // refer to FiberRootNode
+  this.stateNode = null; // point to FiberRootNode
 
   // Fiber
-  this.return = null; // refer to parent
+  this.return = null; // point to parent
   this.child = null;
   this.sibling = null;
   this.index = 0;
@@ -54,10 +54,7 @@ function FiberNode(tag, pendingProps, key){
 
   if (__ENV__){
     this._debugID = debugCounter++;
-    this._debugSource = null;
     this._debugOwner = null;
-    this._debugNeedsRemount = false;
-    this._debugHookTypes = null;
     Object.preventExtensions(this);
   }
 
@@ -112,7 +109,7 @@ export function createWorkInProgress(current){
   workInProgress.ref = current.ref;
 
   if(__ENV__){
-    workInProgress._debugNeedsRemount = current._debugNeedsRemount;
+    // workInProgress._debugNeedsRemount = current._debugNeedsRemount;
     switch(workInProgress.tag){
       default:
         workInProgress.tag!==3?console.error('createWorkInProgress3'):'';
@@ -158,7 +155,7 @@ export function createFiberFromElement(element, lanes){
   }
   const fiber = createFiberFromTypeAndProps(element, lanes, owner);
   if (__ENV__){
-    fiber._debugSource = element._source;
+    // fiber._debugSource = element._source;
     fiber._debugOwner = element._owner;
   }
   return fiber;

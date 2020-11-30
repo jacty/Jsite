@@ -8,8 +8,7 @@ import {
 } from '@Jeact/vDOM/FiberLane';
 import { markSkippedUpdateLanes } from '@Jeact/vDOM/FiberWorkLoop';
 
-let hasForceUpdate = false;
-let currentlyProcessingQueue;
+let currentlyProcessingQueue;// to denote currently processing queue in DEV.
 
 export function cloneUpdateQueue(workInProgress){
   const queue = workInProgress.updateQueue;
@@ -42,10 +41,11 @@ export function enqueueUpdate(fiber, update){
   const updateQueue = fiber.updateQueue;
   let pending = updateQueue.pending;
   if (pending === null) {
-    // This is the first update.
+    // First update.
     update.next = update;
   } else {
-    console.log('another update');
+    update.next = pending.next;
+    pending.next = update;
   }
   updateQueue.pending = update;
 }
@@ -78,8 +78,6 @@ function getStateFromUpdate(workInProgress, queue, update, prevState, nextProps,
 export function processUpdateQueue(workInProgress, props, instance, renderLanes){
 
   const queue = workInProgress.updateQueue;
-
-  hasForceUpdate = false;
 
   if (__ENV__){
     currentlyProcessingQueue = queue.pending;

@@ -1,11 +1,10 @@
-import { createFiber } from '@Jeact/vDOM/Fiber';
 import {
-  __ENV__,
   NoTimestamp,
   HostRoot,
   noTimeout,
   NoLanes,
 } from '@Jeact/shared/Constants';
+import { createFiber } from '@Jeact/vDOM/Fiber';
 import {
   createLaneMap,
 } from '@Jeact/vDOM/FiberLane'
@@ -26,7 +25,7 @@ function FiberRootNode(containerInfo){
   this.suspendedLanes = NoLanes;
   this.pingedLanes = NoLanes;
   this.expiredLanes = NoLanes;
-  this.finishedLanes = 0;
+  this.finishedLanes = NoLanes;
 
   this.entangledLanes = NoLanes;
   this.entanglements = createLaneMap(0);

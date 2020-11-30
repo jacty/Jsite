@@ -153,6 +153,22 @@ export function getNextLanesPriority(){
   return highestLanePriority;
 }
 
+export function findUpdateLane(lanePriority, wipLanes){
+  switch (lanePriority) {
+    case DefaultLanePriority: {//8
+      let lane = getHighestPriorityLane(DefaultLanes & ~wipLanes);
+      if (lane === NoLane) {
+        console.error('findUpdateLane1')
+      }
+      return lane;
+    }
+    default:
+      // The remaining priorities are not valid for updates
+      console.log('findUpdateLane.default', lanePriority)
+      break;
+  }
+}
+
 function getHighestPriorityLane(lanes){
   return lanes & -lanes; // Why this way can get the highest priority.
 }
@@ -169,22 +185,6 @@ function getEqualOrHigherPriorityLanes(lanes){
 
 function pickArbitraryLaneIndex(lanes){
   return 31 - Math.clz32(lanes);
-}
-
-export function findUpdateLane(lanePriority, wipLanes){
-  switch (lanePriority) {
-    case DefaultLanePriority: {//8
-      let lane = getHighestPriorityLane(DefaultLanes & ~wipLanes);
-      if (lane === NoLane) {
-        console.error('findUpdateLane1')
-      }
-      return lane;
-    }
-    default:
-      // The remaining priorities are not valid for updates
-      console.log('findUpdateLane.default', lanePriority)
-      break;
-  }
 }
 
 export function includesSomeLane(a, b){

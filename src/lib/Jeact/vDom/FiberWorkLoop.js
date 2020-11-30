@@ -97,7 +97,7 @@ let mostRecentlyUpdatedRoot = null;
 let wipRootRenderTargetTime = Infinity;
 const RENDER_TIMEOUT = 500;
 
-function resetRenderTimer(){
+function resetRenderTimer(){// Used by Suspense
   wipRootRenderTargetTime = performance.now() + RENDER_TIMEOUT;
 }
 

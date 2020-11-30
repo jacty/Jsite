@@ -11,12 +11,7 @@ vRoot.prototype.render = function(children){
 
 
 function createRootImpl(container){
-  // 1.Create FiberRoot and Fiber.
-  // 2.Connect them to each other.
-
   const root = createFiberRoot(container);
-
-  container.nodeType !== 1 ? console.error('createRootImpl'):'';
 
   return root;
 }

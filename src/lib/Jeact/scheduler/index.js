@@ -63,15 +63,13 @@ function workLoop(initialTime){
     if (typeof callback === 'function'){
       currentTask.callback = null;
       currentPriority = currentTask.priority;
-      // will be pushed into argument lists of callback
-      const didUserCallbackTimeout = currentTask.expirationTime <= currentTime;
       //performConcurrentWorkOnRoot()
-      const contiuationCallback = callback(didUserCallbackTimeout);
+      const contiuationCallback = callback();
       currentTime = performance.now();
       if(typeof contiuationCallback === 'function'){
         currentTask.callback = contiuationCallback;
       } else {
-        // the last task in queue?
+        // the last task in queue
         if (currentTask === peek(taskQueue)){
           pop(taskQueue);
         }

@@ -112,15 +112,6 @@ let currentEventTime = NoTimestamp;
 let currentEventWipLanes = NoLanes;
 let currentEventPendingLanes = NoLanes;
 
-export function getCurrentPriority(){
-  switch(getCurrentSchedulePriority()){
-    case NormalSchedulePriority:
-      return NormalPriority;
-    default:
-      console.log('getCurrentPriority', getCurrentSchedulePriority())
-  }
-}
-
 export function requestEventTime(){
   if ((executionContext & (RenderContext | CommitContext)) !== NoContext){
     // We're inside Jeact.
@@ -214,12 +205,9 @@ function ensureRootIsScheduled(root, currentTime){
   root.callbackNode = newCallbackNode;
 }
 
-// This is the entry point for every concurrent task, i.e. anything that
+// Entry point for every concurrent task, i.e. anything that
 // goes through Scheduler.
 function performConcurrentWorkOnRoot(root){
-  console.error('x');
-  // Since we know we're in a Jeact event, we can clear the current
-  // event time. The next update will compute a new event time.
   currentEventTime = NoTimestamp;
   currentEventWipLanes = NoLanes;
   currentEventPendingLanes = NoLanes;
@@ -241,8 +229,10 @@ function performConcurrentWorkOnRoot(root){
     root,
     root === wipRoot ? wipRootRenderLanes : NoLanes,
   );
+
   if (lanes === NoLanes){
-    console.error('performConcurrentWorkOnRoot3')
+    console.error('Probably a bug!');
+    return null;
   }
 
   let exitStatus = renderRootConcurrent(root, lanes);
@@ -256,13 +246,14 @@ function performConcurrentWorkOnRoot(root){
     if (exitStatus === RootFatalErrored){
       console.error('performConcurrentWorkOnRoot6')
     }
-
+    console.log('performConcurrentWorkOnRoot');
     // now we have a consistent tree.
     const finishedWork = root.current.alternate
     root.finishedWork = finishedWork;
     root.finishedLanes = lanes;
     finishConcurrentRender(root, exitStatus, lanes);
   }
+  //why again?
   ensureRootIsScheduled(root, performance.now());
   if (root.callbackNode === originalCallbackNode){
     // Continue expired tasks.
@@ -307,7 +298,18 @@ function prepareFreshStack(root, lanes){
 }
 
 function handleError(root, thrownValue){
-  console.error('handleError', thrownValue);
+  do {
+    let erroredWork = wip;
+    try{
+      resetContextDependencies();
+      resetCurrentDebugFiberInDev();
+      console.error('handleError', wip);
+      completeUnitOfWork(erroredWork);
+    } catch (yetAnotherThrownValue){
+      console.error('handleError.catch', wip);
+    }
+    return;
+  } while(true);
 }
 
 function pushDispatcher(){
@@ -332,9 +334,6 @@ export function markSkippedUpdateLanes(lane){
 }
 
 function renderRootConcurrent(root, lanes){
-  if (executionContext!==0){//debug
-    console.error('renderRootConcurrent1')
-  }
   const prevExecutionContext = executionContext;
   executionContext |= RenderContext;
   const prevDispatcher = pushDispatcher();
@@ -344,12 +343,17 @@ function renderRootConcurrent(root, lanes){
     // create a new Node by cloning root.current and set it to wip.
     prepareFreshStack(root, lanes);
   }
-
-  workLoopConcurrent()
+  //Keep trying until all caught error handled.
+  do{
+    try {
+      workLoopConcurrent();
+      break;
+    } catch(thrownValue){
+      handleError(root, thrownValue);
+    }
+  } while (true);
 
   resetContextDependencies();
-
-  popDispatcher(prevDispatcher);
   executionContext = prevExecutionContext;
 
   // Check if the tree has completed.
@@ -367,6 +371,7 @@ function renderRootConcurrent(root, lanes){
 }
 
 function workLoopConcurrent(){
+  console.log('workLoopConcurrent');
   // Perform work until Scheduler asks us to yield
   while(wip !== null && !shouldYieldToHost()){
     performUnitOfWork(wip);
@@ -637,3 +642,11 @@ export function flushPassiveEffects(){
   return false;
 }
 
+export function getCurrentPriority(){
+  switch(getCurrentSchedulePriority()){
+    case NormalSchedulePriority:
+      return NormalPriority;
+    default:
+      console.log('getCurrentPriority', getCurrentSchedulePriority())
+  }
+}

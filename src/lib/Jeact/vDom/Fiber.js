@@ -69,7 +69,7 @@ export const createFiber = function(tag=HostRoot, pendingProps=null, key){
 export function createWorkInProgress(current){
   //TODO: Optimize the clone part using a function to iterate.
   let workInProgress = current.alternate;
-
+  console.log('createWorkInProgress');
   if (workInProgress === null){
     // We use a double buffering pooling technique because we know that we'll
     // only ever need at most two versions of a tree. We pool the "other"

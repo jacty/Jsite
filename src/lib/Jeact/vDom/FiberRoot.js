@@ -27,8 +27,6 @@ function FiberRootNode(containerInfo){
   this.expiredLanes = NoLanes;
   this.finishedLanes = NoLanes;
 
-  this.entangledLanes = NoLanes;
-  this.entanglements = createLaneMap(0);
 }
 
 export function createFiberRoot(container){

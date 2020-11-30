@@ -4,10 +4,6 @@ import {
 } from '@Jeact';
 const React = {createElement:createElement};
 
-// const React.createElement = createElement;
-// const a.b = 1;
-// import React, { Suspense, useState} from 'react';
-
 import '@assets/styles/interview.sass';
 // const List = React.lazy(()=> import('@com/List/list.jsx'));
 
@@ -17,11 +13,11 @@ let flag = 0; //1: show all questions; 0: show a random question
 const mask = 1; // Toggle mask;
 
 function Interview(props){
+    console.error('interview');return;
     document.title='Interview Q&A';
     const items = props.data;
-    // const [ind, setInd] = useState(0);
-    console.error('interview', useState(0))
-    return;
+    const [ind, setInd] = useState(0);
+
     const btnAllTxt = ['All Questions','Random Question'];
     const btnTitleTxt = ['List all questions','Show a random question'];
 

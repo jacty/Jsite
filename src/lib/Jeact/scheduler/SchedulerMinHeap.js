@@ -1,8 +1,5 @@
 export function push(heap, node){
   const index = heap.length;
-  if(index>2){
-    console.error('push');
-  }
   heap.push(node);
   siftUp(heap, node, index);
 }
@@ -28,20 +25,19 @@ export function pop(heap){
 
 function siftUp(heap, node, i){
   let index = i;
-  // while (true){// Why use while condition? it seems it should only run once per invocation.
+  while (true){
     const parentIndex = (index - 1) >>> 1;
     const parent = heap[parentIndex];
     if (parent !== undefined && compare(parent, node) > 0){
-      console.log('parent existed in siftUp', parent, node);
       // The parent is larger. Swap positions.
       heap[parentIndex] = node;
       heap[index] = parent;
-      index = parentIndex;
+      index = parentIndex; // trigger another loop.      
     } else {
       // The parent is smaller. Exit.
       return;
     }
-  // }
+  }
 }
 
 function siftDown(heap, node, i){

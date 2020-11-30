@@ -38,7 +38,6 @@ import {
   shouldYieldToHost,
   scheduleCallback,
   runWithPriority,
-  requestPaint
 } from '@Jeact/scheduler';
 import {
   findUpdateLane,
@@ -162,24 +161,13 @@ export function requestUpdateLane(fiber){
 export function scheduleUpdateOnFiber(fiber, lane, eventTime){
   // Update fiber.lanes
   const root = markUpdateLaneFromFiberToRoot(fiber, lane);
-  console.error('x', root);
-  if (root === null){
-    console.error('scheduleUpdateOnFiber1')
-  }
+
   // update root.pendingLane, eventTimes etc.
   markRootUpdated(root, lane, eventTime);
 
-  if(wipRoot){
-    console.error('scheduleUpdateOnFiber2', wipRoot)
-  }
-  if(lane!==512||executionContext!==0){
-    console.error('scheduleUpdateOnFiber3')
-  }
-
-  // Schedule other updates after in case the callback is sync.
   ensureRootIsScheduled(root, eventTime);
-
-  mostRecentlyUpdatedRoot = root;// should be used in requestUpdatelane for a transition.
+  // Used in requestUpdatelane for a transition.
+  mostRecentlyUpdatedRoot = root;
 }
 
 function markUpdateLaneFromFiberToRoot(fiber, lane){
@@ -189,14 +177,12 @@ function markUpdateLaneFromFiberToRoot(fiber, lane){
   return fiber.stateNode;
 }
 
-// Use this function to schedule a task for a root. There's only one task per root; if a task was already scheduled, we'll check to make sure the priority of the existing task is the same as the priority of the next level that the root has worked on. This function is called on every update, and right before existing a task.
 function ensureRootIsScheduled(root, currentTime){
   const existingCallbackNode = root.callbackNode;
 
   // update root.expirationTime
   markStarvedLanesAsExpired(root, currentTime);
 
-  // Determine the next lanes to work on, and their priority.
   const nextLanes = getNextLanes(
     root,
     root === wipRoot ? wipRootRenderLanes : NoLanes,
@@ -204,6 +190,7 @@ function ensureRootIsScheduled(root, currentTime){
 
   if (nextLanes === NoLanes){
     if (existingCallbackNode !== null){
+      // There shouldn't have tasks to work on.
       console.log('ensureRootIsScheduled1', existingCallbackNode);
     }
     return;
@@ -217,16 +204,11 @@ function ensureRootIsScheduled(root, currentTime){
   const newCallbackPriority = getNextLanesPriority();
 
   // Schedule a new callback.
-  let newCallbackNode;
-  if (newCallbackPriority !== 8){// DefaultLanePriority:8
-    console.log('ensureRootIsScheduled1')
-  } else {
-    const priority = LanePriorityToPriority(newCallbackPriority);
-    newCallbackNode = scheduleCallback(
-      priority,
-      performConcurrentWorkOnRoot.bind(null, root),
-    )
-  }
+  const priority = LanePriorityToPriority(newCallbackPriority);
+  let newCallbackNode = scheduleCallback(
+    priority,
+    performConcurrentWorkOnRoot.bind(null, root),
+  )
 
   root.callbackPriority = newCallbackPriority;
   root.callbackNode = newCallbackNode;
@@ -563,7 +545,6 @@ function commitRootImpl(root, renderPriority){
       commitLayoutEffects(root, lanes);
     } while(nextEffect!==null);
     nextEffect = null;
-    requestPaint();
     executionContext = prevExecutionContext;
   } else {
     console.error('commitRootImpl8')

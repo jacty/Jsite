@@ -10,7 +10,7 @@ import {
 
 let debugCounter = 1;
 
-function FiberNode(tag, pendingProps=null, key){
+function FiberNode(tag, pendingProps=null, key=null){
   /* Instance */
   this.tag = tag; // Decides which kind of component the fiber is
   this.key = key; // {key} attribute in lists' items

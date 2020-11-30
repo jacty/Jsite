@@ -162,6 +162,7 @@ export function requestUpdateLane(fiber){
 export function scheduleUpdateOnFiber(fiber, lane, eventTime){
   // Update fiber.lanes
   const root = markUpdateLaneFromFiberToRoot(fiber, lane);
+  console.error('x', root);
   if (root === null){
     console.error('scheduleUpdateOnFiber1')
   }
@@ -182,26 +183,8 @@ export function scheduleUpdateOnFiber(fiber, lane, eventTime){
 }
 
 function markUpdateLaneFromFiberToRoot(fiber, lane){
-  if (fiber.tag !== HostRoot){
-    console.error('markUpdateLaneFromFiberToRoot1')
-  }
 
   fiber.lanes = mergeLanes(fiber.lanes, lane);
-  const alternate = fiber.alternate;
-  if (alternate!== null){
-    console.error('markUpdateLaneFromFiberToRoot2')
-  }
-  if (__ENV__){
-    if(alternate === null&& fiber.flags !== NoFlags){
-      console.error('markUpdateLaneFromFiberToRoot3', fiber.flags)
-    }
-  }
-
-  // Walk the parent path to the root and update the child expiration time.
-  let parent = fiber.return;
-  if(parent!==null){
-    console.log('markUpdateLaneFromFiberToRoot3', parent);
-  }
 
   return fiber.stateNode;
 }

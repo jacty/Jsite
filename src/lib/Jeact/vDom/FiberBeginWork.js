@@ -11,9 +11,6 @@ import {
   includesSomeLane,
 } from '@Jeact/vDOM/FiberLane';
 import {
-  hasContextChanged,
-} from '@Jeact/vDOM/FiberContext';
-import {
   prepareToReadContext
 } from '@Jeact/vDOM/FiberNewContext';
 import {

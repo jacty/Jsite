@@ -8,6 +8,9 @@ import {
   PerformedWork,
 } from '@Jeact/shared/Constants';
 import {
+  CurrentOwner
+} from '@Jeact/shared/internals';
+import {
   includesSomeLane,
 } from '@Jeact/vDOM/FiberLane';
 import {
@@ -23,14 +26,14 @@ import {
 } from '@Jeact/vDOM/ChildFiber';
 import {
   processUpdateQueue,
-  cloneUpdateQueue,
 } from '@Jeact/vDOM/UpdateQueue';
 import {renderWithHooks} from '@Jeact/vDOM/FiberHooks';
+import { setIsRendering } from '@Jeact/dev/CurrentFiber';
 
 let didReceiveUpdate = false;
 
-export function reconcileChildren(workInProgress, nextChildren, renderLanes){
-  const current = workInProgress.alternate;
+export function reconcileChildren(current, workInProgress, nextChildren, renderLanes){
+
   if (current === null){
     // If this is a fresh new component that hasn't been rendered yet, we
     // won't update its child set by applying minimal side-effects. Instead,
@@ -74,7 +77,7 @@ function updateFunctionComponent(
   Component,
   nextProps,
   renderLanes
-  ){
+){
   if (__ENV__){
     if (workInProgress.type !== workInProgress.elementType){
       console.error('updateFunctionComponent1');
@@ -82,6 +85,10 @@ function updateFunctionComponent(
   }
   let context;
   prepareToReadContext(workInProgress, renderLanes);
+  if (__ENV__){
+    CurrentOwner.current = workInProgress;
+    // setIsRendering(true);
+  }
   let nextChildren = renderWithHooks(
     current,
     workInProgress,
@@ -90,25 +97,25 @@ function updateFunctionComponent(
     context,
     renderLanes,
     )
-
+  if (__ENV__){
+    // setIsRendering(false);
+  }
   if (current!==null){
     console.error('updateFunctionComponent2')
   };
 
   workInProgress.flags |= PerformedWork;
-  reconcileChildren(workInProgress, nextChildren, renderLanes);
-
+  reconcileChildren(current, workInProgress, nextChildren, renderLanes);
   return workInProgress.child;
 }
 
-function updateHostRoot(workInProgress, renderLanes){
+function updateHostRoot(alternate, workInProgress, renderLanes){
   const root = workInProgress.stateNode;
   pushHostContainer(workInProgress);
   const nextProps = workInProgress.pendingProps;
   const prevState = workInProgress.memoizedState;
   const prevChildren = prevState !== null ? prevState.element : null;
-  //To make updateQueue in wip and wip.alternate point to different objects in memory. but why?
-  cloneUpdateQueue(workInProgress);
+
   //update wip.lanes, wip.memoizedState;
   processUpdateQueue(workInProgress, nextProps, null, renderLanes);
   const nextState = workInProgress.memoizedState;
@@ -116,7 +123,8 @@ function updateHostRoot(workInProgress, renderLanes){
   if (nextChildren === prevChildren){
     console.error('updateHostRoot1')
   }
-  reconcileChildren(workInProgress, nextChildren, renderLanes);
+  reconcileChildren(alternate, workInProgress, nextChildren, renderLanes);
+
   return workInProgress.child;
 }
 
@@ -147,20 +155,14 @@ function updateHostText(current, workInProgress){
   return null;
 }
 
-export function beginWork(workInProgress, renderLanes){
-  const alternate = workInProgress.alternate;
+export function beginWork(alternate, workInProgress, renderLanes){
   const updateLanes = workInProgress.lanes;
-  if (__ENV__){
-    if(workInProgress._debugNeedsRemount){
-      console.error('beginWork1')
-    }
-  }
+
   if (alternate !== null){
     const oldProps = alternate.memoizedProps;
     const newProps = workInProgress.pendingProps;
     if (
       oldProps !== newProps || 
-      hasContextChanged() ||
       // Force a re-render if the implementation changed due to hot reload:
       (__ENV__ ? workInProgress.type !== alternate.type : false)
       ){
@@ -219,11 +221,11 @@ export function beginWork(workInProgress, renderLanes){
       );
     }
     case HostRoot://3
-      return updateHostRoot(workInProgress, renderLanes);
+      return updateHostRoot(alternate, workInProgress, renderLanes);
     case HostComponent://5
       return updateHostComponent(workInProgress, renderLanes);
     case HostText://6
-      return updateHostText(alternate, workInProgress);
+      return updateHostText(workInProgress);
     default:
       console.error('beginWork4', workInProgress.tag);
   }

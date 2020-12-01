@@ -1,4 +1,5 @@
 import {
+  __ENV__,
   JEACT_ELEMENT_TYPE,
   Placement
 } from '@Jeact/shared/Constants';
@@ -11,10 +12,10 @@ function coerceRef(
   returnFiber,
   current,
   element
-  ){
+){
   const mixedRef = element.ref;
   if (mixedRef !== null){
-    console.error('coerceRef', mixedRef);
+    console.error('coerceRef', element);
   }
   return mixedRef;
 }
@@ -139,7 +140,7 @@ function ChildReconciler(shouldTrackSideEffects){
   ){
     const key = element.key;
     let child = currentFirstChild;
-    while (child !== null){
+    if (child !== null){
       console.error('reconcileSingleElement1')
     }
     const created = createFiberFromElement(element, lanes);
@@ -160,7 +161,7 @@ function ChildReconciler(shouldTrackSideEffects){
     // If the top level item is an array, we treat it as a set of children,
     // not as a fragment. Nested arrays on the other hand will be treated as
     // fragment nodes. Recursion happens at the normal flow.
-    
+
     // Handle object types
     const isObject = typeof newChild === 'object' && newChild !== null;
     if (isObject){
@@ -180,9 +181,11 @@ function ChildReconciler(shouldTrackSideEffects){
           }
       };
     }
+
     if(typeof newChild === 'string' || typeof newChild === 'number'){
       console.error('reconcileChildFibers4')
     }
+
     if (Array.isArray(newChild)){
       return reconcileChildrenArray(
         returnFiber,
@@ -191,7 +194,15 @@ function ChildReconciler(shouldTrackSideEffects){
         lanes,
       );
     }
+
     console.error('reconcileChildFibers5');
+
+    if (__ENV__){
+      if (typeof newChild === 'function'){
+        console.error('reconcileChildFibers6')
+      }
+    }
+
     if(typeof newChild === 'undefined'){
       switch(returnFiber.tag){
         default:

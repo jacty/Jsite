@@ -12,7 +12,7 @@ export function resetContextDependencies(){
 export function prepareToReadContext(
   workInProgress,
   renderLanes
-  ){
+){
   currentlyRenderingFiber = workInProgress;
   lastContextDependency = null;
   lastContextWithAllBitsObserved = null;

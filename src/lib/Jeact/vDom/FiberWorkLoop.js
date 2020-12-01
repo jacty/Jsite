@@ -29,8 +29,8 @@ import {
   CurrentDispatcher
 } from '@Jeact/shared/internals';
 import {
-  setCurrentDebugFiberInDev,
-  resetCurrentDebugFiberInDev,
+  setCurrentFiber,
+  resetCurrentFiber,
 } from '@Jeact/dev/CurrentFiber'
 import {
   getCurrentSchedulePriority,
@@ -302,7 +302,7 @@ function handleError(root, thrownValue){
     let erroredWork = wip;
     try{
       resetContextDependencies();
-      resetCurrentDebugFiberInDev();
+      resetCurrentFiber();
       console.error('handleError', wip);
       completeUnitOfWork(erroredWork);
     } catch (yetAnotherThrownValue){
@@ -344,14 +344,14 @@ function renderRootConcurrent(root, lanes){
     prepareFreshStack(root, lanes);
   }
   //Keep trying until all caught error handled.
-  do{
+  // do{
     try {
       workLoopConcurrent();
-      break;
+      // break;
     } catch(thrownValue){
       handleError(root, thrownValue);
     }
-  } while (true);
+  // } while (true);
 
   resetContextDependencies();
   executionContext = prevExecutionContext;
@@ -371,7 +371,6 @@ function renderRootConcurrent(root, lanes){
 }
 
 function workLoopConcurrent(){
-  console.log('workLoopConcurrent');
   // Perform work until Scheduler asks us to yield
   while(wip !== null && !shouldYieldToHost()){
     performUnitOfWork(wip);
@@ -382,14 +381,15 @@ function performUnitOfWork(unitOfWork){
   // The current, flushed, state of this fiber is the alternate. Ideally
   // nothing should rely on this, but relying on it here means that we don't
   // need an additional field on the work in progress.
+  const alternate = unitOfWork.alternate;
   if(__ENV__){
-    setCurrentDebugFiberInDev(unitOfWork);    
+    setCurrentFiber(unitOfWork);    
   }
 
-  let next = beginWork(unitOfWork, subtreeRenderLanes);
+  let next = beginWork(alternate, unitOfWork, subtreeRenderLanes);
 
   if(__ENV__){
-    resetCurrentDebugFiberInDev()
+    resetCurrentFiber()
   }
 
   unitOfWork.memoizedProps = unitOfWork.pendingProps;
@@ -409,10 +409,10 @@ function completeUnitOfWork(unitOfWork){
     const returnFiber = completedWork.return;
     // Check if the work completed or if something threw.
     if ((completedWork.flags & Incomplete) === NoFlags){
-      setCurrentDebugFiberInDev(completedWork);
+      setCurrentFiber(completedWork);
       // Process alternate.child
       let next = completeWork(completedWork, subtreeRenderLanes);
-      resetCurrentDebugFiberInDev();
+      resetCurrentFiber();
       if (next !== null){
         console.error('completeUnitOfWork1', next)
       }
@@ -581,9 +581,9 @@ function commitBeforeMutationEffects(){
 
     const flags = nextEffect.flags;
     if ((flags & Snapshot) !== NoFlags){
-      setCurrentDebugFiberInDev(nextEffect);
+      setCurrentFiber(nextEffect);
       commitBeforeMutationEffectOnFiber(nextEffect);// Seems it do nothing actually..
-      resetCurrentDebugFiberInDev()
+      resetCurrentFiber()
     }
     if ((flags & Passive) !== NoFlags){
       console.error('commitBeforeMutationEffects2')
@@ -594,7 +594,7 @@ function commitBeforeMutationEffects(){
 
 function commitMutationEffects(root, renderPriority){
   while (nextEffect !== null){
-    setCurrentDebugFiberInDev(nextEffect);
+    setCurrentFiber(nextEffect);
     const flags = nextEffect.flags;
     if(flags & ContentReset){
       console.error('commitMutationEffects1')
@@ -614,14 +614,14 @@ function commitMutationEffects(root, renderPriority){
         console.error('commitMutationEffects3', primaryFlags):0;
      }
 
-    resetCurrentDebugFiberInDev();
+    resetCurrentFiber();
     nextEffect = nextEffect.nextEffect;
   }
 }
 
 function commitLayoutEffects(root, committedLanes){
   while(nextEffect!== null){
-    setCurrentDebugFiberInDev(nextEffect);
+    setCurrentFiber(nextEffect);
     const flags = nextEffect.flags;
     if (flags & (Update | Callback)){
       console.error('commitLayoutEffects1')
@@ -629,7 +629,7 @@ function commitLayoutEffects(root, committedLanes){
     if (flags & Ref){
       console.error('commitLayoutEffects2')
     }
-    resetCurrentDebugFiberInDev();
+    resetCurrentFiber();
     nextEffect = nextEffect.nextEffect;
   }
 }

@@ -59,8 +59,9 @@ export function createElement(type, config, children){
         warnStringRef(config);
       }
     }
-    ref = hasValidRef(config) ? config.ref : '';
-    key = hasValidKey(config) ? config.key : '';
+    if (hasValidKey(config)){
+      key = '' + config.key;
+    }
 
     for (propName in config){
       if(config.hasOwnProperty(propName)&&

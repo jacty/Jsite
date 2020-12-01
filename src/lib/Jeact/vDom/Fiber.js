@@ -163,7 +163,6 @@ export function createFiberFromElement(element, lanes){
   }
   const fiber = createFiberFromTypeAndProps(element, lanes, owner);
   if (__ENV__){
-    // fiber._debugSource = element._source;
     fiber._debugOwner = element._owner;
   }
   return fiber;

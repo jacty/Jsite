@@ -10,21 +10,6 @@ import { markSkippedUpdateLanes } from '@Jeact/vDOM/FiberWorkLoop';
 
 let currentlyProcessingQueue;// to denote currently processing queue in DEV.
 
-export function cloneUpdateQueue(workInProgress){
-  const queue = workInProgress.updateQueue;
-  const currentQueue = workInProgress.alternate.updateQueue;
-  if (queue === currentQueue){
-    const clone = {
-      baseState: currentQueue.baseState,
-      firstBaseUpdate: currentQueue.firstBaseUpdate,
-      lastBaseUpdate: currentQueue.lastBaseUpdate,
-      pending: currentQueue.pending,
-      effects: currentQueue.effects,
-    };
-    workInProgress.updateQueue = clone;
-  }
-}
-
 export function createUpdate(eventTime, lane){
   const update = {
     eventTime,
@@ -50,8 +35,14 @@ export function enqueueUpdate(fiber, update){
   updateQueue.pending = update;
 }
 
-function getStateFromUpdate(workInProgress, queue, update, prevState, nextProps, instance){
-
+function getStateFromUpdate(
+  workInProgress, 
+  queue, 
+  update, 
+  prevState, 
+  nextProps, 
+  instance)
+{
   switch (update.tag){
     case UpdateState: {
       const payload = update.payload;
@@ -75,14 +66,18 @@ function getStateFromUpdate(workInProgress, queue, update, prevState, nextProps,
   return prevState;
 }
 
-export function processUpdateQueue(workInProgress, props, instance, renderLanes){
+export function processUpdateQueue(
+  workInProgress, 
+  props, 
+  instance, 
+  renderLanes
+){
 
   const queue = workInProgress.updateQueue;
 
   if (__ENV__){
     currentlyProcessingQueue = queue.pending;
   }
-
 
   let firstBaseUpdate = queue.firstBaseUpdate;
   let lastBaseUpdate = queue.lastBaseUpdate;
@@ -96,11 +91,12 @@ export function processUpdateQueue(workInProgress, props, instance, renderLanes)
     const lastPendingUpdate = pendingQueue;
     const firstPendingUpdate = lastPendingUpdate.next;
     lastPendingUpdate.next = null;
+
     // Append pending updates to base queue
     if (lastBaseUpdate === null){
       firstBaseUpdate = firstPendingUpdate;
     } else {
-      console.error('processUpdateQueue2')
+      lastBaseUpdate.next = firstPendingUpdate;
     }
     lastBaseUpdate = lastPendingUpdate;
 
@@ -114,7 +110,7 @@ export function processUpdateQueue(workInProgress, props, instance, renderLanes)
         if (currentLastBaseUpdate === null){
           currentQueue.firstBaseUpdate = firstPendingUpdate;
         } else {
-          console.error('processUpdateQueue1')
+          currentLastBaseUpdate.next = firstPendingUpdate;
         }
         currentQueue.lastBaseUpdate = lastPendingUpdate;
       }

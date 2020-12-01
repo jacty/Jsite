@@ -8,16 +8,20 @@ function getCurrentFiberStackInDev(){
     console.error('getCurrentFiberStackInDev')
 };
 
-export function resetCurrentDebugFiberInDev(){
+export function resetCurrentFiber(){
     // alternate of resetCurrentFiber()
     DebugCurrentFrame.getCurrentStack = null;
     current = null;
     isRendering = false;   
 }
 
-export function setCurrentDebugFiberInDev(fiber){
+export function setCurrentFiber(fiber){
     // alternate of setCurrentFiber()
     DebugCurrentFrame.getCurrentStack = getCurrentFiberStackInDev;
     current = fiber;
     isRendering = false;         
+}
+
+export function setIsRendering(rendering){
+    isRendering = rendering;
 }

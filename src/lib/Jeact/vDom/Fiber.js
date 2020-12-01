@@ -55,6 +55,7 @@ function FiberNode(tag, pendingProps=null, key=null){
   if (__ENV__){
     this._debugID = debugCounter++;
     this._debugOwner = null;
+    this._debugHookTypes = null;
     Object.preventExtensions(this);
   }
 
@@ -69,7 +70,7 @@ export const createFiber = function(tag=HostRoot, pendingProps=null, key){
 export function createWorkInProgress(current){
   //TODO: Optimize the clone part using a function to iterate.
   let workInProgress = current.alternate;
-  console.log('createWorkInProgress');
+  let cloneKeys = [];
   if (workInProgress === null){
     // We use a double buffering pooling technique because we know that we'll
     // only ever need at most two versions of a tree. We pool the "other"
@@ -78,44 +79,50 @@ export function createWorkInProgress(current){
     workInProgress = createFiber(
       current.tag,
     );
-    workInProgress.elementType = current.elementType;
-    workInProgress.type = current.type;
-    workInProgress.stateNode = current.stateNode;
+
+    cloneKeys = [
+      'elementType',
+      'type',
+      'stateNode',
+    ];
+
+    if (__ENV__){
+      cloneKeys = cloneKeys.concat([
+        '_debugID',
+        '_debugOwner',
+        '_debugHookTypes'
+      ])
+    }
+    clone(current,workInProgress,cloneKeys)   
 
     workInProgress.alternate = current;
     current.alternate = workInProgress;
   } else{
     console.error('createWorkInProgress1')
   }
+  cloneKeys = [
+    'childLanes',
+    'lanes',
+    'child',
+    'memoizedProps',
+    'memoizedState',
+    'updateQueue',
+    'sibling',
+    'index',
+    'ref'
+  ];
+  clone(current,workInProgress,cloneKeys);
 
-  workInProgress.childLanes = current.childLanes;
-  workInProgress.lanes = current.lanes;
-
-  workInProgress.child = current.child;
-  workInProgress.memoizedProps = current.memoizedProps;
-  workInProgress.memoizedState = current.memoizedState;
-  workInProgress.updateQueue = current.updateQueue;
   // Clone the dependencies object. This is mutated during the render phase,
   // so it cannot be shared with the current fiber.
   const currentDependencies = current.dependencies;
   workInProgress.dependencies =
     currentDependencies === null
     ? null
-    : console.log('createWorkInProgress2')
-
-  // These will be overridden during the parent's reconciliation
-  workInProgress.sibling = current.sibling;
-  workInProgress.index = current.index;
-  workInProgress.ref = current.ref;
-
-  if(__ENV__){
-    // workInProgress._debugNeedsRemount = current._debugNeedsRemount;
-    switch(workInProgress.tag){
-      default:
-        workInProgress.tag!==3?console.error('createWorkInProgress3'):'';
-        break;
-    }
-  }
+    : {
+      lanes: currentDependencies.lanes,
+      firstContext: currentDependencies.firstContext,
+    };
 
   return workInProgress;
 }
@@ -165,4 +172,24 @@ export function createFiberFromText(content, lanes){
   const fiber = createFiber(HostText, content, null);
   fiber.lanes = lanes;
   return fiber;
+}
+/* 
+* cloneKeys: keys of items need to be cloned in {from}. Default to empty 
+* array means clone all the items in {from} to {to}.
+*/
+function clone(from, to, cloneKeys=[]){
+  for (const property in from){
+    if (!from.hasOwnProperty(property)||
+        (cloneKeys.length>0 && !cloneKeys.includes(property))
+      ){
+      continue
+    }
+    Object.defineProperty(
+      to,
+      property,
+      Object.getOwnPropertyDescriptor(from, property)
+    );
+  }
+
+  return to;
 }

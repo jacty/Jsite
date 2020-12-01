@@ -214,10 +214,7 @@ export function markRootFinished(root, remainingLanes){
   root.pingedLanes = 0;
   
   root.expiredLanes &= remainingLanes;
-  root.mutableReadLanes &= remainingLanes;
-  root.entangledLanes &= remainingLanes;
 
-  const entanglements = root.entanglements;
   const eventTimes = root.eventTimes;
   const expirationTimes = root.expirationTimes;
 

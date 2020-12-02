@@ -90,7 +90,7 @@ function workLoop(initialTime){
 
 export function runWithPriority(priority,fn){
   const schedulePriority = PriorityToSchedulePriority(priority);
-
+  
   priority = NormalPriority;
   const previousPriority = currentPriority;
   currentPriority = priority;

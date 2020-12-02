@@ -141,7 +141,6 @@ function updateHostText(current, workInProgress){
 
 export function beginWork(alternate, workInProgress, renderLanes){
   const updateLanes = workInProgress.lanes;
-
   if (alternate !== null){
     const oldProps = alternate.memoizedProps;
     const newProps = workInProgress.pendingProps;

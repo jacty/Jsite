@@ -22,9 +22,9 @@ function coerceRef(
   return mixedRef;
 }
 
-  // This API will tag the children with the side-effect of the reconciliation
-  // itself. They will be added to the side-effect list as we pass through the
-  // children and the parent.
+// This API will tag the children with the side-effect of the reconciliation
+// itself. They will be added to the side-effect list as we pass through the
+// children and the parent.
 export function reconcileChildFibers(
   returnFiber,
   currentChild,
@@ -105,16 +105,15 @@ function reconcileSingleElement(
 
 function reconcileChildrenArray(
   returnFiber,
-  currentFirstChild,
+  currentChild,
   newChildren,
   lanes
 ){
 
-  console.error('reconcileChildrenArray', newChildren);
   let resultingFirstChild = null;
   let previousNewFiber = null;
 
-  let oldFiber = currentFirstChild;
+  let oldFiber = currentChild;
   let lastPlacedIndex = 0;
   let newIdx = 0;
   let nextOldFiber = null;
@@ -130,7 +129,8 @@ function reconcileChildrenArray(
     // since the rest will all be insertions.
     for (; newIdx < newChildren.length; newIdx++){
       const newFiber = createChild(returnFiber, newChildren[newIdx], lanes);
-      if (newFiber === null){
+      if (newFiber === null){// which case
+        console.error('reconcileChildrenArray3')
         continue;
       }
       lastPlacedIndex = placeChild(newFiber, lastPlacedIndex, newIdx);
@@ -143,6 +143,7 @@ function reconcileChildrenArray(
     }
     return resultingFirstChild;
   }
+  console.error('reconcileChildrenArray4')
 }
 
 function createChild(returnFiber, newChild, lanes){
@@ -155,7 +156,6 @@ function createChild(returnFiber, newChild, lanes){
     return created;
   }
   if(typeof newChild === 'object' && newChild !== null){
-    console.error('createChild1');return;
     switch(newChild.$$typeof){
       case JEACT_ELEMENT_TYPE:{
         const created = createFiberFromElement(

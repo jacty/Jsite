@@ -3,10 +3,6 @@ import {
   createTextNode,
   setInitialProperties,
 } from '@Jeact/vDOM/DOMComponent';
-import {
-  precacheFiberNode,
-  updateFiberProps,
-} from '@Jeact/vDOM/DOMComponentTree';
 
 function shouldAutoFocusHostComponent(type, props){
   switch(type){
@@ -19,10 +15,6 @@ function shouldAutoFocusHostComponent(type, props){
   return false;
 }
 
-export function resetAfterCommit(containerInfo){
-  
-}
-
 export function createInstance(
   type,
   props, 
@@ -31,14 +23,7 @@ export function createInstance(
   interalInstancedHandle
 ){
   let parentNamespace = hostContext; 
-  const domElement = createElement(
-    type,
-    props,
-    rootContainerInstance,
-    parentNamespace,
-  )
-  precacheFiberNode(interalInstancedHandle, domElement);
-  updateFiberProps(domElement, props);
+  const domElement = createElement(type,rootContainerInstance)
   return domElement;
 }
 

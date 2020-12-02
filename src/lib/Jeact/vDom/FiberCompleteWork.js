@@ -78,10 +78,10 @@ function appendAllChildren(parent, workInProgress, needsVisibilityToggle, isHidd
 }
 
 export function completeWork(
+  alternate,
   workInProgress,
   renderLanes
-  ){
-  const current = workInProgress.alternate;
+){
   const newProps = workInProgress.pendingProps;
   switch(workInProgress.tag){
     case FunctionComponent:
@@ -89,26 +89,20 @@ export function completeWork(
     case HostRoot:{//3
       popHostContainer(workInProgress);
       const fiberRoot = workInProgress.stateNode;
+
       if (fiberRoot.pendingContext){
         console.error('completeWork1')
       }
-      if(current === null || current.child === null){
-        workInProgress.flags |= Snapshot;
-      }
+      updateHostContainer(workInProgress);
       return null;
     }
     case HostComponent:{//5
       popHostContext(workInProgress);
       const rootContainerInstance = getRootHostContainer();
       const type = workInProgress.type;
-      if (current!== null){
+      if (alternate!== null){// which case?
         console.error('completeWork2')
       } else{
-        if(!newProps){
-          workInProgress.stateNode === null
-          ? console.error('completeWork3'):''
-        }
-
         const currentHostContext = getHostContext();
         const instance = createInstance(
           type,
@@ -117,9 +111,10 @@ export function completeWork(
           currentHostContext,
           workInProgress
         );
-        appendAllChildren(instance, workInProgress, false, false);
 
+        appendAllChildren(instance, workInProgress, false, false);
         workInProgress.stateNode = instance;
+
         if(finalizeInitialChildren(
             instance,
             type,
@@ -157,6 +152,15 @@ export function completeWork(
     }
     default:
       console.error('completeWork', workInProgress)
+  }
+}
+
+function updateHostContainer(workInProgress){
+  const childrenUnchanged = workInProgress.firstEffect === null;
+  if(childrenUnchanged){
+
+  } else {
+    console.error('updateHostContainer1')  
   }
 }
 

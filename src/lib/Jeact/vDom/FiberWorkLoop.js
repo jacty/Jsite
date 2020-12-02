@@ -17,7 +17,6 @@ import {
   Placement,
   Update, 
   Deletion,
-  Snapshot,
   Passive,
   ContentReset,
   Ref,
@@ -68,9 +67,6 @@ import {
   commitPlacement,
 } from '@Jeact/vDOM/FiberCommitWork';
 import {
-  resetAfterCommit,
-} from '@Jeact/vDOM/FiberHost';
-import {
   resetHooksAfterThrow
 } from '@Jeact/vDOM/FiberHooks';
 
@@ -104,12 +100,6 @@ function resetRenderTimer(){// Used by Suspense
 }
 
 let nextEffect = null;
-
-let rootDoesHavePassiveEffects = false;
-let rootWithPendingPassiveEffects = null;
-let pendingPassiveEffectsRenderPriority = NoPriority;
-let rootsWithPendingDiscreteUpdates = null;
-
 
 let currentEventTime = NoTimestamp;
 let currentEventWipLanes = NoLanes;
@@ -217,15 +207,7 @@ function performConcurrentWorkOnRoot(root){
     root === wipRoot ? wipRootRenderLanes : NoLanes,
   );
 
-  if (lanes === NoLanes){
-    console.error('Probably a bug!');
-    return null;
-  }
-
   let exitStatus = renderRootConcurrent(root, lanes);
-  //debug
-  console.error('performConcurrentWorkOnRoot', exitStatus, RootCompleted);
-
 
   if (includesSomeLane(wipRootIncludedLanes, wipRootUpdatedLanes)){
     console.error('performConcurrentWorkOnRoot4')
@@ -243,8 +225,10 @@ function performConcurrentWorkOnRoot(root){
     root.finishedLanes = lanes;
     finishConcurrentRender(root, exitStatus, lanes);
   }
+
   //why again?
   ensureRootIsScheduled(root, performance.now());
+
   if (root.callbackNode === originalCallbackNode){
     // Continue expired tasks.
     return performConcurrentWorkOnRoot.bind(null, root);
@@ -328,7 +312,6 @@ function popDispatcher(prevDispatcher){
   CurrentDispatcher.current = prevDispatcher;
 }
 
-
 export function markSkippedUpdateLanes(lane){
   wipRootSkippedLanes = mergeLanes(
     lane,
@@ -339,7 +322,7 @@ export function markSkippedUpdateLanes(lane){
 function renderRootConcurrent(root, lanes){
   const prevExecutionContext = executionContext;
   executionContext |= RenderContext;
-  
+
   // If the root or lanes have changed, throw out the existing stack
   // and prepare a fresh one. Otherwise we'll continue where we left off.
   if (wipRoot !== root || wipRootRenderLanes !== lanes){
@@ -407,15 +390,16 @@ function performUnitOfWork(unitOfWork){
 }
 
 function completeUnitOfWork(unitOfWork){
-
   let completedWork = unitOfWork;
+
   do {
+    const alternate = completedWork.alternate;
     const returnFiber = completedWork.return;
     // Check if the work completed or if something threw.
     if ((completedWork.flags & Incomplete) === NoFlags){
       setCurrentFiber(completedWork);
       // Process alternate.child
-      let next = completeWork(completedWork, subtreeRenderLanes);
+      let next = completeWork(alternate, completedWork, subtreeRenderLanes);
       resetCurrentFiber();
       if (next !== null){
         console.error('completeUnitOfWork1', next)
@@ -488,15 +472,13 @@ function commitRoot(root){
 }
 
 function commitRootImpl(root, renderPriority){
-  // Debug
-  rootWithPendingPassiveEffects !== null ?
-    console.error('commitRootImpl1'):'';
 
   const finishedWork = root.finishedWork;
   const lanes = root.finishedLanes;
 
   if (finishedWork === null){
     console.error('commitRootImpl2');
+    return null;
   }
 
   root.finishedWork = null;
@@ -509,11 +491,7 @@ function commitRootImpl(root, renderPriority){
   root.callbackNode = null;
 
   let remainingLanes = mergeLanes(finishedWork.lanes, finishedWork.childLanes);
-  markRootFinished(root, remainingLanes);
-
-  if (rootsWithPendingDiscreteUpdates !== null){
-    console.error('commitRootImpl3')
-  }
+  markRootFinished(root, remainingLanes);//update lanes and eventTimes
 
   if (root === wipRoot) {
     console.error('commitRootImpl4')
@@ -526,11 +504,10 @@ function commitRootImpl(root, renderPriority){
       finishedWork.lastEffect.nextEffect = finishedWork;
       firstEffect = finishedWork.firstEffect;
     } else {
-      // firstEffect = finishedWork;
-      console.error('commitRootImpl6')
+      firstEffect = finishedWork;
     }
   } else {
-    console.error('commitRootImpl7');
+    firstEffect = finishedWork.firstEffect;
   }
 
   if(firstEffect!==null){
@@ -541,54 +518,48 @@ function commitRootImpl(root, renderPriority){
 
     nextEffect = firstEffect;
     do{
-      commitBeforeMutationEffects();
+      commitBeforeMutationEffects();//Update flag
     } while(nextEffect !== null);
 
     nextEffect = firstEffect
     do {
       commitMutationEffects(root, renderPriority);
     } while (nextEffect !== null);
-    resetAfterCommit(root.containerInfo);
+
     root.current = finishedWork;
+
     nextEffect = firstEffect;
     do{
       commitLayoutEffects(root, lanes);
     } while(nextEffect!==null);
+
     nextEffect = null;
     executionContext = prevExecutionContext;
   } else {
-    console.error('commitRootImpl8')
+    root.current = finishedWork;
   }
-  const rootDidHavePassiveEffects = rootDoesHavePassiveEffects;
-  if (rootDidHavePassiveEffects){
-    console.error('commitRootImpl9')
-  } else {
-    nextEffect = firstEffect;
-    while (nextEffect !== null){
-      const nextNextEffect = nextEffect.nextEffect;
-      nextEffect.nextEffect = null;
-      if (nextEffect.flags & Deletion){
-        console.error('commitRootImpl10')
-      }
-      nextEffect = nextNextEffect;
-    }
-    remainingLanes = root.pendingLanes;
 
-    ensureRootIsScheduled(root, performance.now());
-    return null;
+  nextEffect = firstEffect;
+  while (nextEffect !== null){
+    const nextNextEffect = nextEffect.nextEffect;
+    nextEffect.nextEffect = null;
+    if (nextEffect.flags & Deletion){
+      console.error('commitRootImpl10')
+    }
+    nextEffect = nextNextEffect;
   }
+
+  remainingLanes = root.pendingLanes;
+
+  ensureRootIsScheduled(root, performance.now());
+
+  return null;
 }
 
 function commitBeforeMutationEffects(){
   while (nextEffect !== null){
-    const current = nextEffect.alternate;
-
     const flags = nextEffect.flags;
-    if ((flags & Snapshot) !== NoFlags){
-      setCurrentFiber(nextEffect);
-      commitBeforeMutationEffectOnFiber(nextEffect);// Seems it do nothing actually..
-      resetCurrentFiber()
-    }
+
     if ((flags & Passive) !== NoFlags){
       console.error('commitBeforeMutationEffects2')
     }
@@ -598,14 +569,10 @@ function commitBeforeMutationEffects(){
 
 function commitMutationEffects(root, renderPriority){
   while (nextEffect !== null){
-    setCurrentFiber(nextEffect);
+    __ENV__ ? setCurrentFiber(nextEffect):'';
+    
     const flags = nextEffect.flags;
-    if(flags & ContentReset){
-      console.error('commitMutationEffects1')
-    }
-    if (flags & Ref){
-      console.error('commitMutationEffects2')
-    }
+    
     const primaryFlags = flags & (Placement | Update | Deletion);
     switch(primaryFlags){
       case Placement:{//2
@@ -618,22 +585,20 @@ function commitMutationEffects(root, renderPriority){
         console.error('commitMutationEffects3', primaryFlags):0;
      }
 
-    resetCurrentFiber();
+    __ENV__ ? resetCurrentFiber() : '';
+
     nextEffect = nextEffect.nextEffect;
   }
 }
 
 function commitLayoutEffects(root, committedLanes){
   while(nextEffect!== null){
-    setCurrentFiber(nextEffect);
+    __ENV__ ? setCurrentFiber(nextEffect) : '';
+    
     const flags = nextEffect.flags;
-    if (flags & (Update | Callback)){
-      console.error('commitLayoutEffects1')
-    }
-    if (flags & Ref){
-      console.error('commitLayoutEffects2')
-    }
-    resetCurrentFiber();
+
+    __ENV__ ? resetCurrentFiber():'';
+
     nextEffect = nextEffect.nextEffect;
   }
 }

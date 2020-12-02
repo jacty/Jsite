@@ -224,9 +224,7 @@ function performConcurrentWorkOnRoot(root){
 
   let exitStatus = renderRootConcurrent(root, lanes);
   //debug
-  exitStatus !== 5 
-  ? console.error('performConcurrentWorkOnRoot')
-  :'';
+  console.error('performConcurrentWorkOnRoot', exitStatus, RootCompleted);
 
 
   if (includesSomeLane(wipRootIncludedLanes, wipRootUpdatedLanes)){

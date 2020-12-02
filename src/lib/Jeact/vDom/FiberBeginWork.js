@@ -18,7 +18,6 @@ import {
   pushHostContainer
 } from '@Jeact/vDOM/FiberHostContext';
 import {
-  mountChildFibers,
   reconcileChildFibers,
 } from '@Jeact/vDOM/ChildFiber';
 import {
@@ -29,33 +28,6 @@ import { setIsRendering } from '@Jeact/dev/CurrentFiber';
 
 let didReceiveUpdate = false;
 
-export function reconcileChildren(current, workInProgress, nextChildren, renderLanes){
-  if (current === null){
-    // If this is a fresh new component that hasn't been rendered yet, we
-    // won't update its child set by applying minimal side-effects. Instead,
-    // we will add them all to the child before it gets rendered. That means
-    // we can optimize this reconciliation pass by not tracking side-effects.
-    workInProgress.child = mountChildFibers(
-      workInProgress,
-      null,
-      nextChildren,
-      renderLanes,
-    );
-  } else {
-    // If the current child is the same as the work in progress, it means that
-    // we haven't yet started any work on these children. Therefore, we use the
-    // clone algorithm to create a copy of all the current children.
-
-    // If we had any progressed work already, that is invalid at this point so
-    // let's throw it out.
-    workInProgress.child = reconcileChildFibers(
-      workInProgress,
-      current.child,
-      nextChildren,
-      renderLanes,
-    );
-  }
-}
 
 function markRef(current, workInProgress){
   const ref = workInProgress.ref;
@@ -68,7 +40,7 @@ function markRef(current, workInProgress){
 }
 
 function updateFunctionComponent(
-  current,
+  alternate,
   workInProgress,
   Component,
   nextProps,
@@ -79,8 +51,6 @@ function updateFunctionComponent(
       console.error('updateFunctionComponent1');
     }
   }
-
-  // prepareToReadContext(workInProgress, renderLanes);
   
   if (__ENV__){
     CurrentOwner.current = workInProgress;
@@ -88,7 +58,7 @@ function updateFunctionComponent(
   }
 
   let nextChildren = renderWithHooks(
-    current,
+    alternate,
     workInProgress,
     Component,
     nextProps,
@@ -100,12 +70,19 @@ function updateFunctionComponent(
     setIsRendering(false);
   }
 
-  if (current!==null){
+  if (alternate!==null){
     console.error('updateFunctionComponent2')
   };
 
   workInProgress.flags |= PerformedWork;
-  reconcileChildren(current, workInProgress, nextChildren, renderLanes);
+
+  workInProgress.child = reconcileChildFibers(
+      workInProgress,
+      alternate === null ? alternate : alternate.child,
+      nextChildren,
+      renderLanes,
+    );
+
   return workInProgress.child;
 }
 
@@ -121,7 +98,13 @@ function updateHostRoot(alternate, workInProgress, renderLanes){
   const nextState = workInProgress.memoizedState;
   const nextChildren = nextState.element;
 
-  reconcileChildren(alternate, workInProgress, nextChildren, renderLanes);
+  workInProgress.child = reconcileChildFibers(
+      workInProgress,
+      alternate === null ? alternate : alternate.child,
+      nextChildren,
+      renderLanes,
+  );
+
   return workInProgress.child;
 }
 
@@ -142,7 +125,13 @@ function updateHostComponent(alternate, workInProgress,renderLanes){
   }
   markRef(alternate, workInProgress);
 
-  reconcileChildren(alternate, workInProgress, nextChildren, renderLanes);
+  workInProgress.child = reconcileChildFibers(
+      workInProgress,
+      alternate === null ? alternate : alternate.child,
+      nextChildren,
+      renderLanes,
+    );
+
   return workInProgress.child;
 }
 
@@ -188,18 +177,11 @@ export function beginWork(alternate, workInProgress, renderLanes){
   } else {
     didReceiveUpdate = false;
   }
-   
-  workInProgress.lanes = NoLanes; // Why?   
+  
+  // Will be updated to renderLanes later.
+  workInProgress.lanes = NoLanes;    
 
   switch (workInProgress.tag){
-    // case IndeterminateComponent:{//2
-    //   return mountIndeterminateComponent(
-    //     alternate,
-    //     workInProgress,
-    //     workInProgress.type,
-    //     renderLanes,
-    //   );
-    // }
     case FunctionComponent:{//0
       const Component = workInProgress.type;
       const unresolvedProps = workInProgress.pendingProps;

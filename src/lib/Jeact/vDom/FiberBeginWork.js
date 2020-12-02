@@ -14,9 +14,6 @@ import {
   includesSomeLane,
 } from '@Jeact/vDOM/FiberLane';
 import {
-  prepareToReadContext
-} from '@Jeact/vDOM/FiberNewContext';
-import {
   pushHostContext,
   pushHostContainer
 } from '@Jeact/vDOM/FiberHostContext';
@@ -83,7 +80,7 @@ function updateFunctionComponent(
     }
   }
 
-  prepareToReadContext(workInProgress, renderLanes);
+  // prepareToReadContext(workInProgress, renderLanes);
   
   if (__ENV__){
     CurrentOwner.current = workInProgress;
@@ -123,11 +120,8 @@ function updateHostRoot(alternate, workInProgress, renderLanes){
   processUpdateQueue(workInProgress, nextProps, null, renderLanes);
   const nextState = workInProgress.memoizedState;
   const nextChildren = nextState.element;
-  if (nextChildren === prevChildren){
-    console.error('updateHostRoot1')
-  }
-  reconcileChildren(alternate, workInProgress, nextChildren, renderLanes);
 
+  reconcileChildren(alternate, workInProgress, nextChildren, renderLanes);
   return workInProgress.child;
 }
 

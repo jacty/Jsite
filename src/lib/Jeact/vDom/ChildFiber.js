@@ -28,7 +28,7 @@ function ChildReconciler(shouldTrackSideEffects){
 
   function deleteRemainingChildren(
     returnFiber,
-    currentFirstChild,
+    currentChild,
   ){
     if (!shouldTrackSideEffects){
       return null;
@@ -154,10 +154,8 @@ function ChildReconciler(shouldTrackSideEffects){
       console.error('reconcileSingleElement1')
     }
     const created = createFiberFromElement(element, lanes);
-    returnFiber.tag === 0 ? console.error('x', element):'';//debug
     created.ref = coerceRef(returnFiber, currentFirstChild, element);
     created.return = returnFiber;
-    
     return created;
   }
   // This API will tag the children with the side-effect of the reconciliation
@@ -165,19 +163,19 @@ function ChildReconciler(shouldTrackSideEffects){
   // children and the parent.
   function reconcileChildFibers(
     returnFiber,
-    currentFirstChild,
+    currentChild,
     newChild,// from payload.element
     lanes){
-
     // Handle object types
+
     const isObject = typeof newChild === 'object' && newChild !== null;
     if (isObject){
       switch(newChild.$$typeof){
         case JEACT_ELEMENT_TYPE:
-          return placeSingleChild(
+          return placeSingleChild(//update flag to Placement.
             reconcileSingleElement(
               returnFiber,
-              currentFirstChild,
+              currentChild,
               newChild,
               lanes,
             ),
@@ -196,18 +194,10 @@ function ChildReconciler(shouldTrackSideEffects){
     if (Array.isArray(newChild)){
       return reconcileChildrenArray(
         returnFiber,
-        currentFirstChild,
+        currentChild,
         newChild,
         lanes,
       );
-    }
-
-    console.error('reconcileChildFibers5');
-
-    if (__ENV__){
-      if (typeof newChild === 'function'){
-        console.error('reconcileChildFibers6')
-      }
     }
 
     if(typeof newChild === 'undefined'){
@@ -215,11 +205,10 @@ function ChildReconciler(shouldTrackSideEffects){
         default:
           returnFiber.tag !== 5? console.error('reconcileChildFibers2'):'';
       }
-    } else{
-      console.error('reconcileChildFibers3', newChild)
     }
+
     // Remaining cases are all treated as empty.
-    return deleteRemainingChildren(returnFiber, currentFirstChild);
+    return deleteRemainingChildren(returnFiber, currentChild);
   }
   return reconcileChildFibers;
 }

@@ -64,9 +64,6 @@ import {
   completeWork
 } from '@Jeact/vDOM/FiberCompleteWork';
 import {
-  resetContextDependencies
-} from '@Jeact/vDOM/FiberNewContext';
-import {
   commitBeforeMutationEffectOnFiber,
   commitPlacement,
 } from '@Jeact/vDOM/FiberCommitWork';
@@ -143,7 +140,7 @@ export function requestUpdateLane(fiber){
   const LanePriority = PriorityToLanePriority(priority);
 
   let lane = findUpdateLane(LanePriority, currentEventWipLanes)
-  
+
   return lane;
 }
 
@@ -200,7 +197,9 @@ function ensureRootIsScheduled(root, currentTime){
 // Entry point for every concurrent task, i.e. anything that
 // goes through Scheduler.
 function performConcurrentWorkOnRoot(root){
+  // This will be set in requestEventTime() for getting time in browser event phase.
   currentEventTime = NoTimestamp;
+
   currentEventWipLanes = NoLanes;
   currentEventPendingLanes = NoLanes;
 
@@ -211,10 +210,6 @@ function performConcurrentWorkOnRoot(root){
   // Flush any pending passive effects before deciding which lanes to work on,
   // in case they schedule additional work.
   const originalCallbackNode = root.callbackNode;
-  const didFlushPassiveEffects = flushPassiveEffects();
-  if (didFlushPassiveEffects){
-    console.log('performConcurrentWorkOnRoot2')
-  }
 
   // Determine the next expiration time to work on, using the fields stored on the root.
   let lanes = getNextLanes(
@@ -228,7 +223,12 @@ function performConcurrentWorkOnRoot(root){
   }
 
   let exitStatus = renderRootConcurrent(root, lanes);
-  
+  //debug
+  exitStatus !== 5 
+  ? console.error('performConcurrentWorkOnRoot')
+  :'';
+
+
   if (includesSomeLane(wipRootIncludedLanes, wipRootUpdatedLanes)){
     console.error('performConcurrentWorkOnRoot4')
   } else if(exitStatus !== RootIncomplete){
@@ -238,7 +238,7 @@ function performConcurrentWorkOnRoot(root){
     if (exitStatus === RootFatalErrored){
       console.error('performConcurrentWorkOnRoot6')
     }
-    console.log('performConcurrentWorkOnRoot');
+
     // now we have a consistent tree.
     const finishedWork = root.current.alternate
     root.finishedWork = finishedWork;
@@ -277,8 +277,8 @@ function prepareFreshStack(root, lanes){
   if (wip !== null){
     console.log('prepareFreshStack2');
   }
-  wipRoot = root;
 
+  wipRoot = root;
   wip = createWorkInProgress(root.current);
   wipRootRenderLanes = subtreeRenderLanes =
     wipRootIncludedLanes = lanes;
@@ -341,13 +341,15 @@ export function markSkippedUpdateLanes(lane){
 function renderRootConcurrent(root, lanes){
   const prevExecutionContext = executionContext;
   executionContext |= RenderContext;
-  const prevDispatcher = pushDispatcher();
-
+  
+  // If the root or lanes have changed, throw out the existing stack
+  // and prepare a fresh one. Otherwise we'll continue where we left off.
   if (wipRoot !== root || wipRootRenderLanes !== lanes){
     resetRenderTimer();
-    // create a new Node by cloning root.current and set it to wip.
+    // GET WIP:create a new Node by cloning root.current and set it to wip.
     prepareFreshStack(root, lanes);
   }
+
   //Keep trying until all caught error handled.
   // do{
     // try {
@@ -358,7 +360,6 @@ function renderRootConcurrent(root, lanes){
     // }
   // } while (true);
 
-  resetContextDependencies();
   executionContext = prevExecutionContext;
 
   // Check if the tree has completed.
@@ -383,7 +384,7 @@ function workLoopConcurrent(){
 }
 
 function performUnitOfWork(unitOfWork){
-  // The current, flushed, state of this fiber is the alternate. Ideally
+  // The current state of this fiber is the alternate. Ideally
   // nothing should rely on this, but relying on it here means that we don't
   // need an additional field on the work in progress.
   const alternate = unitOfWork.alternate;
@@ -637,14 +638,6 @@ function commitLayoutEffects(root, committedLanes){
     resetCurrentFiber();
     nextEffect = nextEffect.nextEffect;
   }
-}
-
-export function flushPassiveEffects(){
-  // Returns whether passive effects were flushed.
-  if (pendingPassiveEffectsRenderPriority !== NoPriority){
-    console.log('flushPassiveEffects2')
-  }
-  return false;
 }
 
 export function getCurrentPriority(){

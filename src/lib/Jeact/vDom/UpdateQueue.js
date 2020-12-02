@@ -47,12 +47,10 @@ function getStateFromUpdate(
     case UpdateState: {
       const payload = update.payload;
       let partialState;
-      if (typeof payload === 'function'){// Updater function
-        console.error('getStateFromUpdate1')
-      } else {
-        // Partial state object
-        partialState = payload;
-      }
+
+      // Partial state object
+      partialState = payload;
+      
       if (partialState === null || partialState === undefined){
         // Null and undefined are treated as no-ops.
         return prevState;

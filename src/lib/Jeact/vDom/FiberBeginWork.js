@@ -83,23 +83,27 @@ function updateFunctionComponent(
       console.error('updateFunctionComponent1');
     }
   }
-  let context;
+
   prepareToReadContext(workInProgress, renderLanes);
+  
   if (__ENV__){
     CurrentOwner.current = workInProgress;
-    // setIsRendering(true);
+    setIsRendering(true);
   }
+
   let nextChildren = renderWithHooks(
     current,
     workInProgress,
     Component,
     nextProps,
-    context,
+    null,
     renderLanes,
-    )
+  );
+  console.log('updateFunctionComponent', nextChildren)
   if (__ENV__){
-    // setIsRendering(false);
+    setIsRendering(false);
   }
+
   if (current!==null){
     console.error('updateFunctionComponent2')
   };

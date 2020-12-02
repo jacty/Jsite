@@ -13,9 +13,9 @@ let flag = 0; //1: show all questions; 0: show a random question
 const mask = 1; // Toggle mask;
 
 function Interview(props){
-    console.error('interview');return;
     document.title='Interview Q&A';
     const items = props.data;
+    console.error('x', props)
     const [ind, setInd] = useState(0);
 
     const btnAllTxt = ['All Questions','Random Question'];

@@ -58,6 +58,9 @@ import {
 } from '@Jeact/vDOM/FiberHooks';
 import { beginWork } from '@Jeact/vDOM/FiberBeginWork';
 import {
+  throwException
+} from '@Jeact/vDOM/FiberThrow';
+import {
   completeWork
 } from '@Jeact/vDOM/FiberCompleteWork';
 import {
@@ -70,6 +73,9 @@ import {
 import {
   resetAfterCommit,
 } from '@Jeact/vDOM/FiberHost';
+import {
+  resetHooksAfterThrow
+} from '@Jeact/vDOM/FiberHooks';
 
 const RootIncomplete = 0;
 const RootFatalErrored = 1;
@@ -302,8 +308,21 @@ function handleError(root, thrownValue){
     let erroredWork = wip;
     try{
       resetContextDependencies();
+      resetHooksAfterThrow();
       resetCurrentFiber();
-      console.error('handleError', wip);
+
+      CurrentOwner.current = null;
+      if (erroredWork === null || erroredWork.return === null){
+        console.error('handleError1');
+      }
+      throwException(
+        root,
+        erroredWork.return,
+        erroredWork,
+        thrownValue,
+        wipRootRenderLanes,
+      );
+      console.error('handleError', erroredWork);
       completeUnitOfWork(erroredWork);
     } catch (yetAnotherThrownValue){
       console.error('handleError.catch', wip);
@@ -345,12 +364,12 @@ function renderRootConcurrent(root, lanes){
   }
   //Keep trying until all caught error handled.
   // do{
-    try {
+    // try {
       workLoopConcurrent();
       // break;
-    } catch(thrownValue){
-      handleError(root, thrownValue);
-    }
+    // } catch(thrownValue){
+      // handleError(root, thrownValue);
+    // }
   // } while (true);
 
   resetContextDependencies();

@@ -33,7 +33,6 @@ import { setIsRendering } from '@Jeact/dev/CurrentFiber';
 let didReceiveUpdate = false;
 
 export function reconcileChildren(current, workInProgress, nextChildren, renderLanes){
-
   if (current === null){
     // If this is a fresh new component that hasn't been rendered yet, we
     // won't update its child set by applying minimal side-effects. Instead,
@@ -99,7 +98,7 @@ function updateFunctionComponent(
     null,
     renderLanes,
   );
-  console.log('updateFunctionComponent', nextChildren)
+
   if (__ENV__){
     setIsRendering(false);
   }
@@ -132,14 +131,12 @@ function updateHostRoot(alternate, workInProgress, renderLanes){
   return workInProgress.child;
 }
 
-function updateHostComponent(workInProgress,renderLanes){
+function updateHostComponent(alternate, workInProgress,renderLanes){
   pushHostContext(workInProgress);
-
-  const current = workInProgress.alternate; 
 
   const type = workInProgress.type;
   const nextProps = workInProgress.pendingProps;
-  const prevProps = current !== null ? current.memoizedProps : null;
+  const prevProps = alternate !== null ? alternate.memoizedProps : null;
 
   let nextChildren = nextProps.children;
   const isDirectTextChild = shouldSetTextContent(type, nextProps);
@@ -149,9 +146,9 @@ function updateHostComponent(workInProgress,renderLanes){
   } else if(prevProps !== null && shouldSetTextContent(type, prevProps)){
     console.error('updateHostComponent2')
   }
-  markRef(current, workInProgress);
+  markRef(alternate, workInProgress);
 
-  reconcileChildren(workInProgress, nextChildren, renderLanes);
+  reconcileChildren(alternate, workInProgress, nextChildren, renderLanes);
   return workInProgress.child;
 }
 
@@ -227,7 +224,7 @@ export function beginWork(alternate, workInProgress, renderLanes){
     case HostRoot://3
       return updateHostRoot(alternate, workInProgress, renderLanes);
     case HostComponent://5
-      return updateHostComponent(workInProgress, renderLanes);
+      return updateHostComponent(alternate, workInProgress, renderLanes);
     case HostText://6
       return updateHostText(workInProgress);
     default:

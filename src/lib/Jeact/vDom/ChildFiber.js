@@ -98,7 +98,16 @@ function ChildReconciler(shouldTrackSideEffects){
     currentFirstChild,
     newChildren,
     lanes
-    ){
+  ){
+
+    if (__ENV__){
+      let knownKeys = null;
+      for (const i = 0; i < newChildren.length; i++){
+        const child = newChildren[i];
+        knownKeys = warnOnInvalidKey(child, knownKeys, returnFiber);
+      }
+    }
+    console.error('reconcileChildrenArray');
     let resultingFirstChild = null;
     let previousNewFiber = null;
 
@@ -112,6 +121,7 @@ function ChildReconciler(shouldTrackSideEffects){
     if (newIdx === newChildren.length){
       console.error('reconcileChildrenArray2')
     }
+
     if (oldFiber === null){
       // If we don't have any more existing children we can choose a fast path
       // since the rest will all be insertions.
@@ -144,6 +154,7 @@ function ChildReconciler(shouldTrackSideEffects){
       console.error('reconcileSingleElement1')
     }
     const created = createFiberFromElement(element, lanes);
+    returnFiber.tag === 0 ? console.error('x', element):'';//debug
     created.ref = coerceRef(returnFiber, currentFirstChild, element);
     created.return = returnFiber;
     
@@ -157,10 +168,6 @@ function ChildReconciler(shouldTrackSideEffects){
     currentFirstChild,
     newChild,// from payload.element
     lanes){
-    // This function is not recursive.
-    // If the top level item is an array, we treat it as a set of children,
-    // not as a fragment. Nested arrays on the other hand will be treated as
-    // fragment nodes. Recursion happens at the normal flow.
 
     // Handle object types
     const isObject = typeof newChild === 'object' && newChild !== null;
@@ -183,7 +190,7 @@ function ChildReconciler(shouldTrackSideEffects){
     }
 
     if(typeof newChild === 'string' || typeof newChild === 'number'){
-      console.error('reconcileChildFibers4')
+      console.error('reconcileChildFibers4', newChild, returnFiber)
     }
 
     if (Array.isArray(newChild)){

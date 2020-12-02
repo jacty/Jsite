@@ -34,11 +34,11 @@ let hookTypesDev = null;
 let hookTypesUpdateIndexDev = -1;
 
 export function renderWithHooks(
-  current,
+  alternate,
   workInProgress,
   Component,
   props,
-  secondArg,
+  secondArg,// [context]
   nextRenderLanes
 ){
   renderLanes = nextRenderLanes;
@@ -46,23 +46,24 @@ export function renderWithHooks(
 
   if (__ENV__){
     hookTypesDev = 
-      current !== null
-        ? current._debugHookTypes
+      alternate !== null
+        ? alternate._debugHookTypes
         : null;
     hookTypesUpdateIndexDev = -1;
   }
-  // why?
+  
+  // why? To get new ones from alternate?
   workInProgress.memoizedState = null;
   workInProgress.updateQueue = null;
   workInProgress.lanes = NoLanes;
 
   CurrentDispatcher.current =
-    current === null || current.memoizedState === null
+    alternate === null || alternate.memoizedState === null
     ? HooksDispatcherOnMount
     : HooksDispatcherOnUpdate;
 
   let children = Component(props, secondArg);
-  console.error('renderWithHooks', children);
+
   // Check if there was a render phase update
   if (didScheduleRenderPhaseUpdateDuringThisPass){
     console.error('renderWithHooks1')
@@ -96,11 +97,53 @@ export function resetHooksAfterThrow(){
   didScheduleRenderPhaseUpdateDuringThisPass = false;
 }
 
+function mountWorkInProgressHook(){
+  const hook = {
+    memoizedState: null,
+
+    baseState: null,
+    baseQueue: null,
+    queue: null,
+
+    next: null,
+  };
+  if (workInProgressHook === null){
+    // first hook in the list.
+    currentlyRenderingFiber.memoizedState = workInProgressHook = hook;
+  } else {
+    // append to the end of the list.
+    workInProgressHook = workInProgressHook.next = hook;
+  }
+  return workInProgressHook;
+}
+
+function mountState(initialState){
+  const hook = mountWorkInProgressHook()
+  if (typeof initialState === 'function'){
+    initialState = initialState(); //TODO: make initialState([args...]) work here?
+  }
+  hook.memoizedState = hook.baseState = initialState;
+  const queue = {
+    pending: null,
+    dispatch: null,
+    lastRenderedState: initialState, 
+  }
+  const dispatch = dispatchAction.bind(null, currentlyRenderingFiber, queue);
+  queue.dispatch = dispatch;
+  
+  return [hook.memoizedState, dispatch];
+}
+
+function dispatchAction(fiber, queue, action){
+  const eventTime = requestEventTime();
+  console.error('dispatchAction', eventTime);
+}
+
 export const ContextOnlyDispatcher = {
   'ContextOnlyDispatcher':1
 }
 
 const HooksDispatcherOnMount ={
-  'HooksDispatcherOnMount':1
+  useState: mountState,
 }
 

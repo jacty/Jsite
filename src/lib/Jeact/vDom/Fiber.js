@@ -161,6 +161,7 @@ export function createFiberFromElement(element, lanes){
   if (__ENV__){
     owner = element._owner;
   }
+
   const fiber = createFiberFromTypeAndProps(element, lanes, owner);
   if (__ENV__){
     fiber._debugOwner = element._owner;

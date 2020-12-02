@@ -16,7 +16,7 @@ import Interview from '@com/interview.jsx';
 import {Footer} from '@com/shared.jsx';
 
 React.createRoot(document.getElementById('root')).render(
-    <Interview data = {data} />
+    <h1></h1>
 )
 
     // <ErrorBoundary>

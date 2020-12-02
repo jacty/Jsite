@@ -7,12 +7,10 @@ function vRoot(container){
 
 vRoot.prototype.render = function(children){
   updateContainer(children, this._Root);
-};
-
+}
 
 function createRootImpl(container){
   const root = createFiberRoot(container);
-
   return root;
 }
 

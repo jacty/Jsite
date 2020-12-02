@@ -1,19 +1,16 @@
-import {
-  __ENV__
-} from '@Jeact/shared/Constants';
+import { __ENV__ } from '@Jeact/shared/Constants';
 import {
   requestEventTime,
   requestUpdateLane,
   scheduleUpdateOnFiber
-} from '@Jeact/vDOM/FiberWorkLoop'
+} from '@Jeact/vDOM/FiberWorkLoop';
 import {
   createUpdate,
   enqueueUpdate
 } from '@Jeact/vDOM/UpdateQueue';
 
-
-export function updateContainer(element, fiberRoot){
-  const current = fiberRoot.current;
+export function updateContainer(element, container){
+  const current = container.current;//uninitialized fiber.
   const eventTime =requestEventTime();
   const lane = requestUpdateLane(current);
 

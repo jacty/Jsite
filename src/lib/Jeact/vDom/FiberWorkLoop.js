@@ -138,39 +138,25 @@ export function requestEventTime(){
 }
 
 export function requestUpdateLane(fiber){
-  if (currentEventWipLanes !== wipRootIncludedLanes){
-    console.error('requestUpdateLane1');
-  }
-
-  const isTransition = CurrentBatchConfig.transition;
-  if (isTransition){
-    console.error('requestUpdateLane2')
-  }
   // TODO: update normal priority to 100?
   const priority = getCurrentPriority();
   const LanePriority = PriorityToLanePriority(priority);
 
   let lane = findUpdateLane(LanePriority, currentEventWipLanes)
-
+  
   return lane;
 }
 
 export function scheduleUpdateOnFiber(fiber, lane, eventTime){
   // Update fiber.lanes
   const root = markUpdateLaneFromFiberToRoot(fiber, lane);
-
   // update root.pendingLane, eventTimes etc.
   markRootUpdated(root, lane, eventTime);
-
   ensureRootIsScheduled(root, eventTime);
-  // Used in requestUpdatelane for a transition.
-  mostRecentlyUpdatedRoot = root;
 }
 
 function markUpdateLaneFromFiberToRoot(fiber, lane){
-
   fiber.lanes = mergeLanes(fiber.lanes, lane);
-
   return fiber.stateNode;
 }
 

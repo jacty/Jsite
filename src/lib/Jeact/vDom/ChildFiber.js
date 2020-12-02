@@ -7,9 +7,6 @@ import {
   createFiberFromElement,
   createFiberFromText,
 } from '@Jeact/vDOM/Fiber';
-import {
-  warnOnInvalidKey
-} from '@Jeact/shared/dev';
 
 let shouldTrackSideEffects = true;
 
@@ -112,13 +109,7 @@ function reconcileChildrenArray(
   newChildren,
   lanes
 ){
-  if (__ENV__){
-    let knownKeys = null;
-    for (let i = 0; i < newChildren.length; i++){
-      let child = newChildren[i];
-      knownKeys = warnOnInvalidKey(child, knownKeys, returnFiber);
-    }
-  }
+
   console.error('reconcileChildrenArray', newChildren);
   let resultingFirstChild = null;
   let previousNewFiber = null;

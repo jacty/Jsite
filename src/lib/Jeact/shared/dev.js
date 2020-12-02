@@ -1,8 +1,8 @@
 import {__ENV__} from '@Jeact/shared/Constants'
 import {DebugCurrentFrame} from '@Jeact/shared/internals';
 
-export let current = null;
-export let isRendering = false;
+let current = null;
+let isRendering = false;
 
 function getCurrentFiberStackInDev(){
     console.error('getCurrentFiberStackInDev')

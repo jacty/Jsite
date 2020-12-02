@@ -31,7 +31,7 @@ import {
 import {
   setCurrentFiber,
   resetCurrentFiber,
-} from '@Jeact/dev/CurrentFiber'
+} from '@Jeact/shared/dev'
 import {
   getCurrentSchedulePriority,
   PriorityToLanePriority,

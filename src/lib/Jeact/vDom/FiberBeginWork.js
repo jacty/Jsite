@@ -24,7 +24,7 @@ import {
   processUpdateQueue,
 } from '@Jeact/vDOM/UpdateQueue';
 import {renderWithHooks} from '@Jeact/vDOM/FiberHooks';
-import { setIsRendering } from '@Jeact/dev/CurrentFiber';
+import { setIsRendering } from '@Jeact/shared/dev';
 
 let didReceiveUpdate = false;
 

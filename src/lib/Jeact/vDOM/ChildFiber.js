@@ -84,7 +84,7 @@ function reconcileSingleElement(
     console.error('reconcileSingleElement1')
   }
   const created = createFiberFromElement(element, lanes);
-  created.ref = coerceRef(returnFiber, currentFirstChild, element);
+  created.ref = element.ref;
   created.return = returnFiber;
   return created;
 }

@@ -192,7 +192,6 @@ export function markRootUpdated(root, updateLane, eventTime){
 
   root.pendingLanes |= updateLane;
 
-
   // Unsuspend any update at equal or lower priority.
   const higherPriorityLanes = updateLane - 1; // Turns 0b1000 into 0b0111
 

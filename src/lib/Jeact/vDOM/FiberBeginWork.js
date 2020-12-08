@@ -87,7 +87,6 @@ function updateFunctionComponent(
 }
 
 function updateHostRoot(alternate, workInProgress, renderLanes){
-  const root = workInProgress.stateNode;
   pushHostContainer(workInProgress);
   const nextProps = workInProgress.pendingProps;
   const prevState = workInProgress.memoizedState;
@@ -141,6 +140,7 @@ function updateHostText(current, workInProgress){
 
 export function beginWork(alternate, workInProgress, renderLanes){
   const updateLanes = workInProgress.lanes;
+
   if (alternate !== null){
     const oldProps = alternate.memoizedProps;
     const newProps = workInProgress.pendingProps;

@@ -52,12 +52,12 @@ function workLoop(initialTime){
   let currentTime = initialTime;
   currentTask = peek(taskQueue);
 
-  while(currentTask !== null){
+  if(currentTask !== null){
     if(currentTask.expirationTime > currentTime &&
        shouldYieldToHost()
       ){
       // deadline reached but currentTask hasn't expired.
-      break;
+      // break;
     }
     const callback = currentTask.callback;
 

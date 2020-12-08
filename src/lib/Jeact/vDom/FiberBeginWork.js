@@ -87,7 +87,6 @@ function updateFunctionComponent(
 }
 
 function updateHostRoot(alternate, workInProgress, renderLanes){
-  const root = workInProgress.stateNode;
   pushHostContainer(workInProgress);
   const nextProps = workInProgress.pendingProps;
   const prevState = workInProgress.memoizedState;
@@ -141,6 +140,7 @@ function updateHostText(current, workInProgress){
 
 export function beginWork(alternate, workInProgress, renderLanes){
   const updateLanes = workInProgress.lanes;
+
   if (alternate !== null){
     const oldProps = alternate.memoizedProps;
     const newProps = workInProgress.pendingProps;
@@ -176,32 +176,29 @@ export function beginWork(alternate, workInProgress, renderLanes){
   } else {
     didReceiveUpdate = false;
   }
-  
-  // Will be updated to renderLanes later.
-  workInProgress.lanes = NoLanes;    
-
+     
   switch (workInProgress.tag){
-    case FunctionComponent:{//0
-      const Component = workInProgress.type;
-      const unresolvedProps = workInProgress.pendingProps;
-      const resolvedProps =
-        workInProgress.elementType === Component
-        ? unresolvedProps
-        : resolveDefaultProps(Component, unresolvedProps);
-      return updateFunctionComponent(
-        alternate,
-        workInProgress,
-        Component,
-        resolvedProps,
-        renderLanes,
-      );
-    }
+    // case FunctionComponent:{//0
+    //   const Component = workInProgress.type;
+    //   const unresolvedProps = workInProgress.pendingProps;
+    //   const resolvedProps =
+    //     workInProgress.elementType === Component
+    //     ? unresolvedProps
+    //     : resolveDefaultProps(Component, unresolvedProps);
+    //   return updateFunctionComponent(
+    //     alternate,
+    //     workInProgress,
+    //     Component,
+    //     resolvedProps,
+    //     renderLanes,
+    //   );
+    // }
     case HostRoot://3
       return updateHostRoot(alternate, workInProgress, renderLanes);
-    case HostComponent://5
-      return updateHostComponent(alternate, workInProgress, renderLanes);
-    case HostText://6
-      return updateHostText(workInProgress);
+    // case HostComponent://5
+    //   return updateHostComponent(alternate, workInProgress, renderLanes);
+    // case HostText://6
+    //   return updateHostText(workInProgress);
     default:
       console.error('beginWork4', workInProgress.tag);
   }

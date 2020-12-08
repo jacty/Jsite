@@ -235,10 +235,10 @@ function prepareFreshStack(root, lanes){
   root.finishedLanes = NoLanes;
 
   const timeoutHandle = root.timeoutHandle;
-  if (timeoutHandle !== noTimeout){
+  if (timeoutHandle !== noTimeout){//suspended work.
     console.log('prepareFreshStack1');
   }
-  if (wip !== null){
+  if (wip !== null){// interrupted work.
     console.log('prepareFreshStack2');
   }
 
@@ -341,7 +341,7 @@ function renderRootConcurrent(root, lanes){
 
 function workLoopConcurrent(){
   // Perform work until Scheduler asks us to yield
-  while(wip !== null && !shouldYieldToHost()){
+  if(wip !== null && !shouldYieldToHost()){
     performUnitOfWork(wip);
   }
 }
@@ -356,7 +356,7 @@ function performUnitOfWork(unitOfWork){
   }
 
   let next = beginWork(alternate, unitOfWork, subtreeRenderLanes);
-
+  console.error('performUnitOfWork', next);return;
   if(__ENV__){
     resetCurrentFiber()
   }

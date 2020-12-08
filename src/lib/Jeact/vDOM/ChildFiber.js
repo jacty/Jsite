@@ -8,7 +8,6 @@ import {
   createFiberFromText,
 } from '@Jeact/vDOM/Fiber';
 
-
 // This API will tag the children with the side-effect of the reconciliation
 // itself. They will be added to the side-effect list as we pass through the
 // children and the parent.
@@ -39,10 +38,6 @@ export function reconcileChildFibers(
     };
   }
 
-  if(typeof newChild === 'string' || typeof newChild === 'number'){
-    console.error('reconcileChildFibers4', newChild, returnFiber)
-  }
-
   if (Array.isArray(newChild)){
     return reconcileChildrenArray(
       returnFiber,
@@ -51,14 +46,8 @@ export function reconcileChildFibers(
       lanes,
     );
   }
-
-  if(typeof newChild === 'undefined'){
-    switch(returnFiber.tag){
-      default:
-        returnFiber.tag !== 5? console.error('reconcileChildFibers2'):'';
-    }
-  }
-
+  newChild !== undefined ?
+    console.error('reconcileChildFibers', newChild):'';
   // Remaining cases are all treated as empty.
   return deleteRemainingChildren(returnFiber, currentChild);
 }
@@ -180,6 +169,8 @@ function deleteRemainingChildren(
   returnFiber,
   currentChild,
 ){
-
-  console.error('deleteRemainingChildren');
+  if (currentChild !== null){
+    console.error('deleteRemainingChildren', currentChild);
+  }
+  return null;
 }

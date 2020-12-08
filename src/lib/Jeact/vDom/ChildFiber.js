@@ -8,8 +8,6 @@ import {
   createFiberFromText,
 } from '@Jeact/vDOM/Fiber';
 
-let shouldTrackSideEffects = true;
-
 function coerceRef(
   returnFiber,
   current,
@@ -31,8 +29,7 @@ export function reconcileChildFibers(
   newChild,// from payload.element
   lanes
 ){
-  shouldTrackSideEffects = 
-    currentChild === null ? false : true;
+
   // Handle object types
   const isObject = typeof newChild === 'object' && newChild !== null;
   if (isObject){
@@ -80,7 +77,7 @@ export function reconcileChildFibers(
 function placeSingleChild(newFiber){
   // This is a simpler for the single child case. We only need to do a
   // placement for inserting new children.
-  if (shouldTrackSideEffects && newFiber.alternate === null){
+  if (newFiber.alternate === null){
     newFiber.flags = Placement;
   }
   return newFiber;
@@ -179,10 +176,7 @@ function placeChild(
   newIndex
 ){
   newFiber.index = newIndex;
-  if (!shouldTrackSideEffects){
-    return lastPlacedIndex;
-  }
-  console.error('placeChild1');return;
+
   const current = newFiber.alternate;
   if (current!==null){
     console.error('placeChild1')
@@ -197,8 +191,6 @@ function deleteRemainingChildren(
   returnFiber,
   currentChild,
 ){
-  if (!shouldTrackSideEffects){
-    return null;
-  }
+
   console.error('deleteRemainingChildren');
 }

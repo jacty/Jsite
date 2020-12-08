@@ -8,17 +8,6 @@ import {
   createFiberFromText,
 } from '@Jeact/vDOM/Fiber';
 
-function coerceRef(
-  returnFiber,
-  current,
-  element
-){
-  const mixedRef = element.ref;
-  if (mixedRef !== null){
-    console.error('coerceRef', element);
-  }
-  return mixedRef;
-}
 
 // This API will tag the children with the side-effect of the reconciliation
 // itself. They will be added to the side-effect list as we pass through the

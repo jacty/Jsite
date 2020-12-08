@@ -177,7 +177,7 @@ function ensureRootIsScheduled(root, currentTime){
   const priority = LanePriorityToPriority(newCallbackPriority);
   let newCallbackNode = scheduleCallback(
     priority,
-    performConcurrentWorkOnRoot.bind(null, root),
+    performConcurrentWorkOnRoot.bind(null, root, nextLanes),
   )
 
   root.callbackPriority = newCallbackPriority;
@@ -186,29 +186,11 @@ function ensureRootIsScheduled(root, currentTime){
 
 // Entry point for every concurrent task, i.e. anything that
 // goes through Scheduler.
-function performConcurrentWorkOnRoot(root){
-  // This will be set in requestEventTime() for getting time in browser event phase.
+function performConcurrentWorkOnRoot(root, nextLanes){
   currentEventTime = NoTimestamp;
 
-  currentEventWipLanes = NoLanes;
-  currentEventPendingLanes = NoLanes;
-
-  if(executionContext !== NoContext){
-    console.error('performConcurrentWorkOnRoot1')
-  };
-
-  // Flush any pending passive effects before deciding which lanes to work on,
-  // in case they schedule additional work.
-  const originalCallbackNode = root.callbackNode;
-
-  // Determine the next expiration time to work on, using the fields stored on the root.
-  let lanes = getNextLanes(
-    root,
-    root === wipRoot ? wipRootRenderLanes : NoLanes,
-  );
-
-  let exitStatus = renderRootConcurrent(root, lanes);
-
+  let exitStatus = renderRootConcurrent(root, nextLanes);
+  console.error('x', root);return;
   if (includesSomeLane(wipRootIncludedLanes, wipRootUpdatedLanes)){
     console.error('performConcurrentWorkOnRoot4')
   } else if(exitStatus !== RootIncomplete){

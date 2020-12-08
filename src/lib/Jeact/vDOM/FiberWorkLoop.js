@@ -149,8 +149,8 @@ function markUpdateLaneFromFiberToRoot(fiber, lane){
 
 function ensureRootIsScheduled(root, currentTime){
   const existingCallbackNode = root.callbackNode;
-
-  // update root.expirationTime
+  // update root.expirationTime. 
+  // TODO: Possible to merge with markRootUpdated()?
   markStarvedLanesAsExpired(root, currentTime);
 
   const nextLanes = getNextLanes(

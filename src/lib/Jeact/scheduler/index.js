@@ -47,11 +47,11 @@ function flushWork(initialTime){
     isPerformingWork = false;
   }
 }
-
+// the return value of this function decides if there will be another re-runs of this function through performWorkUntilDeadline();
 function workLoop(initialTime){
   let currentTime = initialTime;
   currentTask = peek(taskQueue);
-
+  console.error('x', currentTask); return;
   while(currentTask !== null){
     if(currentTask.expirationTime > currentTime &&
        shouldYieldToHost()
@@ -61,7 +61,7 @@ function workLoop(initialTime){
     }
     const callback = currentTask.callback;
     if (typeof callback === 'function'){
-      currentTask.callback = null;
+      currentTask.callback = null;// TODO: try to keep callback in the node.
       currentPriority = currentTask.priority;
       //performConcurrentWorkOnRoot()
       const contiuationCallback = callback();
@@ -157,10 +157,11 @@ function performWorkUntilDeadline(){
       } else {
         // If there's more work, schedule the next message event at the end
         // of the preceding one.
-        port.postMessage(null);
+        // port.postMessage(null);//debug
+        console.error('There is more work to do.', hasMoreWork);
       }
     } catch (error){
-      port.postMessage(null);
+      // port.postMessage(null);// debug
       throw error;
     }
   } else {

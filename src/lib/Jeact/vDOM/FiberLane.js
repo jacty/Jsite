@@ -46,7 +46,6 @@ export function getNextLanes(root, wipLanes){
   const expiredLanes = root.expiredLanes;
   const suspendedLanes = root.suspendedLanes;
   const pingedLanes = root.pingedLanes;
-
   // Check if any work has expired.
   if (expiredLanes !== NoLanes){
     nextLanes = expiredLanes;

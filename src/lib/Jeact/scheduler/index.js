@@ -51,7 +51,7 @@ function flushWork(initialTime){
 function workLoop(initialTime){
   let currentTime = initialTime;
   currentTask = peek(taskQueue);
-  console.error('x', currentTask); return;
+
   while(currentTask !== null){
     if(currentTask.expirationTime > currentTime &&
        shouldYieldToHost()
@@ -60,24 +60,11 @@ function workLoop(initialTime){
       break;
     }
     const callback = currentTask.callback;
-    if (typeof callback === 'function'){
-      currentTask.callback = null;// TODO: try to keep callback in the node.
-      currentPriority = currentTask.priority;
-      //performConcurrentWorkOnRoot()
-      const contiuationCallback = callback();
-      currentTime = performance.now();
-      if(typeof contiuationCallback === 'function'){
-        currentTask.callback = contiuationCallback;
-      } else {
-        // the last task in queue
-        if (currentTask === peek(taskQueue)){
-          pop(taskQueue);
-        }
-      }
-    } else {
-      // invalid task.
-      pop(taskQueue);
-    }
+
+    currentPriority = currentTask.priority;
+    //performConcurrentWorkOnRoot()
+    callback();
+    
     currentTask = peek(taskQueue);
   }
   // Return whether there's additional work.

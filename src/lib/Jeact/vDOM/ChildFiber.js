@@ -48,8 +48,6 @@ export function reconcileChildFibers(
   }
   newChild !== undefined ?
     console.error('reconcileChildFibers', newChild):'';
-  // Remaining cases are all treated as empty.
-  return deleteRemainingChildren(returnFiber, currentChild);
 }
 
 function placeSingleChild(newFiber){
@@ -165,12 +163,3 @@ function placeChild(
   }
 }
 
-function deleteRemainingChildren(
-  returnFiber,
-  currentChild,
-){
-  if (currentChild !== null){
-    console.error('deleteRemainingChildren', currentChild);
-  }
-  return null;
-}

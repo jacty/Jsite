@@ -13,11 +13,10 @@ import {
 // children and the parent.
 export function reconcileChildFibers(
   returnFiber,
-  currentChild,
+  currentFirstChild,
   newChild,// from payload.element
   lanes
 ){
-
   // Handle object types
   const isObject = typeof newChild === 'object' && newChild !== null;
   if (isObject){
@@ -26,7 +25,7 @@ export function reconcileChildFibers(
         return placeSingleChild(//update flag to Placement.
           reconcileSingleElement(
             returnFiber,
-            currentChild,
+            currentFirstChild,
             newChild,
             lanes,
           ),
@@ -41,7 +40,7 @@ export function reconcileChildFibers(
   if (Array.isArray(newChild)){
     return reconcileChildrenArray(
       returnFiber,
-      currentChild,
+      currentFirstChild,
       newChild,
       lanes,
     );
@@ -56,6 +55,7 @@ function placeSingleChild(newFiber){
   if (newFiber.alternate === null){
     newFiber.flags = Placement;
   }
+  
   return newFiber;
 }
 

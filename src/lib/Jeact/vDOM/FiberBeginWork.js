@@ -88,12 +88,11 @@ function updateFunctionComponent(
 
 function updateHostRoot(alternate, workInProgress, renderLanes){
   pushHostContainer(workInProgress);
-  const nextProps = workInProgress.pendingProps;
   const prevState = workInProgress.memoizedState;
   const prevChildren = prevState !== null ? prevState.element : null;
 
   //update wip.lanes, wip.memoizedState;
-  processUpdateQueue(workInProgress, nextProps, null, renderLanes);
+  processUpdateQueue(workInProgress, renderLanes);
   const nextState = workInProgress.memoizedState;
   const nextChildren = nextState.element;
 
@@ -103,7 +102,6 @@ function updateHostRoot(alternate, workInProgress, renderLanes){
       nextChildren,
       renderLanes,
   );
-
   return workInProgress.child;
 }
 

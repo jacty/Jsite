@@ -134,17 +134,15 @@ export function createFiberFromTypeAndProps(element,lanes, owner){
   const key = element.key;
 
   let fiberTag;
-
   if (typeof type === 'function'){
     fiberTag = FunctionComponent;
   } else if(typeof type === 'string'){
     fiberTag = HostComponent;
   } else {
-    console.error('createFiberFromTypeAndProps1')
+    console.error('createFiberFromTypeAndProps1',type)
   }
 
   const fiber = createFiber(fiberTag, pendingProps, key);
-
   fiber.elementType = type;
   fiber.type = type;
   fiber.lanes = lanes;
@@ -161,7 +159,6 @@ export function createFiberFromElement(element, lanes){
   if (__ENV__){
     owner = element._owner;
   }
-
   const fiber = createFiberFromTypeAndProps(element, lanes, owner);
   if (__ENV__){
     fiber._debugOwner = element._owner;

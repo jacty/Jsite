@@ -190,7 +190,7 @@ function performConcurrentWorkOnRoot(root, nextLanes){
   currentEventTime = NoTimestamp;
 
   let exitStatus = renderRootConcurrent(root, nextLanes);
-  console.error('x', root);return;
+  console.error('x', exitStatus);return;
   if (includesSomeLane(wipRootIncludedLanes, wipRootUpdatedLanes)){
     console.error('performConcurrentWorkOnRoot4')
   } else if(exitStatus !== RootIncomplete){
@@ -322,7 +322,7 @@ function renderRootConcurrent(root, lanes){
       // handleError(root, thrownValue);
     // }
   // } while (true);
-
+  console.error('renderRootConcurrent',wip);return;
   executionContext = prevExecutionContext;
 
   // Check if the tree has completed.
@@ -341,7 +341,7 @@ function renderRootConcurrent(root, lanes){
 
 function workLoopConcurrent(){
   // Perform work until Scheduler asks us to yield
-  if(wip !== null && !shouldYieldToHost()){
+  while(wip !== null && !shouldYieldToHost()){
     performUnitOfWork(wip);
   }
 }
@@ -356,7 +356,7 @@ function performUnitOfWork(unitOfWork){
   }
 
   let next = beginWork(alternate, unitOfWork, subtreeRenderLanes);
-  console.error('performUnitOfWork', next);return;
+
   if(__ENV__){
     resetCurrentFiber()
   }
@@ -372,6 +372,7 @@ function performUnitOfWork(unitOfWork){
 }
 
 function completeUnitOfWork(unitOfWork){
+  console.error('completeUnitOfWork',unitOfWork);return;
   let completedWork = unitOfWork;
 
   do {

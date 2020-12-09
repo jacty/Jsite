@@ -78,7 +78,7 @@ function reconcileSingleElement(
 
 function reconcileChildrenArray(
   returnFiber,
-  currentChild,
+  currentFirstChild,
   newChildren,
   lanes
 ){
@@ -86,7 +86,7 @@ function reconcileChildrenArray(
   let resultingFirstChild = null;
   let previousNewFiber = null;
 
-  let oldFiber = currentChild;
+  let oldFiber = currentFirstChild;
   let lastPlacedIndex = 0;
   let newIdx = 0;
   let nextOldFiber = null;
@@ -102,7 +102,7 @@ function reconcileChildrenArray(
     // since the rest will all be insertions.
     for (; newIdx < newChildren.length; newIdx++){
       const newFiber = createChild(returnFiber, newChildren[newIdx], lanes);
-      if (newFiber === null){// which case
+      if (newFiber === null){// which case?
         console.error('reconcileChildrenArray3')
         continue;
       }
@@ -121,22 +121,22 @@ function reconcileChildrenArray(
 
 function createChild(returnFiber, newChild, lanes){
   if (typeof newChild === 'string' || typeof newChild === 'number'){
-    const created = createFiberFromText(
-      ''+ newChild,
-      lanes,
-    );
-    created.return = returnFiber;
-    return created;
+    console.error('createChild1');
+    // const created = createFiberFromText(
+    //   ''+ newChild,
+    //   lanes,
+    // );
+    // created.return = returnFiber;
+    // return created;
   }
   if(typeof newChild === 'object' && newChild !== null){
     switch(newChild.$$typeof){
       case JEACT_ELEMENT_TYPE:{
         const created = createFiberFromElement(
           newChild,
-          returnFiber.mode,
           lanes,
         );
-        created.ref = coerceRef(returnFiber, null, newChild);
+        created.ref = newChild.ref;
         created.return = returnFiber;
         return created;
       }
@@ -152,13 +152,12 @@ function placeChild(
   newIndex
 ){
   newFiber.index = newIndex;
-
   const current = newFiber.alternate;
   if (current!==null){
     console.error('placeChild1')
   } else {
     // This is an insertion.
-    newFiber.flags = Placement;
+    newFiber.flags |= Placement;
     return lastPlacedIndex
   }
 }

@@ -51,11 +51,6 @@ export function renderWithHooks(
         : null;
     hookTypesUpdateIndexDev = -1;
   }
-  
-  // why? To get new ones from alternate?
-  workInProgress.memoizedState = null;
-  workInProgress.updateQueue = null;
-  workInProgress.lanes = NoLanes;
 
   CurrentDispatcher.current =
     alternate === null || alternate.memoizedState === null

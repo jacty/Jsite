@@ -51,7 +51,7 @@ function updateFunctionComponent(
       console.error('updateFunctionComponent1');
     }
   }
-  
+  console.error('x', workInProgress.type);
   if (__ENV__){
     CurrentOwner.current = workInProgress;
     setIsRendering(true);
@@ -75,7 +75,6 @@ function updateFunctionComponent(
   };
 
   workInProgress.flags |= PerformedWork;
-
   workInProgress.child = reconcileChildFibers(
       workInProgress,
       alternate === null ? alternate : alternate.child,
@@ -173,24 +172,23 @@ export function beginWork(alternate, workInProgress, renderLanes){
     }
   } else {
     didReceiveUpdate = false;
-  }
-     
+  }   
   switch (workInProgress.tag){
-    // case FunctionComponent:{//0
-    //   const Component = workInProgress.type;
-    //   const unresolvedProps = workInProgress.pendingProps;
-    //   const resolvedProps =
-    //     workInProgress.elementType === Component
-    //     ? unresolvedProps
-    //     : resolveDefaultProps(Component, unresolvedProps);
-    //   return updateFunctionComponent(
-    //     alternate,
-    //     workInProgress,
-    //     Component,
-    //     resolvedProps,
-    //     renderLanes,
-    //   );
-    // }
+    case FunctionComponent:{//0
+      const Component = workInProgress.type;
+      const unresolvedProps = workInProgress.pendingProps;
+      const resolvedProps =
+        workInProgress.elementType === Component
+        ? unresolvedProps
+        : resolveDefaultProps(Component, unresolvedProps);
+      return updateFunctionComponent(
+        alternate,
+        workInProgress,
+        Component,
+        resolvedProps,
+        renderLanes,
+      );
+    }
     case HostRoot://3
       return updateHostRoot(alternate, workInProgress, renderLanes);
     // case HostComponent://5
@@ -198,7 +196,7 @@ export function beginWork(alternate, workInProgress, renderLanes){
     // case HostText://6
     //   return updateHostText(workInProgress);
     default:
-      console.error('beginWork4', workInProgress.tag);
+      console.error('beginWork4', workInProgress);
   }
 }
 

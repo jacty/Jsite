@@ -17,6 +17,7 @@ export function reconcileChildFibers(
   newChild,// from payload.element
   lanes
 ){
+
   // Handle object types
   const isObject = typeof newChild === 'object' && newChild !== null;
   if (isObject){
@@ -45,8 +46,11 @@ export function reconcileChildFibers(
       lanes,
     );
   }
-  newChild !== undefined ?
+
+  newChild !== null ?
     console.error('reconcileChildFibers', newChild):'';
+
+  return null;
 }
 
 function placeSingleChild(newFiber){
@@ -65,6 +69,7 @@ function reconcileSingleElement(
   element,
   lanes
 ){
+
   const key = element.key;
   let child = currentFirstChild;
   if (child !== null){
@@ -114,6 +119,7 @@ function reconcileChildrenArray(
       }
       previousNewFiber = newFiber;
     }
+
     return resultingFirstChild;
   }
   console.error('reconcileChildrenArray4')

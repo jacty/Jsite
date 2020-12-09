@@ -51,7 +51,7 @@ function updateFunctionComponent(
       console.error('updateFunctionComponent1');
     }
   }
-  console.error('x', workInProgress.type);
+
   if (__ENV__){
     CurrentOwner.current = workInProgress;
     setIsRendering(true);
@@ -119,7 +119,6 @@ function updateHostComponent(alternate, workInProgress,renderLanes){
   } else if(prevProps !== null && shouldSetTextContent(type, prevProps)){
     console.error('updateHostComponent2')
   }
-  markRef(alternate, workInProgress);
 
   workInProgress.child = reconcileChildFibers(
       workInProgress,
@@ -191,8 +190,8 @@ export function beginWork(alternate, workInProgress, renderLanes){
     }
     case HostRoot://3
       return updateHostRoot(alternate, workInProgress, renderLanes);
-    // case HostComponent://5
-    //   return updateHostComponent(alternate, workInProgress, renderLanes);
+    case HostComponent://5
+      return updateHostComponent(alternate, workInProgress, renderLanes);
     // case HostText://6
     //   return updateHostText(workInProgress);
     default:
@@ -202,9 +201,6 @@ export function beginWork(alternate, workInProgress, renderLanes){
 
 function shouldSetTextContent(type, props){
   return (
-    type === 'textarea' ||
-    type === 'option' ||
-    type === 'noscript' ||
     typeof props.children === 'string' ||
     typeof props.children === 'number' ||
     (typeof props.dangerouslySetInnerHTML === 'object' &&

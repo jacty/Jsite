@@ -35,19 +35,11 @@ export function enqueueUpdate(fiber, update){
   updateQueue.pending = update;
 }
 
-function getStateFromUpdate(
-  workInProgress, 
-  queue, 
-  update, 
-  prevState, 
-  nextProps, 
-  instance)
-{
+function getStateFromUpdate(update, prevState){
   switch (update.tag){
     case UpdateState: {
       const payload = update.payload;
       let partialState;
-
       // Partial state object
       partialState = payload;
       
@@ -65,17 +57,13 @@ function getStateFromUpdate(
 }
 
 export function processUpdateQueue(
-  workInProgress, 
-  props, 
-  instance, 
-  renderLanes
+  workInProgress,  
+  renderLanes,
 ){
 
   const queue = workInProgress.updateQueue;
+  const props = workInProgress.pendingProps;
 
-  if (__ENV__){
-    currentlyProcessingQueue = queue.pending;
-  }
 
   let firstBaseUpdate = queue.firstBaseUpdate;
   let lastBaseUpdate = queue.lastBaseUpdate;
@@ -85,12 +73,13 @@ export function processUpdateQueue(
   if (pendingQueue !== null){
     queue.pending = null;
 
-    // Disconnect the pointer between first and last.
+    
     const lastPendingUpdate = pendingQueue;
     const firstPendingUpdate = lastPendingUpdate.next;
+    // Disconnect the pointer between first and last.
     lastPendingUpdate.next = null;
 
-    // Append pending updates to base queue
+    //Append pending updates to base queue
     if (lastBaseUpdate === null){
       firstBaseUpdate = firstPendingUpdate;
     } else {
@@ -100,8 +89,6 @@ export function processUpdateQueue(
 
     const current = workInProgress.alternate;
     if (current !== null){
-      // Update relevantly as above.
-      // TODO: clone workInProgress.updateQueue to current.updateQueue?
       const currentQueue = current.updateQueue;
       const currentLastBaseUpdate = currentQueue.lastBaseUpdate;
       if (currentLastBaseUpdate !== lastBaseUpdate){
@@ -140,12 +127,8 @@ export function processUpdateQueue(
           }
           // Process this update.
           newState = getStateFromUpdate(
-            workInProgress,
-            queue,
             update,
-            newState,
-            props,
-            instance,
+            newState
           );
           const callback = update.callback;
           if (callback !== null) {

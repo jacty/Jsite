@@ -362,7 +362,7 @@ function performUnitOfWork(unitOfWork){
   }
 
   unitOfWork.memoizedProps = unitOfWork.pendingProps;
-  if (next == null){
+  if (next === null){
     // If this doesn't spawn new work, complete the current work.
     completeUnitOfWork(unitOfWork);
   } else {

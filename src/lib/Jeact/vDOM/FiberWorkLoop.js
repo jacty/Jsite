@@ -338,6 +338,7 @@ function renderRootConcurrent(root, lanes){
 function workLoopConcurrent(){
   // Perform work until Scheduler asks us to yield
   while(wip !== null && !shouldYieldToHost()){
+    console.error('workLoopConcurrent', wip._debugID);
     performUnitOfWork(wip);
   }
 }
@@ -369,9 +370,6 @@ function performUnitOfWork(unitOfWork){
 
 function completeUnitOfWork(unitOfWork){
   let completedWork = unitOfWork;
-  if(completedWork._debugID!==7){//debug
-    return;
-  }
   do {
     const alternate = completedWork.alternate;
     const returnFiber = completedWork.return;
@@ -388,19 +386,26 @@ function completeUnitOfWork(unitOfWork){
       }
 
       if(returnFiber !== null &&
+        // Do not append effects to parents if a sibling failed to complete.
           (returnFiber.flags & Incomplete) === NoFlags
         ){
+        // Append all the effects of the subtree and this fiber onto the effect
+        // list of the parent. The completion order of the children affects the
+        // side-effect order.
         if (returnFiber.firstEffect === null){
           returnFiber.firstEffect = completedWork.firstEffect;
         }
         if (completedWork.lastEffect !== null){
-          console.error('completeUnitOfWork2')
+          if (returnFiber.lastEffect !== null){
+            returnFiber.lastEffect.nextEffect = completedWork.firstEffect;
+          }
+          returnFiber.lastEffect = completedWork.lastEffect;
         }
 
         const flags = completedWork.flags;
         if (flags > PerformedWork){
-          if(returnFiber.lastEffect !== null){
-            console.error('completeUnitOfWork3', completedWork._debugID)
+          if(returnFiber.lastEffect !== null){// next sibling effect.
+            returnFiber.lastEffect.nextEffect = completedWork;
           } else {
             returnFiber.firstEffect = completedWork;
           }

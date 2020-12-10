@@ -17,7 +17,6 @@ export function reconcileChildFibers(
   newChild,// from payload.element
   lanes
 ){
-
   // Handle object types
   const isObject = typeof newChild === 'object' && newChild !== null;
   if (isObject){
@@ -127,13 +126,12 @@ function reconcileChildrenArray(
 
 function createChild(returnFiber, newChild, lanes){
   if (typeof newChild === 'string' || typeof newChild === 'number'){
-    console.error('createChild1');
-    // const created = createFiberFromText(
-    //   ''+ newChild,
-    //   lanes,
-    // );
-    // created.return = returnFiber;
-    // return created;
+    const created = createFiberFromText(
+      ''+ newChild,
+      lanes,
+    );
+    created.return = returnFiber;
+    return created;
   }
   if(typeof newChild === 'object' && newChild !== null){
     switch(newChild.$$typeof){

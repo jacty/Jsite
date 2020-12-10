@@ -21,7 +21,9 @@ function setInitialDOMProperties(
             const nextHTML = nextProp[HTML];
             domElement.innerHTML = nextHTML;
         } else if (propKey === CHILDREN){
-            setTextContent(domElement, ''+ nextProp);
+            if(typeof nextProp === 'string' || typeof nextProp === 'number'){
+                setTextContent(domElement, ''+ nextProp);
+            }
         } else if (nextProp !== null){
             console.error('x', nextProp)
         }

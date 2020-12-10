@@ -40,7 +40,6 @@ export function finalizeInitialChildren(
 
 export function createTextInstance(text, rootContainerInstance, hostContext, interalInstancedHandle){
   const textNode = createTextNode(text, rootContainerInstance);
-  precacheFiberNode(interalInstancedHandle, textNode)
   return textNode;
 }
 

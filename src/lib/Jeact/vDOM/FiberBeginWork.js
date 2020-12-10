@@ -192,8 +192,8 @@ export function beginWork(alternate, workInProgress, renderLanes){
       return updateHostRoot(alternate, workInProgress, renderLanes);
     case HostComponent://5
       return updateHostComponent(alternate, workInProgress, renderLanes);
-    // case HostText://6
-    //   return updateHostText(workInProgress);
+    case HostText://6
+      return updateHostText(workInProgress);
     default:
       console.error('beginWork4', workInProgress);
   }

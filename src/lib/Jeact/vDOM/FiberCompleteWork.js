@@ -53,27 +53,10 @@ function bubbleProperties(completedWork){
   return didBailout;
 }
 
-function appendAllChildren(parent, workInProgress, needsVisibilityToggle, isHidden){
+function appendAllChildren(parent, workInProgress, needsVisibilityToggle=false, isHidden=false){
   let node = workInProgress.child;
-  while (node!==null){
-    if (node.tag === HostComponent || node.tag === HostText){
-      appendInitialChild(parent, node.stateNode)
-    } else if (node.child !== null){
-      node.child.return = node;
-      node = node.child;
-      continue;
-    }
-    if (node === workInProgress){
-      return;
-    }
-    while (node.sibling === null){
-      if (node.return === null || node.return === workInProgress){
-        return;
-      }
-      node = node.return;
-    }
-    node.sibling.return = node.return;
-    node = node.sibling;
+  if (node!==null){
+    console.error('appendAllChildren1')
   }
 }
 
@@ -84,35 +67,34 @@ export function completeWork(
 ){
   const newProps = workInProgress.pendingProps;
   switch(workInProgress.tag){
-    case FunctionComponent:
-      return null;
-    case HostRoot:{//3
-      popHostContainer(workInProgress);
-      const fiberRoot = workInProgress.stateNode;
+    // case FunctionComponent:
+    //   return null;
+    // case HostRoot:{//3
+    //   popHostContainer(workInProgress);
+    //   const fiberRoot = workInProgress.stateNode;
 
-      if (fiberRoot.pendingContext){
-        console.error('completeWork1')
-      }
-      updateHostContainer(workInProgress);
-      return null;
-    }
+    //   if (fiberRoot.pendingContext){
+    //     console.error('completeWork1')
+    //   }
+    //   updateHostContainer(workInProgress);
+    //   return null;
+    // }
     case HostComponent:{//5
       popHostContext(workInProgress);
       const rootContainerInstance = getRootHostContainer();
       const type = workInProgress.type;
+
       if (alternate!== null){// which case?
         console.error('completeWork2')
       } else{
         const currentHostContext = getHostContext();
         const instance = createInstance(
           type,
-          newProps,
           rootContainerInstance,
-          currentHostContext,
-          workInProgress
         );
 
-        appendAllChildren(instance, workInProgress, false, false);
+        appendAllChildren(instance, workInProgress);
+
         workInProgress.stateNode = instance;
 
         if(finalizeInitialChildren(
@@ -124,32 +106,31 @@ export function completeWork(
             console.error('completeWork4')
           markUpdate(workInProgress)
         }
-
         if(workInProgress.ref !== null){
           console.error('completeWork5')
         }
       }
       return null;
     }
-    case HostText: {
-      const newText = newProps;
-      if(current){
-        console.error('HostText1')
-      } else {
-        if (typeof newText !== 'string'){
-          console.error('HostText2', newText)
-        }
-        const rootContainerInstance = getRootHostContainer();
-        const currentHostContext = getHostContext();
-        workInProgress.stateNode = createTextInstance(
-          newText,
-          rootContainerInstance,
-          currentHostContext,
-          workInProgress,
-        );
-      }
-      return null;
-    }
+    // case HostText: {
+    //   const newText = newProps;
+    //   if(current){
+    //     console.error('HostText1')
+    //   } else {
+    //     if (typeof newText !== 'string'){
+    //       console.error('HostText2', newText)
+    //     }
+    //     const rootContainerInstance = getRootHostContainer();
+    //     const currentHostContext = getHostContext();
+    //     workInProgress.stateNode = createTextInstance(
+    //       newText,
+    //       rootContainerInstance,
+    //       currentHostContext,
+    //       workInProgress,
+    //     );
+    //   }
+    //   return null;
+    // }
     default:
       console.error('completeWork', workInProgress)
   }

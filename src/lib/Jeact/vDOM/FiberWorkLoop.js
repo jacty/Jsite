@@ -190,7 +190,7 @@ function performConcurrentWorkOnRoot(root, nextLanes){
   currentEventTime = NoTimestamp;
 
   let exitStatus = renderRootConcurrent(root, nextLanes);
-  console.error('x', exitStatus);return;
+
   if (includesSomeLane(wipRootIncludedLanes, wipRootUpdatedLanes)){
     console.error('performConcurrentWorkOnRoot4')
   } else if(exitStatus !== RootIncomplete){
@@ -200,20 +200,17 @@ function performConcurrentWorkOnRoot(root, nextLanes){
     if (exitStatus === RootFatalErrored){
       console.error('performConcurrentWorkOnRoot6')
     }
-
     // now we have a consistent tree.
     const finishedWork = root.current.alternate
     root.finishedWork = finishedWork;
-    root.finishedLanes = lanes;
-    finishConcurrentRender(root, exitStatus, lanes);
+    root.finishedLanes = nextLanes;
+    finishConcurrentRender(root, exitStatus);
   }
-
-  //why again?
+  //schedule to finish Incomplete work.
   ensureRootIsScheduled(root, performance.now());
-
-  if (root.callbackNode === originalCallbackNode){
+  if (root.callbackNode !== null){
     // Continue expired tasks.
-    return performConcurrentWorkOnRoot.bind(null, root);
+    return performConcurrentWorkOnRoot.bind(null, root, nextLanes);
   }
   return null;
 }
@@ -322,9 +319,8 @@ function renderRootConcurrent(root, lanes){
       // handleError(root, thrownValue);
     // }
   // } while (true);
-  console.error('renderRootConcurrent',wip);return;
+ 
   executionContext = prevExecutionContext;
-
   // Check if the tree has completed.
   if ( wip !== null){
     // Still work remaining.
@@ -372,23 +368,24 @@ function performUnitOfWork(unitOfWork){
 }
 
 function completeUnitOfWork(unitOfWork){
-  console.error('completeUnitOfWork',unitOfWork);return;
   let completedWork = unitOfWork;
-
+  if(completedWork._debugID!==7){//debug
+    return;
+  }
   do {
     const alternate = completedWork.alternate;
     const returnFiber = completedWork.return;
     // Check if the work completed or if something threw.
+
     if ((completedWork.flags & Incomplete) === NoFlags){
       setCurrentFiber(completedWork);
       // Process alternate.child
       let next = completeWork(alternate, completedWork, subtreeRenderLanes);
+
       resetCurrentFiber();
       if (next !== null){
         console.error('completeUnitOfWork1', next)
       }
-
-      resetChildLanes(completedWork);
 
       if(returnFiber !== null &&
           (returnFiber.flags & Incomplete) === NoFlags
@@ -399,10 +396,11 @@ function completeUnitOfWork(unitOfWork){
         if (completedWork.lastEffect !== null){
           console.error('completeUnitOfWork2')
         }
+
         const flags = completedWork.flags;
         if (flags > PerformedWork){
           if(returnFiber.lastEffect !== null){
-            console.error('completeUnitOfWork3')
+            console.error('completeUnitOfWork3', completedWork._debugID)
           } else {
             returnFiber.firstEffect = completedWork;
           }

@@ -13,7 +13,9 @@ function setInitialDOMProperties(
     nextProps
 ){
     for (const propKey in nextProps){
-        if (!nextProps.hasOwnProperty(propKey)) continue; 
+        if (!nextProps.hasOwnProperty(propKey)){
+             continue;
+        } 
         const nextProp = nextProps[propKey];
         if (propKey === DANGEROUS_HTML){
             const nextHTML = nextProp[HTML];
@@ -50,7 +52,7 @@ export function setInitialProperties(
     
     switch(tag){
         default:
-            if(rawprops&& typeof rawprops.onClick === 'function'){
+            if(typeof rawprops.onClick === 'function'){
                 console.error('setInitialProperties');
             }
     }  

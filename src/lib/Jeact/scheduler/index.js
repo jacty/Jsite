@@ -136,20 +136,19 @@ function performWorkUntilDeadline(){
   if (scheduledHostCallback !== null){
     const currentTime = performance.now();
     deadline = currentTime + yieldInterval;
+    let hasMoreWork = true;
     try{
       // scheduledHostCallback = flushWork;
-      const hasMoreWork = scheduledHostCallback(currentTime);
-      if (!hasMoreWork){
-        isMessageLoopRunning = false;
-      } else {
+      hasMoreWork = scheduledHostCallback(currentTime);
+    } finally {
+      if (hasMoreWork){
         // If there's more work, schedule the next message event at the end
         // of the preceding one.
-        // port.postMessage(null);//debug
-        console.error('There is more work to do.', hasMoreWork);
+        port.postMessage(null);
+      } else {
+        isMessageLoopRunning = false;
+        scheduledHostCallback = null;
       }
-    } catch (error){
-      // port.postMessage(null);// debug
-      throw error;
     }
   } else {
     isMessageLoopRunning = false;

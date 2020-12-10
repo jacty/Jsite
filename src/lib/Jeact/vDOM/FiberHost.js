@@ -17,12 +17,8 @@ function shouldAutoFocusHostComponent(type, props){
 
 export function createInstance(
   type,
-  props, 
   rootContainerInstance,
-  hostContext,
-  interalInstancedHandle
 ){
-  let parentNamespace = hostContext; 
   const domElement = createElement(type,rootContainerInstance)
   return domElement;
 }

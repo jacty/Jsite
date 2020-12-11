@@ -28,22 +28,25 @@ function getHostParentFiber(fiber){
 }
 
 function isHostParent(fiber){
-    return fiber.tag === HostRoot;
+    return (
+        fiber.tag === HostRoot ||
+        fiber.tag === HostComponent
+        );
 }
 
 function getHostSibling(fiber){
     let node = fiber;
-    // siblings: while(true){
-        while (node.sibling === null){
-            if(node.return === null || isHostParent(node.return)){
+    while (true){
+        while(node.sibling === null){
+            if (node.return === null || isHostParent(node.return)){
                 return null;
             }
             node = node.return;
         }
-        console.error('getHostSibling1', node)
-        // node.sibling.return = node.return;
-        // node = node.sibling;
-    // }
+        node.sibling.return = node.return;
+        node = node.sibling;
+    }
+    console.error('getHostSibling');
 }
 
 export function commitPlacement(finishedWork){
@@ -53,6 +56,10 @@ export function commitPlacement(finishedWork){
     let isContainer;
     const parentStateNode = parentFiber.stateNode;
     switch(parentFiber.tag){
+        case HostComponent:
+            parent = parentStateNode;
+            isContainer = false;
+            break;
         case HostRoot:
             parent = parentStateNode.containerInfo;
             isContainer = true;
@@ -67,7 +74,7 @@ export function commitPlacement(finishedWork){
     if(isContainer){
         insertOrAppendPlacementNodeIntoContainer(finishedWork, before, parent);
     } else {
-        console.error('commitPlacement3');
+        insertOrAppendPlacementNode(finishedWork, before, parent);
     }
 }
 
@@ -92,5 +99,20 @@ function insertOrAppendPlacementNodeIntoContainer(node, before, parent){
             }
         }
         
+    }
+}
+
+function insertOrAppendPlacementNode(node, before, parent){
+    const tag = node.tag;
+    const isHost = tag === HostComponent || tag === HostText;
+    if (isHost){
+        const stateNode = node.stateNode;
+        if (before){
+            console.error('insertOrAppendPlacementNode')
+        } else {
+            console.error('xx');
+        }
+    } else {
+        console.error('insertOrAppendPlacementNode1')
     }
 }

@@ -155,14 +155,6 @@ function placeChild(
   lastPlacedIndex,
   newIndex
 ){
-  newFiber.index = newIndex;
-  const current = newFiber.alternate;
-  if (current!==null){
-    console.error('placeChild1')
-  } else {
-    // This is an insertion.
-    newFiber.flags |= Placement;
-    return lastPlacedIndex
-  }
+  return lastPlacedIndex;
 }
 

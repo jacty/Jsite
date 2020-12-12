@@ -9,7 +9,7 @@ import {
 import {push, pop, peek} from './SchedulerMinHeap';
 
 // Tasks are stored on a min heap.
-const taskQueue = [];
+let taskQueue = [];
 
 // Incrementing id counter. Used to maintain insertion order.
 let taskIdCount = 1;
@@ -63,8 +63,10 @@ function workLoop(initialTime){
 
     currentPriority = currentTask.priority;
     //performConcurrentWorkOnRoot()
-    callback();
-    
+    const additionalWork = callback();
+    if(additionalWork===null){
+      taskQueue = []
+    }
     currentTask = peek(taskQueue);
   }
   // Return whether there's additional work.
@@ -148,7 +150,7 @@ function performWorkUntilDeadline(){
       if (hasMoreWork){
         // If there's more work, schedule the next message event at the end
         // of the preceding one.
-        port.postMessage(null);//debug
+        port.postMessage(null);
       } else {
         isMessageLoopRunning = false;
         scheduledHostCallback = null;

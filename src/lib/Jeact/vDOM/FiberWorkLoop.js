@@ -208,7 +208,7 @@ function performConcurrentWorkOnRoot(root, nextLanes){
   }
   //schedule to finish Incomplete work.
   ensureRootIsScheduled(root, performance.now());
-  if (root.callbackNode !== null){
+  if (exitStatus!==RootCompleted){
     // Continue expired tasks.
     return performConcurrentWorkOnRoot.bind(null, root, nextLanes);
   }
@@ -338,7 +338,6 @@ function renderRootConcurrent(root, lanes){
 function workLoopConcurrent(){
   // Perform work until Scheduler asks us to yield
   while(wip !== null && !shouldYieldToHost()){
-    console.error('workLoopConcurrent', wip._debugID);
     performUnitOfWork(wip);
   }
 }
@@ -538,7 +537,7 @@ function commitRootImpl(root, renderPriority){
   remainingLanes = root.pendingLanes;
 
   ensureRootIsScheduled(root, performance.now());
-
+  root.callbackNode = null;
   return null;
 }
 

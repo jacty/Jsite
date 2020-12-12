@@ -49,7 +49,7 @@ function siftDown(heap, node, i){
     const rightIndex = leftIndex + 1;
     const right = heap[rightIndex];
     if (left!== undefined && compare(left, node) < 0){
-      console.error('siftDown')
+      console.error('siftDown', left)
     } else if (right !== undefined && compare(right, node) < 0){
       console.error('siftDown1')
     } else{

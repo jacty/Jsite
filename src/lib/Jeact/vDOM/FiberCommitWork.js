@@ -82,7 +82,7 @@ function insertOrAppendPlacementNodeIntoContainer(node, before, parent){
     const tag = node.tag;
     const isHost = tag === HostComponent || tag === HostText;
     if (isHost){
-        const stateNode = isHost ? node.stateNode : console.error('insertOrAppendPlacementNodeIntoContainer2');
+        const stateNode =node.stateNode;
         if (before){
             console.error('insertOrAppendPlacementNodeIntoContainer3')
         } else {

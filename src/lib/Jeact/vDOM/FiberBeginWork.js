@@ -36,11 +36,6 @@ function updateFunctionComponent(
   nextProps,
   renderLanes
 ){
-  if (__ENV__){
-    if (workInProgress.type !== workInProgress.elementType){
-      console.error('updateFunctionComponent1');
-    }
-  }
 
   if (__ENV__){
     CurrentOwner.current = workInProgress;
@@ -165,16 +160,12 @@ export function beginWork(alternate, workInProgress, renderLanes){
   switch (workInProgress.tag){
     case FunctionComponent:{//0
       const Component = workInProgress.type;
-      const unresolvedProps = workInProgress.pendingProps;
-      const resolvedProps =
-        workInProgress.elementType === Component
-        ? unresolvedProps
-        : resolveDefaultProps(Component, unresolvedProps);
+      const props = workInProgress.pendingProps;
       return updateFunctionComponent(
         alternate,
         workInProgress,
         Component,
-        resolvedProps,
+        props,
         renderLanes,
       );
     }

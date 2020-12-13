@@ -1,6 +1,5 @@
 import {
   NoTimestamp,
-  noTimeout,
   NoLanes,
 } from '@Jeact/shared/Constants';
 import { createFiber } from '@Jeact/vDOM/Fiber';
@@ -21,7 +20,6 @@ function FiberRootNode(containerInfo){
 
 export function createFiberRoot(container){
   const root = new FiberRootNode(container);
-  console.error('x');
   const fiber = createFiber();
   root.current = fiber;
   fiber.stateNode = root;

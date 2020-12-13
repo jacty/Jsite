@@ -10,11 +10,10 @@ import {
 
 let debugCounter = 1;
 
-function FiberNode(tag, pendingProps=null, key=null){
+function FiberNode(tag=HostRoot, pendingProps=null, key=null){
   /* Instance */
   this.tag = tag; // Decides which kind of component the fiber is
   this.key = key; // {key} attribute in lists' items
-  this.elementType = null;
   this.type = null;
   this.stateNode = null; // point to FiberRootNode
 
@@ -62,7 +61,7 @@ function FiberNode(tag, pendingProps=null, key=null){
 
 }
 
-export const createFiber = function(tag=HostRoot, pendingProps=null, key){
+export const createFiber = function(tag, pendingProps, key){
   return new FiberNode(tag, pendingProps, key);
 };
 
@@ -82,7 +81,6 @@ export function createWorkInProgress(current){
     );
 
     cloneKeys = [
-      'elementType',
       'type',
       'stateNode',
     ];
@@ -143,7 +141,6 @@ export function createFiberFromTypeAndProps(element,lanes, owner){
   }
 
   const fiber = createFiber(fiberTag, pendingProps, key);
-  fiber.elementType = type;
   fiber.type = type;
   fiber.lanes = lanes;
 

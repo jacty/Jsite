@@ -225,10 +225,6 @@ function prepareFreshStack(root, lanes){
   root.finishedWork = null;
   root.finishedLanes = NoLanes;
 
-  const timeoutHandle = root.timeoutHandle;
-  if (timeoutHandle !== noTimeout){//suspended work.
-    console.log('prepareFreshStack1');
-  }
   if (wip !== null){// interrupted work.
     console.log('prepareFreshStack2');
   }

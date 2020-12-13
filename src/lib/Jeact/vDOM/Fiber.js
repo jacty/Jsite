@@ -11,7 +11,7 @@ import {
 let debugCounter = 1;
 
 function FiberNode(tag=HostRoot, pendingProps=null, key=null){
-  /* Instance */
+  // Instance
   this.tag = tag; // Decides which kind of component the fiber is
   this.key = key; // {key} attribute in lists' items
   this.type = null;
@@ -22,7 +22,7 @@ function FiberNode(tag=HostRoot, pendingProps=null, key=null){
   this.child = null;
   this.sibling = null;
   this.index = 0;
-
+  // props and states
   this.pendingProps = pendingProps;
   this.memoizedProps = null;
   this.memoizedState = null; // As baseState in update queue.
@@ -33,17 +33,14 @@ function FiberNode(tag=HostRoot, pendingProps=null, key=null){
     pending: null,
     effects: null,
   };
-  this.memoizedState = null; // As baseState in update queue.
-  this.dependencies = null;
 
   // Effects
   this.flags = NoFlags;
-  this.nextEffect = null;
-
   this.firstEffect = null;
   this.lastEffect = null;
+  this.nextEffect = null;
+
   this.subtreeFlags = NoFlags;
-  this.deletions = null;
 
   this.lanes = NoLanes;
   this.childLanes = NoLanes;
@@ -56,7 +53,6 @@ function FiberNode(tag=HostRoot, pendingProps=null, key=null){
     this._debugHookTypes = null;
     Object.preventExtensions(this);
   }
-
 }
 
 export const createFiber = function(tag, pendingProps, key){
@@ -108,17 +104,6 @@ export function createWorkInProgress(current){
     'index',
   ];
   clone(current,workInProgress,cloneKeys);
-
-  // Clone the dependencies object. This is mutated during the render phase,
-  // so it cannot be shared with the current fiber.
-  const currentDependencies = current.dependencies;
-  workInProgress.dependencies =
-    currentDependencies === null
-    ? null
-    : {
-      lanes: currentDependencies.lanes,
-      firstContext: currentDependencies.firstContext,
-    };
 
   return workInProgress;
 }

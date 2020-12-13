@@ -123,9 +123,6 @@ export function completeWork(
             console.error('completeWork4')
           markUpdate(workInProgress)
         }
-        if(workInProgress.ref !== null){
-          console.error('completeWork5')
-        }
       }
       return null;
     }

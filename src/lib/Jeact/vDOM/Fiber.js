@@ -15,15 +15,13 @@ function FiberNode(tag=HostRoot, pendingProps=null, key=null){
   this.tag = tag; // Decides which kind of component the fiber is
   this.key = key; // {key} attribute in lists' items
   this.type = null;
-  this.stateNode = null; // point to FiberRootNode
+  this.stateNode = null; // point to FiberRootNode or DOMNode.
 
   // Fiber
   this.return = null; // point to parent
   this.child = null;
   this.sibling = null;
   this.index = 0;
-
-  this.ref = null;
 
   this.pendingProps = pendingProps;
   this.memoizedProps = null;
@@ -108,7 +106,6 @@ export function createWorkInProgress(current){
     'updateQueue',
     'sibling',
     'index',
-    'ref'
   ];
   clone(current,workInProgress,cloneKeys);
 

@@ -1,7 +1,6 @@
 import{
  HostRoot,
  HostText,
- ContentReset,
  HostComponent,
 } from '@Jeact/shared/Constants';
 import {
@@ -66,9 +65,6 @@ export function commitPlacement(finishedWork){
             break;
         default:
             console.error('commitPlacement1', parentFiber.tag);
-    }
-    if (parentFiber.flags & ContentReset){
-        console.error('commitPlacement2')
     }
     const before = getHostSibling(finishedWork);
     if(isContainer){

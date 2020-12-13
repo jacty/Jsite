@@ -2,7 +2,6 @@ import {
   FunctionComponent,
   HostText,
   HostComponent,
-  Snapshot,
   HostRoot,
   NoLanes,
   NoFlags,

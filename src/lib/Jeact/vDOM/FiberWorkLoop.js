@@ -14,13 +14,7 @@ import {
   RenderContext,
   CommitContext,
   PerformedWork,
-  Placement,
-  Update, 
-  Deletion,
-  Passive,
-  ContentReset,
-  Ref,
-  Callback,
+  Placement, 
 } from '@Jeact/shared/Constants';
 import {
   CurrentBatchConfig,
@@ -528,9 +522,6 @@ function commitRootImpl(root, renderPriority){
   while (nextEffect !== null){
     const nextNextEffect = nextEffect.nextEffect;
     nextEffect.nextEffect = null;
-    if (nextEffect.flags & Deletion){
-      console.error('commitRootImpl10')
-    }
     nextEffect = nextNextEffect;
   }
 
@@ -544,10 +535,6 @@ function commitRootImpl(root, renderPriority){
 function commitBeforeMutationEffects(){
   while (nextEffect !== null){
     const flags = nextEffect.flags;
-
-    if ((flags & Passive) !== NoFlags){
-      console.error('commitBeforeMutationEffects2')
-    }
     nextEffect = nextEffect.nextEffect;
   }
 }
@@ -558,7 +545,7 @@ function commitMutationEffects(root, renderPriority){
     
     const flags = nextEffect.flags;
     
-    const primaryFlags = flags & (Placement | Update | Deletion);
+    const primaryFlags = flags & Placement;
     switch(primaryFlags){
       case Placement:{//2
         commitPlacement(nextEffect);

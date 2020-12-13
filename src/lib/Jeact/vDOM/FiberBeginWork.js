@@ -29,16 +29,6 @@ import { setIsRendering } from '@Jeact/shared/dev';
 let didReceiveUpdate = false;
 
 
-function markRef(current, workInProgress){
-  const ref = workInProgress.ref;
-  if (
-    (current === null && ref !== null) ||
-    (current !== null && current.ref !== ref)
-  ){
-    workInProgress.flags |= Ref;
-  }
-}
-
 function updateFunctionComponent(
   alternate,
   workInProgress,

@@ -2,22 +2,20 @@ import {
     createElement,
     createRoot,
 } from '@Jeact';
+import ErrorBoundary from '@com/Errors/ErrorBoundary.jsx';
+import '@assets/styles/main.sass';
+
+import Aboutme from '@com/aboutme.jsx';
+import {Footer} from '@com/shared.jsx';
+
 const React = {
     createElement:createElement,
     createRoot:createRoot
 };
 
-import ErrorBoundary from '@com/Errors/ErrorBoundary.jsx';
-
-import data from '@data/interview.json';
-import '@assets/styles/main.sass';
-
-import Interview from '@com/interview.jsx';
-import {Footer} from '@com/shared.jsx';
-
 React.createRoot(document.getElementById('root')).render(
     <ErrorBoundary>
-         <Interview data={data}></Interview>
+         <Aboutme></Aboutme>
          <Footer />
     </ErrorBoundary>
 )

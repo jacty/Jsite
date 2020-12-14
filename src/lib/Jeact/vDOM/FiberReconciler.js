@@ -1,4 +1,3 @@
-import { __ENV__ } from '@Jeact/shared/Constants';
 import {
   requestEventTime,
   requestUpdateLane,

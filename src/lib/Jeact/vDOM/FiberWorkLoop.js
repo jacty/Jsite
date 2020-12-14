@@ -100,19 +100,7 @@ let currentEventWipLanes = NoLanes;
 let currentEventPendingLanes = NoLanes;
 
 export function requestEventTime(){
-  if ((executionContext & (RenderContext | CommitContext)) !== NoContext){
-    // We're inside Jeact.
-    console.warn('We\'re inside Jeact');
-    return performance.now();
-  }
-  // We're not inside Jeact, so we may be in the middle of a browser event.
-  if (currentEventTime !== NoTimestamp){
-    console.warn('We may be in a browser event');
-    // Use the same start time for all updates until we enter Jeact again.
-    return currentEventTime;
-  }
-
-  // This is the first update since Jeact yield. Compute a new start time.
+  // This is the first update.
   currentEventTime = performance.now();
 
   return currentEventTime;

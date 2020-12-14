@@ -11,19 +11,6 @@ const RESERVED_ATTR = {
   ref: true,
 };
 
-function hasValidRef(config){
-  return config.ref !== undefined;
-}
-
-function hasValidKey(config){
-  return config.key !== undefined;
-}
-
-function warnStringRef(config){
-  if (typeof config.ref === 'string'){
-    console.error('String ref is not supported.')
-  }
-}
 
 function JeactElement(type, key, ref, owner, props){
   const element = {
@@ -53,15 +40,8 @@ export function createElement(type, config, children){
   let ref = null;
 
   if (config != null) {
-    if (hasValidRef(config)){
-      ref = config.ref;
-      if(__ENV__){
-        warnStringRef(config);
-      }
-    }
-    if (hasValidKey(config)){
-      key = '' + config.key;
-    }
+    ref = config.ref;
+    key = '' + config.key;
 
     for (propName in config){
       if(config.hasOwnProperty(propName)&&

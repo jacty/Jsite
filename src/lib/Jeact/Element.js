@@ -21,7 +21,7 @@ function JeactElement(type, key, ref, owner, props){
     key: key,
     ref: ref,
     props: props,
-    // Record the component responsible for creating this element.
+    // Who created this element. From CurrentOwner.current
     _owner: owner,
   };
 
@@ -61,10 +61,7 @@ export function createElement(type, config, children){
     for (let i = 0; i < childrenLength; i++){
       childArray[i] = arguments[i + 2];
     }
-    if (__ENV__){
-      // to protect the first version.
-      Object.freeze(childArray);
-    }
+    
     props.children = childArray;
   }
 

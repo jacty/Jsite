@@ -4,7 +4,6 @@ import {
   NoLanePriority,
   NormalPriority,
   DefaultLanePriority,
-  TransitionLanePriority,
   DefaultLanes,
   NonIdleLanes,
   TotalLanes,
@@ -92,12 +91,6 @@ function computeExpirationTime(lane, currentTime){
   // TODO: Expiration heuristic is constant per lane, so could use a map.
   getHighestPriorityLanes(lane);//update global variable highestLanePriority
   const priority = highestLanePriority;
-
-  if (priority >= TransitionLanePriority){
-    return currentTime + 5000;
-  } else {
-    console.error('computeExpirationTime1')
-  }
 }
 
 export function markStarvedLanesAsExpired(root, currentTime){
@@ -131,9 +124,9 @@ export function getNextLanesPriority(){
   return highestLanePriority;
 }
 
-export function findUpdateLane(lanePriority, wipLanes){
+export function requestUpdateLane(lanePriority=1, wipLanes=0){
   switch (lanePriority) {
-    case DefaultLanePriority: {//8
+    case DefaultLanePriority: {//1
       let lane = getHighestPriorityLane(DefaultLanes & ~wipLanes);
       if (lane === NoLane) {
         console.error('findUpdateLane1')
@@ -148,7 +141,7 @@ export function findUpdateLane(lanePriority, wipLanes){
 }
 
 function getHighestPriorityLane(lanes){
-  return lanes & -lanes; // Why this way can get the highest priority.
+  return lanes & -lanes; // Why this way can get the highest priority?
 }
 
 function getLowestPriorityLane(lanes){

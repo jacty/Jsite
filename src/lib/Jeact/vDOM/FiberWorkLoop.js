@@ -27,13 +27,12 @@ import {
 } from '@Jeact/shared/dev'
 import {
   getCurrentSchedulePriority,
-  PriorityToLanePriority,
   shouldYieldToHost,
   scheduleCallback,
   runWithPriority,
 } from '@Jeact/scheduler';
 import {
-  findUpdateLane,
+  requestUpdateLane,
   mergeLanes,
   getNextLanes,
   getNextLanesPriority,
@@ -106,15 +105,6 @@ export function requestEventTime(){
   return currentEventTime;
 }
 
-export function requestUpdateLane(fiber){
-  // TODO: update normal priority to 100?
-  const priority = getCurrentPriority();
-  const LanePriority = PriorityToLanePriority(priority);
-
-  let lane = findUpdateLane(LanePriority, currentEventWipLanes)
-
-  return lane;
-}
 
 export function scheduleUpdateOnFiber(fiber, lane, eventTime){
   // Update fiber.lanes
@@ -426,10 +416,9 @@ function resetChildLanes(completedWork){
 }
 
 function commitRoot(root){
-  const renderPriority = getCurrentPriority();
   runWithPriority(
     ImmediatePriority,
-    commitRootImpl.bind(null, root, renderPriority),
+    commitRootImpl.bind(null, root),
   );
   return null;
 }
@@ -556,14 +545,5 @@ function commitLayoutEffects(root, committedLanes){
     __ENV__ ? resetCurrentFiber():'';
 
     nextEffect = nextEffect.nextEffect;
-  }
-}
-
-export function getCurrentPriority(){
-  switch(getCurrentSchedulePriority()){
-    case NormalSchedulePriority:
-      return NormalPriority;
-    default:
-      console.log('getCurrentPriority', getCurrentSchedulePriority())
   }
 }

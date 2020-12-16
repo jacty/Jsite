@@ -36,8 +36,7 @@ export const NormalSchedulePriority = 3;
 
 /* LanePriorities */
 export const NoLanePriority = 0;
-export const DefaultLanePriority = 8;
-export const TransitionLanePriority = 6;//Why?
+export const DefaultLanePriority = 1;
 
 /* JeactUpdateQueue.js */
 export const UpdateState = 0;

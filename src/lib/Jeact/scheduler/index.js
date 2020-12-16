@@ -181,18 +181,6 @@ function requestHostCallback(callback){
 
 
 
-export function PriorityToLanePriority(priority){
-  switch(priority){
-    case NormalPriority://97
-      return DefaultLanePriority;
-    default:
-      if(priority !== NoLanePriority){
-        console.error('UnknowPriority', priority)
-      } else {
-        return NoLanePriority;
-      }
-  }
-}
 
 export function PriorityToSchedulePriority(priority){
   switch(priority){

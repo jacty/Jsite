@@ -3,13 +3,8 @@ import {
   NoFlags,
   NoLanes,
   NoTimestamp,
-  HostRoot,
-  NormalSchedulePriority,
   ImmediatePriority,
-  NoPriority,
-  NormalPriority,
   Incomplete,
-  noTimeout,
   NoContext,
   RenderContext,
   CommitContext,
@@ -17,7 +12,6 @@ import {
   Placement, 
 } from '@Jeact/shared/Constants';
 import {
-  CurrentBatchConfig,
   CurrentOwner,
   CurrentDispatcher
 } from '@Jeact/shared/internals';
@@ -26,13 +20,11 @@ import {
   resetCurrentFiber,
 } from '@Jeact/shared/dev'
 import {
-  getCurrentSchedulePriority,
   shouldYieldToHost,
   scheduleCallback,
   runWithPriority,
 } from '@Jeact/scheduler';
 import {
-  requestUpdateLane,
   mergeLanes,
   getNextLanes,
   getNextLanesPriority,
@@ -56,7 +48,6 @@ import {
   completeWork
 } from '@Jeact/vDOM/FiberCompleteWork';
 import {
-  commitBeforeMutationEffectOnFiber,
   commitPlacement,
 } from '@Jeact/vDOM/FiberCommitWork';
 import {
@@ -84,7 +75,7 @@ let wipRootSkippedLanes = NoLanes;
 let wipRootUpdatedLanes = NoLanes;
 
 let wipRootPingedLanes = NoLanes;
-let mostRecentlyUpdatedRoot = null;
+
 let wipRootRenderTargetTime = Infinity;
 const RENDER_TIMEOUT = 500;
 
@@ -95,8 +86,6 @@ function resetRenderTimer(){// Used by Suspense
 let nextEffect = null;
 
 let currentEventTime = NoTimestamp;
-let currentEventWipLanes = NoLanes;
-let currentEventPendingLanes = NoLanes;
 
 export function requestEventTime(){
   // This is the first update.
@@ -105,10 +94,10 @@ export function requestEventTime(){
   return currentEventTime;
 }
 
-
 export function scheduleUpdateOnFiber(fiber, lane, eventTime){
   // Update fiber.lanes
   const root = markUpdateLaneFromFiberToRoot(fiber, lane);
+
   // update root.pendingLane, eventTimes etc.
   markRootUpdated(root, lane, eventTime);
   ensureRootIsScheduled(root, eventTime);

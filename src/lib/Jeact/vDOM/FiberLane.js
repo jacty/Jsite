@@ -181,14 +181,13 @@ export function createLaneMap(initial){
 }
 
 export function markRootUpdated(root, updateLane, eventTime){
-
+  console.error('x');
   root.pendingLanes |= updateLane;
 
   // Unsuspend any update at equal or lower priority.
   const higherPriorityLanes = updateLane - 1; // Turns 0b1000 into 0b0111
 
   root.suspendedLanes &= higherPriorityLanes;
-  root.pingedLanes &= higherPriorityLanes;
 
   const eventTimes = root.eventTimes;
   const index = pickArbitraryLaneIndex(updateLane);

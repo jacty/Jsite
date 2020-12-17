@@ -33,6 +33,7 @@ export function enqueueUpdate(fiber, update){
     pending.next = update;
   }
   updateQueue.pending = update;
+
 }
 
 function getStateFromUpdate(update, prevState){

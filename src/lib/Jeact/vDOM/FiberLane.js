@@ -90,13 +90,12 @@ export function getNextLanes(root, wipLanes){
 function computeExpirationTime(lane, currentTime){
   // TODO: Expiration heuristic is constant per lane, so could use a map.
   getHighestPriorityLanes(lane);//update global variable highestLanePriority
-  const priority = highestLanePriority;
+  return currentTime + 5000;
 }
 
 export function markStarvedLanesAsExpired(root, currentTime){
 
   const suspendedLanes = root.suspendedLanes;
-  const pingedLanes = root.pingedLanes;
   const expirationTimes = root.expirationTimes;
 
   // Iterate through the pending lanes and check if we've reached their expiration time. If so, we'll assume the update is being starved and mark it as expired to force it to finish.
@@ -107,8 +106,7 @@ export function markStarvedLanesAsExpired(root, currentTime){
     const expirationTime = expirationTimes[index];
     if (expirationTime === NoTimestamp){
       if (
-        (lane & suspendedLanes) === NoLanes ||
-        (lane & pingedLanes) !== NoLanes){
+        (lane & suspendedLanes) === NoLanes){
         // Assumes timestamps are monotonically increasing.
         expirationTimes[index] = computeExpirationTime(lane, currentTime);
       }
@@ -181,7 +179,6 @@ export function createLaneMap(initial){
 }
 
 export function markRootUpdated(root, updateLane, eventTime){
-  console.error('x');
   root.pendingLanes |= updateLane;
 
   // Unsuspend any update at equal or lower priority.

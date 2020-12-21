@@ -113,34 +113,17 @@ function ensureRootIsScheduled(root, currentTime){
   // update root.expirationTime. 
   markStarvedLanesAsExpired(root, currentTime);
 
-  const nextLanes = getNextLanes(
-    root,
-    root === wipRoot ? wipRootRenderLanes : NoLanes,
-  );
-
-  if (nextLanes === NoLanes){
-    if (existingCallbackNode !== null){
-      // There shouldn't have tasks to work on.
-      console.log('ensureRootIsScheduled1', existingCallbackNode);
-    }
-    return;
-  }
+  const nextLanes = root.pendingLanes === 512 ? root.pendingLanes : console.error('ensureRootIsScheduled2');
   
-  // Check if there's an existing task. We may be able to reuse it.
+  // Reuse existing task if there is.
   if (existingCallbackNode !== null){
     return;
   }
 
-  const newCallbackPriority = getNextLanesPriority();
-
-  // Schedule a new callback.
-  const priority = LanePriorityToPriority(newCallbackPriority);
   let newCallbackNode = scheduleCallback(
-    priority,
     performConcurrentWorkOnRoot.bind(null, root, nextLanes),
   )
 
-  root.callbackPriority = newCallbackPriority;
   root.callbackNode = newCallbackNode;
 }
 

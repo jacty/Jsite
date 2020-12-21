@@ -94,28 +94,20 @@ export function runWithPriority(priority,fn){
   }
 }
 
-export function scheduleCallback(priority, callback){
-  const schedulePriority = PriorityToSchedulePriority(priority)
+export function scheduleCallback(callback){
+  
   let startTime = performance.now();
-
-  let timeout;
-  switch(schedulePriority){
-    case NormalSchedulePriority:
-    default:
-      schedulePriority!==NormalSchedulePriority?console.log('scheduleCallback2', schedulePriority):'';
-      timeout = NormalTimeout;
-      break;
-  }
-
+  let timeout = NormalTimeout;
   let expirationTime = startTime + timeout;
+
   const newTask = {
     id: taskIdCount++,
     callback,
-    priority:schedulePriority,
     startTime,
     expirationTime,
     sortIndex: -1,
   };
+  
   // to sort task order in siftUp();  
   newTask.sortIndex = expirationTime;
   push(taskQueue, newTask);

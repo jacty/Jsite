@@ -32,36 +32,34 @@ let deadline = 0;
 let isMessageLoopRunning = false;
 let scheduledHostCallback = null;
 
-function flushWork(initialTime){
+function flushWork(){
   // We'll need a host callback the next time work is scheduled.
   isHostCallbackScheduled = false;
   isPerformingWork = true;
 
-  const previousPriority = currentPriority;
   try{
-     return workLoop(initialTime);
+     return workLoop();
   } finally {
     // flags may be set in workLoop should be reset finally.
     currentTask = null;
-    currentPriority = previousPriority;
     isPerformingWork = false;
   }
 }
 // the return value of this function decides if there will be another re-runs of this function through performWorkUntilDeadline();
-function workLoop(initialTime){
-  let currentTime = initialTime;
+function workLoop(){
+  const currentTime = performance.now();
+  deadline = currentTime + yieldInterval;
   currentTask = peek(taskQueue);
 
-  if(currentTask !== null){
+  while(currentTask !== null){
     if(currentTask.expirationTime > currentTime &&
        shouldYieldToHost()
       ){
       // deadline reached but currentTask hasn't expired.
-      // break;
+      break;
     }
     const callback = currentTask.callback;
 
-    currentPriority = currentTask.priority;
     //performConcurrentWorkOnRoot()
     const additionalWork = callback();
     if(additionalWork===null){
@@ -107,7 +105,7 @@ export function scheduleCallback(callback){
     expirationTime,
     sortIndex: -1,
   };
-  
+
   // to sort task order in siftUp();  
   newTask.sortIndex = expirationTime;
   push(taskQueue, newTask);
@@ -122,22 +120,16 @@ export function scheduleCallback(callback){
   return newTask;
 }
 
-export function getCurrentSchedulePriority(){
-  return currentPriority;
-}
-
 export function shouldYieldToHost(){
   return performance.now() >= deadline;
 }
 
 function performWorkUntilDeadline(){
   if (scheduledHostCallback !== null){
-    const currentTime = performance.now();
-    deadline = currentTime + yieldInterval;
     let hasMoreWork = true;
     try{
       // scheduledHostCallback = flushWork;
-      hasMoreWork = scheduledHostCallback(currentTime);
+      hasMoreWork = scheduledHostCallback();
     } finally {
       if (hasMoreWork){
         // If there's more work, schedule the next message event at the end

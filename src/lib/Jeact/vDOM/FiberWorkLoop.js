@@ -76,13 +76,6 @@ let wipRootUpdatedLanes = NoLanes;
 
 let wipRootPingedLanes = NoLanes;
 
-let wipRootRenderTargetTime = Infinity;
-const RENDER_TIMEOUT = 500;
-
-function resetRenderTimer(){// Used by Suspense
-  wipRootRenderTargetTime = performance.now() + RENDER_TIMEOUT;
-}
-
 let nextEffect = null;
 
 let currentEventTime = NoTimestamp;
@@ -130,7 +123,6 @@ function ensureRootIsScheduled(root, currentTime){
 // Entry point for every concurrent task, i.e. anything that
 // goes through Scheduler.
 function performConcurrentWorkOnRoot(root, nextLanes){
-  currentEventTime = NoTimestamp;
 
   let exitStatus = renderRootConcurrent(root, nextLanes);
 
@@ -170,18 +162,12 @@ function finishConcurrentRender(root, exitStatus, lanes){
   }
 }
 
-function prepareFreshStack(root, lanes){
-  root.finishedWork = null;
-  root.finishedLanes = NoLanes;
-
-  if (wip !== null){// interrupted work.
-    console.log('prepareFreshStack2');
-  }
+function prepareFreshStack(root, updateLanes){
 
   wipRoot = root;
   wip = createWorkInProgress(root.current);
   wipRootRenderLanes = subtreeRenderLanes =
-    wipRootIncludedLanes = lanes;
+    wipRootIncludedLanes = updateLanes;
   wipRootExitStatus = RootIncomplete;
   wipRootFatalError = null;
   wipRootSkippedLanes = NoLanes;
@@ -237,16 +223,15 @@ export function markSkippedUpdateLanes(lane){
   )
 }
 
-function renderRootConcurrent(root, lanes){
+function renderRootConcurrent(root, updateLanes){
   const prevExecutionContext = executionContext;
   executionContext |= RenderContext;
 
   // If the root or lanes have changed, throw out the existing stack
   // and prepare a fresh one. Otherwise we'll continue where we left off.
-  if (wipRoot !== root || wipRootRenderLanes !== lanes){
-    resetRenderTimer();
+  if (wipRoot !== root || wipRootRenderLanes !== updateLanes){
     // GET WIP:create a new Node by cloning root.current and set it to wip.
-    prepareFreshStack(root, lanes);
+    prepareFreshStack(root, updateLanes);
   }
 
   //Keep trying until all caught error handled.

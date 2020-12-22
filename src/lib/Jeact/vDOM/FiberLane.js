@@ -126,9 +126,7 @@ export function requestUpdateLane(lanePriority=1, wipLanes=0){
   switch (lanePriority) {
     case DefaultLanePriority: {//1
       let lane = getHighestPriorityLane(DefaultLanes & ~wipLanes);
-      if (lane === NoLane) {
-        console.error('findUpdateLane1')
-      }
+
       return lane;
     }
     default:

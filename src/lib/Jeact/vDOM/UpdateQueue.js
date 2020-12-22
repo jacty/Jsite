@@ -40,15 +40,10 @@ function getStateFromUpdate(update, prevState){
   switch (update.tag){
     case UpdateState: {
       const payload = update.payload;
-      let partialState;
-      // Partial state object
-      partialState = payload;
-      
+      let partialState = payload;      
       if (partialState === null || partialState === undefined){
-        // Null and undefined are treated as no-ops.
         return prevState;
       }
-      // Merge the partial state and the previous state.
       return Object.assign({}, prevState, partialState);
     }
     default:
@@ -57,14 +52,10 @@ function getStateFromUpdate(update, prevState){
   return prevState;
 }
 
-export function processUpdateQueue(
-  workInProgress,  
-  renderLanes,
-){
+export function processUpdateQueue(workInProgress,renderLanes){
 
   const queue = workInProgress.updateQueue;
   const props = workInProgress.pendingProps;
-
 
   let firstBaseUpdate = queue.firstBaseUpdate;
   let lastBaseUpdate = queue.lastBaseUpdate;
@@ -74,7 +65,6 @@ export function processUpdateQueue(
   if (pendingQueue !== null){
     queue.pending = null;
 
-    
     const lastPendingUpdate = pendingQueue;
     const firstPendingUpdate = lastPendingUpdate.next;
     // Disconnect the pointer between first and last.
@@ -119,24 +109,16 @@ export function processUpdateQueue(
 
       do {
         const updateLane = update.lane;
-        if(!isSubsetOfLanes(renderLanes, updateLane)){
-          console.error('processUpdateQueue3')
-        } else {
-          // This update does have sufficient priority.
-          if (newLastBaseUpdate !== null){
-            console.error('processUpdateQueue4');
-          }
-          // Process this update.
-          newState = getStateFromUpdate(
-            update,
-            newState
-          );
-          const callback = update.callback;
-          if (callback !== null) {
-            console.error('processUpdateQueue5');
-          }
+        // Process this update.
+        newState = getStateFromUpdate(
+          update,
+          newState
+        );
+        const callback = update.callback;
+        if (callback !== null) {
+          console.error('processUpdateQueue5');
         }
-
+        
         update = update.next;
         if (update=== null){
           pendingQueue = queue.pending;
@@ -156,7 +138,6 @@ export function processUpdateQueue(
       queue.firstBaseUpdate = newFirstBaseUpdate;
       queue.lastBaseUpdate = newLastBaseUpdate;
 
-      markSkippedUpdateLanes(newLanes);
       workInProgress.lanes = newLanes;
       workInProgress.memoizedState = newState;
   }

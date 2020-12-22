@@ -28,20 +28,11 @@ import {renderWithHooks} from '@Jeact/vDOM/FiberHooks';
 let didReceiveUpdate = false;
 
 
-function updateFunctionComponent(
-  alternate,
-  workInProgress,
-  Component,
-  nextProps,
-  renderLanes
-){
+function updateFunctionComponent(alternate,workInProgress,renderLanes){
 
   let nextChildren = renderWithHooks(
     alternate,
     workInProgress,
-    Component,
-    nextProps,
-    null,
     renderLanes,
   );
 
@@ -61,14 +52,12 @@ function updateFunctionComponent(
 }
 
 function updateHostRoot(alternate, workInProgress, renderLanes){
-  pushHostContainer(workInProgress);
   const prevState = workInProgress.memoizedState;
   const prevChildren = prevState !== null ? prevState.element : null;
 
   //update wip.lanes, wip.memoizedState;
   processUpdateQueue(workInProgress, renderLanes);
-  const nextState = workInProgress.memoizedState;
-  const nextChildren = nextState.element;
+  const nextChildren = workInProgress.memoizedState;
 
   workInProgress.child = reconcileChildFibers(
       workInProgress,
@@ -115,56 +104,25 @@ export function beginWork(alternate, workInProgress, renderLanes){
   if (alternate !== null){
     const oldProps = alternate.memoizedProps;
     const newProps = workInProgress.pendingProps;
-    if (
-      oldProps !== newProps || 
-      // Force a re-render if the implementation changed due to hot reload:
-      (__ENV__ ? workInProgress.type !== alternate.type : false)
-      ){
+    if (oldProps !== newProps){
       console.error('beginWork1', workInProgress)
-    } else if(!includesSomeLane(renderLanes, updateLanes)){
-      console.error('beginWork2', workInProgress);
-      return;
-      didReceiveUpdate = false;
-      // This fiber does not have any pending work. Bailout without entering
-      // the begin phase. There's still some bookkeeping we that needs to be
-      // done in this optimized path, mostly pushing stuff on the stack.
-      switch (workInProgress.tag){
-        case HostRoot:
-          pushHostRootContext(workInProgress);
-          break;
-        default:
-          console.error('beginWork3', workInProgress.tag)
-      }
-      return bailoutOnAlreadyFinishedWork(alternate, workInProgress, renderLanes);
-    } else {
-      // An update was scheduled on this fiber, but there are no new props
-      // nor legacy context. Set this to false. If an update queue or context
-      // consumer produces a changed value, it will set this to true.
-      // Otherwise, the component will assume the children have not changed
-      // and bail out.
-      didReceiveUpdate = false;
     }
-  } else {
-    didReceiveUpdate = false;
-  }   
+  }  
+
   switch (workInProgress.tag){
     case FunctionComponent:{//0
-      const Component = workInProgress.type;
-      const props = workInProgress.pendingProps;
       return updateFunctionComponent(
         alternate,
         workInProgress,
-        Component,
-        props,
         renderLanes,
       );
     }
     case HostRoot://3
       return updateHostRoot(alternate, workInProgress, renderLanes);
-    case HostComponent://5
-      return updateHostComponent(alternate, workInProgress, renderLanes);
-    case HostText://6
-      return updateHostText(workInProgress);
+    // case HostComponent://5
+    //   return updateHostComponent(alternate, workInProgress, renderLanes);
+    // case HostText://6
+    //   return updateHostText(workInProgress);
     default:
       console.error('beginWork4', workInProgress);
   }

@@ -65,16 +65,16 @@ function placeSingleChild(newFiber){
 function reconcileSingleElement(
   returnFiber,
   currentFirstChild,
-  element,
+  children,
   lanes
 ){
 
-  const key = element.key;
+  const key = children.key;
   let child = currentFirstChild;
   if (child !== null){
     console.error('reconcileSingleElement1')
   }
-  const created = createFiberFromElement(element, lanes);
+  const created = createFiberFromElement(children, lanes);
   created.return = returnFiber;
   return created;
 }
@@ -90,7 +90,6 @@ function reconcileChildrenArray(
   let previousNewFiber = null;
 
   let oldFiber = currentFirstChild;
-  let lastPlacedIndex = 0;
   let newIdx = 0;
   let nextOldFiber = null;
   for (; oldFiber!==null && newIdx < newChildren.length; newIdx++){
@@ -105,11 +104,6 @@ function reconcileChildrenArray(
     // since the rest will all be insertions.
     for (; newIdx < newChildren.length; newIdx++){
       const newFiber = createChild(returnFiber, newChildren[newIdx], lanes);
-      if (newFiber === null){// which case?
-        console.error('reconcileChildrenArray3')
-        continue;
-      }
-      lastPlacedIndex = placeChild(newFiber, lastPlacedIndex, newIdx);
       if(previousNewFiber === null){
         resultingFirstChild = newFiber;
       } else {
@@ -120,7 +114,6 @@ function reconcileChildrenArray(
 
     return resultingFirstChild;
   }
-  console.error('reconcileChildrenArray4')
 }
 
 function createChild(returnFiber, newChild, lanes){

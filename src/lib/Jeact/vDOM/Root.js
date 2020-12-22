@@ -1,5 +1,5 @@
 import { createFiberRoot } from '@Jeact/vDOM/FiberRoot';
-import { updateContainer } from '@Jeact/vDOM/FiberReconciler';
+import { updateContainer } from '@Jeact/vDOM/FiberReconcile';
 
 function vRoot(container){
   this._Root = createRootImpl(container);

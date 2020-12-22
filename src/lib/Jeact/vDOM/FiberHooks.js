@@ -27,28 +27,17 @@ let didScheduleRenderPhaseUpdateDuringThisPass = false;
 
 const RE_RENDER_LIMIT = 25;
 
-// In DEV, this list ensures that hooks are called in the same order between renders.
-// The list stores the order of hooks used during the initial render (mount).
-// Subsequent renders (updates) reference this list.
-let hookTypesDev = null;
 let hookTypesUpdateIndexDev = -1;
 
-export function renderWithHooks(
-  alternate,
-  workInProgress,
-  Component,
-  props,
-  secondArg,// [context]
-  nextRenderLanes
-){
+export function renderWithHooks(alternate,workInProgress,nextRenderLanes){
+
+  const Component = workInProgress.type;
+  const props = workInProgress.pendingProps;
+
   renderLanes = nextRenderLanes;
   currentlyRenderingFiber = workInProgress;
 
   if (__ENV__){
-    hookTypesDev = 
-      alternate !== null
-        ? alternate._debugHookTypes
-        : null;
     hookTypesUpdateIndexDev = -1;
   }
 
@@ -57,7 +46,7 @@ export function renderWithHooks(
     ? HooksDispatcherOnMount
     : HooksDispatcherOnUpdate;
 
-  let children = Component(props, secondArg);
+  let children = Component(props);
 
   // Check if there was a render phase update
   if (didScheduleRenderPhaseUpdateDuringThisPass){
@@ -67,7 +56,10 @@ export function renderWithHooks(
   CurrentDispatcher.current = ContextOnlyDispatcher;
 
   if (__ENV__){
-    workInProgress._debugHookTypes = hookTypesDev;
+    workInProgress._debugHookTypes =  
+        alternate !== null
+        ? alternate._debugHookTypes
+        : null;
   }
 
   return children

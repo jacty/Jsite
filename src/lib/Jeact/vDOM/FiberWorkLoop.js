@@ -227,14 +227,14 @@ function renderRootConcurrent(root, updateLanes){
   }
 
   //Keep trying until all caught error handled.
-  do{
-    try {
+  // do{
+    // try {
       workLoopConcurrent();
-      break;
-    } catch(thrownValue){
-      handleError(root, thrownValue);
-    }
-  } while (true);
+      // break;
+    // } catch(thrownValue){
+      // handleError(root, thrownValue);
+    // }
+  // } while (true);
  
   executionContext = prevExecutionContext;
   // Check if the tree has completed.
@@ -263,14 +263,12 @@ function performUnitOfWork(unitOfWork){
 
   let next = beginWork(alternate, unitOfWork, subtreeRenderLanes);
 
-  unitOfWork.memoizedProps = unitOfWork.pendingProps;
   if (next === null){
     // If this doesn't spawn new work, complete the current work.
     completeUnitOfWork(unitOfWork);
   } else {
     wip = next;
   }
-  CurrentOwner.current = null;
 }
 
 function completeUnitOfWork(unitOfWork){

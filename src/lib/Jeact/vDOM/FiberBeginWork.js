@@ -24,7 +24,6 @@ import {
   processUpdateQueue,
 } from '@Jeact/vDOM/UpdateQueue';
 import {renderWithHooks} from '@Jeact/vDOM/FiberHooks';
-import { setIsRendering } from '@Jeact/shared/dev';
 
 let didReceiveUpdate = false;
 
@@ -37,11 +36,6 @@ function updateFunctionComponent(
   renderLanes
 ){
 
-  if (__ENV__){
-    CurrentOwner.current = workInProgress;
-    setIsRendering(true);
-  }
-
   let nextChildren = renderWithHooks(
     alternate,
     workInProgress,
@@ -50,10 +44,6 @@ function updateFunctionComponent(
     null,
     renderLanes,
   );
-
-  if (__ENV__){
-    setIsRendering(false);
-  }
 
   if (alternate!==null){
     console.error('updateFunctionComponent2')

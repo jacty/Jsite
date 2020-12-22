@@ -16,10 +16,6 @@ import {
   CurrentDispatcher
 } from '@Jeact/shared/internals';
 import {
-  setCurrentFiber,
-  resetCurrentFiber,
-} from '@Jeact/shared/dev'
-import {
   shouldYieldToHost,
   scheduleCallback,
   runWithPriority,
@@ -163,16 +159,12 @@ function finishConcurrentRender(root, exitStatus, lanes){
 }
 
 function prepareFreshStack(root, updateLanes){
-
   wipRoot = root;
   wip = createWorkInProgress(root.current);
   wipRootRenderLanes = subtreeRenderLanes =
     wipRootIncludedLanes = updateLanes;
   wipRootExitStatus = RootIncomplete;
   wipRootFatalError = null;
-  wipRootSkippedLanes = NoLanes;
-  wipRootUpdatedLanes = NoLanes;
-  wipRootPingedLanes = NoLanes;
 }
 
 function handleError(root, thrownValue){
@@ -235,14 +227,14 @@ function renderRootConcurrent(root, updateLanes){
   }
 
   //Keep trying until all caught error handled.
-  // do{
-    // try {
+  do{
+    try {
       workLoopConcurrent();
-      // break;
-    // } catch(thrownValue){
-      // handleError(root, thrownValue);
-    // }
-  // } while (true);
+      break;
+    } catch(thrownValue){
+      handleError(root, thrownValue);
+    }
+  } while (true);
  
   executionContext = prevExecutionContext;
   // Check if the tree has completed.
@@ -267,19 +259,9 @@ function workLoopConcurrent(){
 }
 
 function performUnitOfWork(unitOfWork){
-  // The current state of this fiber is the alternate. Ideally
-  // nothing should rely on this, but relying on it here means that we don't
-  // need an additional field on the work in progress.
   const alternate = unitOfWork.alternate;
-  if(__ENV__){
-    setCurrentFiber(unitOfWork);    
-  }
 
   let next = beginWork(alternate, unitOfWork, subtreeRenderLanes);
-
-  if(__ENV__){
-    resetCurrentFiber()
-  }
 
   unitOfWork.memoizedProps = unitOfWork.pendingProps;
   if (next === null){
@@ -299,11 +281,9 @@ function completeUnitOfWork(unitOfWork){
     // Check if the work completed or if something threw.
 
     if ((completedWork.flags & Incomplete) === NoFlags){
-      setCurrentFiber(completedWork);
       // Process alternate.child
       let next = completeWork(alternate, completedWork, subtreeRenderLanes);
 
-      resetCurrentFiber();
       if (next !== null){
         console.error('completeUnitOfWork1', next)
       }
@@ -470,7 +450,6 @@ function commitBeforeMutationEffects(){
 
 function commitMutationEffects(root, renderPriority){
   while (nextEffect !== null){
-    __ENV__ ? setCurrentFiber(nextEffect):'';
     
     const flags = nextEffect.flags;
     
@@ -486,19 +465,15 @@ function commitMutationEffects(root, renderPriority){
         console.error('commitMutationEffects3', primaryFlags):0;
      }
 
-    __ENV__ ? resetCurrentFiber() : '';
-
     nextEffect = nextEffect.nextEffect;
   }
 }
 
 function commitLayoutEffects(root, committedLanes){
   while(nextEffect!== null){
-    __ENV__ ? setCurrentFiber(nextEffect) : '';
     
     const flags = nextEffect.flags;
 
-    __ENV__ ? resetCurrentFiber():'';
 
     nextEffect = nextEffect.nextEffect;
   }

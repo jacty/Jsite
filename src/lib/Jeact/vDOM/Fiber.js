@@ -146,7 +146,7 @@ export function createFiberFromElement(element, lanes){
 }
 
 export function createFiberFromText(content, lanes){
-  const fiber = createFiber(HostText, content, null);
+  const fiber = createFiber(HostText, content);
   fiber.lanes = lanes;
   return fiber;
 }

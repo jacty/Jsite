@@ -69,20 +69,11 @@ function updateHostRoot(alternate, workInProgress, renderLanes){
 }
 
 function updateHostComponent(alternate, workInProgress,renderLanes){
-  pushHostContext(workInProgress);
-
   const type = workInProgress.type;
   const nextProps = workInProgress.pendingProps;
   const prevProps = alternate !== null ? alternate.memoizedProps : null;
 
   let nextChildren = nextProps.children;
-  const isDirectTextChild = shouldSetTextContent(type, nextProps);
-
-  if (isDirectTextChild){
-    nextChildren = null;
-  } else if(prevProps !== null && shouldSetTextContent(type, prevProps)){
-    console.error('updateHostComponent2')
-  }
 
   workInProgress.child = reconcileChildFibers(
       workInProgress,
@@ -119,8 +110,8 @@ export function beginWork(alternate, workInProgress, renderLanes){
     }
     case HostRoot://3
       return updateHostRoot(alternate, workInProgress, renderLanes);
-    // case HostComponent://5
-    //   return updateHostComponent(alternate, workInProgress, renderLanes);
+    case HostComponent://5
+      return updateHostComponent(alternate, workInProgress, renderLanes);
     // case HostText://6
     //   return updateHostText(workInProgress);
     default:

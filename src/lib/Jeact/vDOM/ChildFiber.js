@@ -46,6 +46,17 @@ export function reconcileChildFibers(
     );
   }
 
+  if (typeof newChild === 'string' || typeof newChild === 'number'){
+    return placeSingleChild(
+      reconcileSingleTextNode(
+        returnFiber,
+        currentFirstChild,
+        '' + newChild,
+        lanes,
+      )
+    )
+  }
+
   newChild !== null ?
     console.error('reconcileChildFibers', newChild):'';
 
@@ -60,6 +71,12 @@ function placeSingleChild(newFiber){
   }
   
   return newFiber;
+}
+
+function reconcileSingleTextNode(returnFiber, currentFirstChild, text, lanes){
+  const created = createFiberFromText(text, lanes);
+  created.return = returnFiber;
+  return created;
 }
 
 function reconcileSingleElement(

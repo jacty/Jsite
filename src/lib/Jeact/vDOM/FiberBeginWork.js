@@ -85,9 +85,6 @@ function updateHostComponent(alternate, workInProgress,renderLanes){
   return workInProgress.child;
 }
 
-function updateHostText(current, workInProgress){
-  return null;
-}
 
 export function beginWork(alternate, workInProgress, renderLanes){
   const updateLanes = workInProgress.lanes;
@@ -112,8 +109,8 @@ export function beginWork(alternate, workInProgress, renderLanes){
       return updateHostRoot(alternate, workInProgress, renderLanes);
     case HostComponent://5
       return updateHostComponent(alternate, workInProgress, renderLanes);
-    // case HostText://6
-    //   return updateHostText(workInProgress);
+    case HostText://6
+      return null;
     default:
       console.error('beginWork4', workInProgress);
   }

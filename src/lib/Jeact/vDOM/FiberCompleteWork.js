@@ -8,9 +8,6 @@ import {
 } from '@Jeact/shared/Constants';
 import {
   getRootHostContainer,
-  popHostContext,
-  getHostContext,
-  popHostContainer,
 } from '@Jeact/vDOM/FiberHostContext';
 import {
   createInstance,
@@ -80,47 +77,47 @@ function appendAllChildren(parent, workInProgress, needsVisibilityToggle=false, 
 export function completeWork(alternate,workInProgress,renderLanes){
   const newProps = workInProgress.pendingProps;
   switch(workInProgress.tag){
-    case FunctionComponent://0
-      return null;
-    case HostRoot:{//3
-      popHostContainer(workInProgress);
-      const fiberRoot = workInProgress.stateNode;
-      if (fiberRoot.pendingContext){
-        console.error('completeWork1')
-      }
-      bubbleProperties(workInProgress);
-      return null;
-    }
-    case HostComponent:{//5
-      popHostContext(workInProgress);
-      const rootContainerInstance = getRootHostContainer();
-      const type = workInProgress.type;
+    // case FunctionComponent://0
+    //   return null;
+    // case HostRoot:{//3
+    //   popHostContainer(workInProgress);
+    //   const fiberRoot = workInProgress.stateNode;
+    //   if (fiberRoot.pendingContext){
+    //     console.error('completeWork1')
+    //   }
+    //   bubbleProperties(workInProgress);
+    //   return null;
+    // }
+    // case HostComponent:{//5
+    //   popHostContext(workInProgress);
+    //   const rootContainerInstance = getRootHostContainer();
+    //   const type = workInProgress.type;
 
-      if (alternate!== null){// which case?
-        console.error('completeWork2')
-      } else{
-        const currentHostContext = getHostContext();
-        const instance = createInstance(
-          type,
-          rootContainerInstance,
-        );
+    //   if (alternate!== null){// which case?
+    //     console.error('completeWork2')
+    //   } else{
+    //     const currentHostContext = getHostContext();
+    //     const instance = createInstance(
+    //       type,
+    //       rootContainerInstance,
+    //     );
 
-        appendAllChildren(instance, workInProgress);
+    //     appendAllChildren(instance, workInProgress);
 
-        workInProgress.stateNode = instance;
+    //     workInProgress.stateNode = instance;
 
-        if(finalizeInitialChildren(
-            instance,
-            type,
-            newProps, 
-            rootContainerInstance
-          )){
-            console.error('completeWork4')
-          markUpdate(workInProgress)
-        }
-      }
-      return null;
-    }
+    //     if(finalizeInitialChildren(
+    //         instance,
+    //         type,
+    //         newProps, 
+    //         rootContainerInstance
+    //       )){
+    //         console.error('completeWork4')
+    //       markUpdate(workInProgress)
+    //     }
+    //   }
+    //   return null;
+    // }
     case HostText: {
       const newText = newProps;
       const rootContainerInstance = getRootHostContainer();

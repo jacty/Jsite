@@ -14,16 +14,13 @@ import {
   includesSomeLane,
 } from '@Jeact/vDOM/FiberLane';
 import {
-  pushHostContext,
-  pushHostContainer
-} from '@Jeact/vDOM/FiberHostContext';
-import {
   reconcileChildFibers,
 } from '@Jeact/vDOM/ChildFiber';
 import {
   processUpdateQueue,
 } from '@Jeact/vDOM/UpdateQueue';
 import {renderWithHooks} from '@Jeact/vDOM/FiberHooks';
+import { pushHostContainer } from '@Jeact/vDOM/FiberHostContext';
 
 let didReceiveUpdate = false;
 
@@ -51,6 +48,8 @@ function updateFunctionComponent(alternate,workInProgress,renderLanes){
 }
 
 function updateHostRoot(alternate, workInProgress, renderLanes){
+  // push host container like div#root into stack, so we can get it to refer in any depth when we are reconcile fiber children.
+  pushHostContainer(workInProgress);
   const prevState = workInProgress.memoizedState;
   const prevChildren = prevState !== null ? prevState.element : null;
 
@@ -86,23 +85,10 @@ function updateHostComponent(alternate, workInProgress,renderLanes){
 // Iterate from parent fibers to children fibers to build the whole fiber chain.
 export function beginWork(alternate, workInProgress, renderLanes){
   const updateLanes = workInProgress.lanes;
-
-  if (alternate !== null){
-    const oldProps = alternate.memoizedProps;
-    const newProps = workInProgress.pendingProps;
-    if (oldProps !== newProps){
-      console.error('beginWork1', workInProgress)
-    }
-  }  
-
+ 
   switch (workInProgress.tag){
-    case FunctionComponent:{//0
-      return updateFunctionComponent(
-        alternate,
-        workInProgress,
-        renderLanes,
-      );
-    }
+    case FunctionComponent://0
+      return updateFunctionComponent(alternate,workInProgress,renderLanes);
     case HostRoot://3
       return updateHostRoot(alternate, workInProgress, renderLanes);
     case HostComponent://5

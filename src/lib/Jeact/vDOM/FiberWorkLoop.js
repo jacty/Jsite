@@ -121,7 +121,6 @@ function ensureRootIsScheduled(root, currentTime){
 function performConcurrentWorkOnRoot(root, nextLanes){
 
   let exitStatus = renderRootConcurrent(root, nextLanes);
-
   if (includesSomeLane(wipRootIncludedLanes, wipRootUpdatedLanes)){
     console.error('performConcurrentWorkOnRoot4')
   } else if(exitStatus !== RootIncomplete){

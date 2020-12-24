@@ -1,6 +1,8 @@
 [
-{"header":"What is the difference between `null` and `undefined`?",
- "content":"<p>Basically they both mean the same thing. However, semantically, `null` means empty but `undefined` means the values are not defined yet. Apart from that, there are some tricky parts we need to know:<pre><code>null == undefined</code> <span class='comments'>// true</span><code>null === undefined</code> <span class='comments'>// false.</span><code>Number(null)</code><span class='comments'>// 0</span><code>Number(undefined)</code><span class='comments'>// NaN</span></pre> </p>"},
- {"header":"Methods those will change the array after operation:",
- "content":"<p>pop(),push(),shift(),unshift(),reverse(),splice()</p>"}
+{"header":"Why should we not update the state directly?",
+ "content":"<p>If you try to update state directly then it won't re-render the component. Instead use <code>setState()</code> method, it schedules an update to a component's state object. When state changes, the component responds by re-rendering.</p>"},
+{"header":"What is HOC?",
+ "content":"<p>Higher Order Component is a function that takes a component and returns a new component.</p>"},
+ {"header":"What is portal in React?",
+  "content":"<p>Portal is a recommended way to render children into a DOM node that exists outside the DOM hierarchy of the parent component.</p>"}
 ]

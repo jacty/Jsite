@@ -45,8 +45,6 @@ function bubbleProperties(completedWork){
   }
 
   completedWork.childLanes = newChildLanes;
-
-  return didBailout;
 }
 
 function appendAllChildren(parent, workInProgress){
@@ -57,14 +55,10 @@ function appendAllChildren(parent, workInProgress){
       parent.appendChild(domInstance);
     }
 
-    while (childFiber.sibling === null){
-      if (childFiber.return === workInProgress){
+    if (childFiber.sibling === null){
         return;
-      }
-      childFiber = childFiber.return;
     }
 
-    childFiber.sibling.return = childFiber.return;
     childFiber = childFiber.sibling;
   }
 };
@@ -74,15 +68,10 @@ export function completeWork(workInProgress,renderLanes){
   switch(workInProgress.tag){
     case FunctionComponent://0
       return null;
-    // case HostRoot:{//3
-    //   popHostContainer(workInProgress);
-    //   const fiberRoot = workInProgress.stateNode;
-    //   if (fiberRoot.pendingContext){
-    //     console.error('completeWork1')
-    //   }
-    //   bubbleProperties(workInProgress);
-    //   return null;
-    // }
+    case HostRoot:{//3
+      bubbleProperties(workInProgress);
+      return null;
+    }
     case HostComponent:{//5
       const rootContainerInstance = getRootHostContainer();
       const type = workInProgress.type;
@@ -97,7 +86,7 @@ export function completeWork(workInProgress,renderLanes){
       
       return null;
     }
-    case HostText: {
+    case HostText: {//6
       const newText = newProps;
       const rootContainerInstance = getRootHostContainer();
       workInProgress.stateNode = createTextNode(

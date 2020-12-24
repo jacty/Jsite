@@ -145,7 +145,7 @@ function performConcurrentWorkOnRoot(root, nextLanes){
   return null;
 }
 
-function finishConcurrentRender(root, exitStatus, lanes){
+function finishConcurrentRender(root, exitStatus){
   switch (exitStatus){
     case RootCompleted:{
       commitRoot(root);
@@ -238,14 +238,12 @@ function renderRootConcurrent(root, updateLanes){
   executionContext = prevExecutionContext;
   // Check if the tree has completed.
   if ( wip !== null){
-    // Still work remaining.
     return RootIncomplete;
   }  else {
     // Set this to null to indicate there's no in-progress render.
     wipRoot = null;
     wipRootRenderLanes = NoLanes;
 
-    // Return the final exit status.
     return wipRootExitStatus;
   }
 }
@@ -315,26 +313,14 @@ function completeUnitOfWork(unitOfWork){
     }
 
     completedWork = returnFiber;
+    // when reached the root, returnFiber is null, set wip to null to make sure performUnitOfWork() in workLoopConcurrent() wont keep running.
+    wip = completedWork;
   } while (completedWork !== null);
 
   // We've reached the root.
   if (wipRootExitStatus === RootIncomplete) {
     wipRootExitStatus = RootCompleted;
   }
-}
-
-function resetChildLanes(completedWork){
-  let newChildLanes = NoLanes;
-  let child = completedWork.child;
-  if (child!== null){
-    newChildLanes = mergeLanes(
-      newChildLanes,
-      mergeLanes(child.lanes, child.childLanes)
-    );
-    child = child.sibling;
-  }
-
-  completedWork.childLanes = newChildLanes;
 }
 
 function commitRoot(root){

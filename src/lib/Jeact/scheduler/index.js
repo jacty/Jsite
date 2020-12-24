@@ -76,19 +76,9 @@ function workLoop(){
 }
 
 export function runWithPriority(priority,fn){
-  const schedulePriority = PriorityToSchedulePriority(priority);
-  switch(priority){
-    case ImmediatePriority:
-      break;
-    default:
-      priority = NormalPriority;
-  }
-  const previousPriority = currentPriority;
-  currentPriority = priority;
   try {
     return fn()
   } finally{
-    currentPriority = previousPriority;
   }
 }
 

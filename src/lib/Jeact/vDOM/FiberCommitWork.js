@@ -3,9 +3,6 @@ import{
  HostText,
  HostComponent,
 } from '@Jeact/shared/Constants';
-import {
-    appendChildToContainer
-} from '@Jeact/vDOM/FiberHost';
 
 export function commitBeforeMutationEffectOnFiber(finishedWork){
   switch(finishedWork.tag){

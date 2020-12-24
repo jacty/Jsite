@@ -269,26 +269,18 @@ function performUnitOfWork(unitOfWork){
     wip = next;
   }
 }
-
+// set stateNode to domInstance and append all children, build effects list.
 function completeUnitOfWork(unitOfWork){
   let completedWork = unitOfWork;
   do {
-    const alternate = completedWork.alternate;
     const returnFiber = completedWork.return;
-    // Check if the work completed or if something threw.
 
     if ((completedWork.flags & Incomplete) === NoFlags){
-      // Process alternate.child
-      let next = completeWork(alternate, completedWork, subtreeRenderLanes);
-
-      if (next !== null){
-        console.error('completeUnitOfWork1', next)
-      }
+      
+      completeWork(completedWork, subtreeRenderLanes);
 
       if(returnFiber !== null &&
-        // Do not append effects to parents if a sibling failed to complete.
-          (returnFiber.flags & Incomplete) === NoFlags
-        ){
+          (returnFiber.flags & Incomplete) === NoFlags){
         // Append all the effects of the subtree and this fiber onto the effect
         // list of the parent. The completion order of the children affects the
         // side-effect order.
@@ -322,10 +314,7 @@ function completeUnitOfWork(unitOfWork){
       return;
     }
 
-    // Otherwise, return to the parent.
     completedWork = returnFiber;
-    // Update the next thing we're working on in case something throws.
-    wip = completedWork;
   } while (completedWork !== null);
 
   // We've reached the root.

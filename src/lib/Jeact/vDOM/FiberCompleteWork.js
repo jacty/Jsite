@@ -10,17 +10,15 @@ import {
   getRootHostContainer,
 } from '@Jeact/vDOM/FiberHostContext';
 import {
-  createInstance,
-  createTextInstance,
-  appendInitialChild,
-  finalizeInitialChildren,
-} from '@Jeact/vDOM/FiberHost';
-import {
   mergeLanes
 } from '@Jeact/vDOM/FiberLane';
+import { 
+  createTextNode, 
+  createElement,
+  setInitialDOMProperties,
+} from '@Jeact/vDOM/DOMComponent';
 
 function bubbleProperties(completedWork){
-
   const didBailout =
     completedWork.alternate !== null &&
     completedWork.alternate.child === completedWork.child;
@@ -51,34 +49,31 @@ function bubbleProperties(completedWork){
   return didBailout;
 }
 
-function appendAllChildren(parent, workInProgress, needsVisibilityToggle=false, isHidden=false){
-  let node = workInProgress.child;
-  while (node!==null){
-    if (node.tag === HostComponent || node.tag === HostText){
-      let instance = node.stateNode;
-      appendInitialChild(parent, instance);
-    } else if (node.child !== null){
-      console.error('appendAllChildren1')
+function appendAllChildren(parent, workInProgress){
+  let childFiber = workInProgress.child;
+  while (childFiber!==null){
+    if (childFiber.tag === HostComponent || childFiber.tag === HostText){
+      let domInstance = childFiber.stateNode;
+      parent.appendChild(domInstance);
     }
-    if (node === workInProgress){
-      return;
-    }
-    while (node.sibling === null){
-      if (node.return === null || node.return === workInProgress){
+
+    while (childFiber.sibling === null){
+      if (childFiber.return === workInProgress){
         return;
       }
-      node = node.return;
+      childFiber = childFiber.return;
     }
-    node.sibling.return = node.return;
-    node = node.sibling;
+
+    childFiber.sibling.return = childFiber.return;
+    childFiber = childFiber.sibling;
   }
 };
 
-export function completeWork(alternate,workInProgress,renderLanes){
+export function completeWork(workInProgress,renderLanes){
   const newProps = workInProgress.pendingProps;
   switch(workInProgress.tag){
-    // case FunctionComponent://0
-    //   return null;
+    case FunctionComponent://0
+      return null;
     // case HostRoot:{//3
     //   popHostContainer(workInProgress);
     //   const fiberRoot = workInProgress.stateNode;
@@ -88,45 +83,27 @@ export function completeWork(alternate,workInProgress,renderLanes){
     //   bubbleProperties(workInProgress);
     //   return null;
     // }
-    // case HostComponent:{//5
-    //   popHostContext(workInProgress);
-    //   const rootContainerInstance = getRootHostContainer();
-    //   const type = workInProgress.type;
+    case HostComponent:{//5
+      const rootContainerInstance = getRootHostContainer();
+      const type = workInProgress.type;
+      const instance = createElement(
+        type,
+        rootContainerInstance,
+      );
 
-    //   if (alternate!== null){// which case?
-    //     console.error('completeWork2')
-    //   } else{
-    //     const currentHostContext = getHostContext();
-    //     const instance = createInstance(
-    //       type,
-    //       rootContainerInstance,
-    //     );
-
-    //     appendAllChildren(instance, workInProgress);
-
-    //     workInProgress.stateNode = instance;
-
-    //     if(finalizeInitialChildren(
-    //         instance,
-    //         type,
-    //         newProps, 
-    //         rootContainerInstance
-    //       )){
-    //         console.error('completeWork4')
-    //       markUpdate(workInProgress)
-    //     }
-    //   }
-    //   return null;
-    // }
+      appendAllChildren(instance, workInProgress);
+      setInitialDOMProperties(workInProgress.pendingProps) 
+      workInProgress.stateNode = instance;
+      
+      return null;
+    }
     case HostText: {
       const newText = newProps;
       const rootContainerInstance = getRootHostContainer();
-      workInProgress.stateNode = createTextInstance(
+      workInProgress.stateNode = createTextNode(
         newText,
         rootContainerInstance,
-        workInProgress,
       );
-      bubbleProperties(workInProgress);
       return null;
     }
     default:

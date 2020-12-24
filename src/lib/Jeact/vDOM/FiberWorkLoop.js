@@ -332,30 +332,16 @@ function commitRoot(root){
 }
 
 function commitRootImpl(root, renderPriority){
-
   const finishedWork = root.finishedWork;
   const lanes = root.finishedLanes;
 
-  if (finishedWork === null){
-    console.error('commitRootImpl2');
-    return null;
-  }
-
   root.finishedWork = null;
   root.finishedLanes = NoLanes;
-
-  if (finishedWork === root.current){
-    console.error('The same tree is being committed!')
-  }
-
   root.callbackNode = null;
 
   let remainingLanes = mergeLanes(finishedWork.lanes, finishedWork.childLanes);
-  markRootFinished(root, remainingLanes);//update lanes and eventTimes
-
-  if (root === wipRoot) {
-    console.error('commitRootImpl4')
-  }
+  //update lanes and eventTimes
+  markRootFinished(root, remainingLanes);
 
   // Get the list of effects.
   let firstEffect;
@@ -373,13 +359,6 @@ function commitRootImpl(root, renderPriority){
   if(firstEffect!==null){
     const prevExecutionContext = executionContext;
     executionContext |= CommitContext;
-
-    CurrentOwner.current = null;
-
-    nextEffect = firstEffect;
-    do{
-      commitBeforeMutationEffects();//Update flag
-    } while(nextEffect !== null);
 
     nextEffect = firstEffect
     do {
@@ -421,10 +400,8 @@ function commitBeforeMutationEffects(){
 }
 
 function commitMutationEffects(root, renderPriority){
-  while (nextEffect !== null){
-    
+  while (nextEffect !== null){   
     const flags = nextEffect.flags;
-    
     const primaryFlags = flags & Placement;
     switch(primaryFlags){
       case Placement:{//2

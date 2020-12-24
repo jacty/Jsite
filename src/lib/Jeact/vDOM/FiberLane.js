@@ -194,11 +194,7 @@ export function markRootFinished(root, remainingLanes){
   const noLongerPendingLanes = root.pendingLanes & ~remainingLanes;
 
   root.pendingLanes = remainingLanes;
-
   root.suspendedLanes = 0;
-  root.pingedLanes = 0;
-  
-  root.expiredLanes &= remainingLanes;
 
   const eventTimes = root.eventTimes;
   const expirationTimes = root.expirationTimes;

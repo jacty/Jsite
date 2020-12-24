@@ -47,7 +47,6 @@ function getHostSibling(fiber){
 
 export function commitPlacement(finishedWork){
     const parentFiber = getHostParentFiber(finishedWork);
-
     let parent;
     let isContainer;
     const parentStateNode = parentFiber.stateNode;
@@ -79,19 +78,10 @@ function insertOrAppendPlacementNodeIntoContainer(node, before, parent){
         if (before){
             console.error('insertOrAppendPlacementNodeIntoContainer3')
         } else {
-            appendChildToContainer(parent, stateNode);
+            parent.append(stateNode);
         }
     } else {
-        const child = node.child;
-        if (child !== null){
-            insertOrAppendPlacementNodeIntoContainer(child, before, parent);
-            let sibling = child.sibling;
-            while(sibling !== null){
-                insertOrAppendPlacementNodeIntoContainer(sibling, before, parent);
-                sibling = sibling.sibling;
-            }
-        }
-        
+        console.error('insertOrAppendPlacementNodeIntoContainer')
     }
 }
 
@@ -103,7 +93,7 @@ function insertOrAppendPlacementNode(node, before, parent){
         if (before){
             console.error('insertOrAppendPlacementNode')
         } else {
-            console.error('xx');
+            parent.append(stateNode);
         }
     } else {
         console.error('insertOrAppendPlacementNode1')

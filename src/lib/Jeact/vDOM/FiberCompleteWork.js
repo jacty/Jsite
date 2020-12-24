@@ -22,7 +22,6 @@ import {
   mergeLanes
 } from '@Jeact/vDOM/FiberLane';
 
-
 function bubbleProperties(completedWork){
 
   const didBailout =
@@ -78,11 +77,7 @@ function appendAllChildren(parent, workInProgress, needsVisibilityToggle=false, 
   }
 };
 
-export function completeWork(
-  alternate,
-  workInProgress,
-  renderLanes
-){
+export function completeWork(alternate,workInProgress,renderLanes){
   const newProps = workInProgress.pendingProps;
   switch(workInProgress.tag){
     case FunctionComponent://0
@@ -128,18 +123,12 @@ export function completeWork(
     }
     case HostText: {
       const newText = newProps;
-      if(alternate){
-        console.error('HostText1')
-      } else {
-        const rootContainerInstance = getRootHostContainer();
-        const currentHostContext = getHostContext();
-        workInProgress.stateNode = createTextInstance(
-          newText,
-          rootContainerInstance,
-          currentHostContext,
-          workInProgress,
-        );
-      }
+      const rootContainerInstance = getRootHostContainer();
+      workInProgress.stateNode = createTextInstance(
+        newText,
+        rootContainerInstance,
+        workInProgress,
+      );
       bubbleProperties(workInProgress);
       return null;
     }

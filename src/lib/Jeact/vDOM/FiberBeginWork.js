@@ -27,7 +27,6 @@ import {renderWithHooks} from '@Jeact/vDOM/FiberHooks';
 
 let didReceiveUpdate = false;
 
-
 function updateFunctionComponent(alternate,workInProgress,renderLanes){
 
   let nextChildren = renderWithHooks(
@@ -85,7 +84,6 @@ function updateHostComponent(alternate, workInProgress,renderLanes){
   return workInProgress.child;
 }
 
-
 export function beginWork(alternate, workInProgress, renderLanes){
   const updateLanes = workInProgress.lanes;
 
@@ -114,14 +112,4 @@ export function beginWork(alternate, workInProgress, renderLanes){
     default:
       console.error('beginWork4', workInProgress);
   }
-}
-
-function shouldSetTextContent(type, props){
-  return (
-    typeof props.children === 'string' ||
-    typeof props.children === 'number' ||
-    (typeof props.dangerouslySetInnerHTML === 'object' &&
-      props.dangerouslySetInnerHTML !== null &&
-      props.dangerouslySetInnerHTML.__html != null)
-  );
 }

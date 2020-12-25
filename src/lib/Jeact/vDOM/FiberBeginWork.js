@@ -42,6 +42,7 @@ function updateFunctionComponent(alternate,workInProgress,renderLanes){
       alternate === null ? alternate : alternate.child,
       nextChildren,
       renderLanes,
+      alternate === null ? false : true
     );
 
   return workInProgress.child;
@@ -62,6 +63,7 @@ function updateHostRoot(alternate, workInProgress, renderLanes){
       alternate === null ? alternate : alternate.child,
       nextChildren,
       renderLanes,
+      alternate === null ? false : true
   );
   return workInProgress.child;
 }
@@ -78,6 +80,7 @@ function updateHostComponent(alternate, workInProgress,renderLanes){
       alternate === null ? alternate : alternate.child,
       nextChildren,
       renderLanes,
+      alternate === null ? false : true
     );
 
   return workInProgress.child;

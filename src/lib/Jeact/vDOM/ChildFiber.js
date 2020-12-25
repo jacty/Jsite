@@ -15,7 +15,8 @@ export function reconcileChildFibers(
   returnFiber,
   currentFirstChild,
   newChild,// from payload.element
-  lanes
+  lanes,
+  shouldTrackEffects
 ){
   // Handle object types
   const isObject = typeof newChild === 'object' && newChild !== null;
@@ -29,6 +30,7 @@ export function reconcileChildFibers(
             newChild,
             lanes,
           ),
+          shouldTrackEffects
         );
       default:
         if(!Array.isArray(newChild)){
@@ -53,7 +55,8 @@ export function reconcileChildFibers(
         currentFirstChild,
         '' + newChild,
         lanes,
-      )
+      ),
+      shouldTrackEffects
     )
   }
 
@@ -63,10 +66,10 @@ export function reconcileChildFibers(
   return null;
 }
 
-function placeSingleChild(newFiber){
+function placeSingleChild(newFiber, shouldTrackEffects){
   // This is a simpler for the single child case. We only need to do a
   // placement for inserting new children.
-  if (newFiber.alternate === null){
+  if (shouldTrackEffects && newFiber.alternate === null){
     newFiber.flags = Placement;
   }
   

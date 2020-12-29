@@ -57,11 +57,7 @@ export function createElement(comp, attrs, children){
     props.children = children;
   } else if (childrenLength > 1){
     // more than one child node in the tree.
-    const childArray = Array(childrenLength);
-    for (let i = 0; i < childrenLength; i++){
-      childArray[i] = arguments[i + 2];
-    }    
-    props.children = childArray;
+    props.children = [...arguments].slice(2,childrenLength+2);
   }
 
   return JeactElement(

@@ -93,6 +93,7 @@ function updateHostComponent(alternate, workInProgress,renderLanes){
     console.error('updateHostComponent1')
   }
   markRef(alternate, workInProgress);
+  
   workInProgress.child = reconcileChildFibers(
       workInProgress,
       alternate === null ? alternate : alternate.child,

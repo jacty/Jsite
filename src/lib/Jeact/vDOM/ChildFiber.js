@@ -60,10 +60,11 @@ export function reconcileChildFibers(
     )
   }
 
-  newChild !== null ?
-    console.error('reconcileChildFibers', newChild):'';
-
-  return null;
+  if (!shouldTrackEffects){
+    return null;
+  } else {
+    console.error('deleteRemainingChildren');
+  }
 }
 
 function placeSingleChild(newFiber, shouldTrackEffects){

@@ -87,8 +87,6 @@ function updateHostComponent(alternate, workInProgress,renderLanes){
 }
 // Iterate from parent fibers to children fibers(including sibling fibers) to build the whole fiber chain.
 export function beginWork(alternate, workInProgress, renderLanes){
-  const updateLanes = workInProgress.lanes;
- 
   switch (workInProgress.tag){
     case FunctionComponent://0
       return updateFunctionComponent(alternate,workInProgress,renderLanes);

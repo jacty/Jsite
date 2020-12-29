@@ -21,7 +21,7 @@ import {
 } from '@Jeact/vDOM/UpdateQueue';
 import {renderWithHooks} from '@Jeact/vDOM/FiberHooks';
 import { pushHostContainer } from '@Jeact/vDOM/FiberHostContext';
-
+import { shouldSetTextContent } from '@Jeact/vDOM/DOMComponent';
 let didReceiveUpdate = false;
 
 function updateFunctionComponent(alternate,workInProgress,renderLanes){
@@ -74,7 +74,13 @@ function updateHostComponent(alternate, workInProgress,renderLanes){
   const prevProps = alternate !== null ? alternate.memoizedProps : null;
 
   let nextChildren = nextProps.children;
-
+  const isDirectTextChild = shouldSetTextContent(type, nextProps);
+  if (isDirectTextChild){
+    // Handle direct text node in host environment to avoid another traversing.
+    nextChildren = null;
+  } else {
+    console.error('updateHostComponent1')
+  }
   workInProgress.child = reconcileChildFibers(
       workInProgress,
       alternate === null ? alternate : alternate.child,
@@ -100,3 +106,4 @@ export function beginWork(alternate, workInProgress, renderLanes){
       console.error('beginWork4', workInProgress);
   }
 }
+

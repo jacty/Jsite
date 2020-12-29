@@ -1,12 +1,11 @@
 import {
   NormalSchedulePriority,
   NormalPriority,
-  DefaultLanePriority,
   ImmediatePriority,
   ImmediateSchedulePriority,
   NormalTimeout,
 } from '@Jeact/shared/Constants';
-import {push, pop, peek} from './SchedulerMinHeap';
+import {push, peek} from './SchedulerMinHeap';
 
 // Tasks are stored on a min heap.
 let taskQueue = [];
@@ -15,7 +14,6 @@ let taskQueue = [];
 let taskIdCount = 1;
 
 let currentTask = null;
-let currentPriority = NormalSchedulePriority;
 
 // This is set while performing work, to prevent re-entry.
 let isPerformingWork = false;
@@ -33,7 +31,6 @@ let isMessageLoopRunning = false;
 let scheduledHostCallback = null;
 
 function flushWork(){
-  // We'll need a host callback the next time work is scheduled.
   isHostCallbackScheduled = false;
   isPerformingWork = true;
 
@@ -50,7 +47,6 @@ function workLoop(){
   const currentTime = performance.now();
   deadline = currentTime + yieldInterval;
   currentTask = peek(taskQueue);
-
   while(currentTask !== null){
     if(currentTask.expirationTime > currentTime &&
        shouldYieldToHost()
@@ -144,25 +140,5 @@ function requestHostCallback(callback){
   if (!isMessageLoopRunning){
     isMessageLoopRunning = true;
     port.postMessage(null);
-  }
-}
-
-
-
-
-
-
-
-
-
-
-export function PriorityToSchedulePriority(priority){
-  switch(priority){
-    case ImmediatePriority:
-        return ImmediateSchedulePriority;
-    case NormalPriority:
-      return NormalSchedulePriority;
-    default:
-      console.log('PriorityToSchedulePriority', priority)
   }
 }

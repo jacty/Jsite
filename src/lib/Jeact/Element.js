@@ -56,7 +56,7 @@ export function createElement(comp, attrs, children){
     // arguments[2] will be set to props.children.
     props.children = children;
   } else if (childrenLength > 1){
-    console.error('childrenLength > 1');
+    // more than one child node in the tree.
     const childArray = Array(childrenLength);
     for (let i = 0; i < childrenLength; i++){
       childArray[i] = arguments[i + 2];

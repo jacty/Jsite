@@ -6,6 +6,7 @@ import {
   FunctionComponent,
   NoLanes,
   PerformedWork,
+  Ref,
 } from '@Jeact/shared/Constants';
 import {
   CurrentOwner
@@ -23,6 +24,16 @@ import {renderWithHooks} from '@Jeact/vDOM/FiberHooks';
 import { pushHostContainer } from '@Jeact/vDOM/FiberHostContext';
 import { shouldSetTextContent } from '@Jeact/vDOM/DOMComponent';
 let didReceiveUpdate = false;
+
+function markRef(current, workInProgress){
+  const ref = workInProgress.ref;
+  if(
+      (current === null && ref!== null) ||
+      (current !== null && current.ref !== ref)
+  ){
+    workInProgress.flags |= Ref;
+  } 
+}
 
 function updateFunctionComponent(alternate,workInProgress,renderLanes){
 
@@ -81,6 +92,7 @@ function updateHostComponent(alternate, workInProgress,renderLanes){
   } else {
     console.error('updateHostComponent1')
   }
+  markRef(alternate, workInProgress);
   workInProgress.child = reconcileChildFibers(
       workInProgress,
       alternate === null ? alternate : alternate.child,

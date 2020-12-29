@@ -27,6 +27,6 @@ export function shouldSetTextContent(type, props){
     (typeof props.dangerouslySetInnerHTML === 'object' && 
       props.dangerouslySetInnerHTML !== null &&
       props.dangerouslySetInnerHTML.__html !== null
-    );
+    )
   )
 }

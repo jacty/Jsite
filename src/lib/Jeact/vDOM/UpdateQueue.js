@@ -6,7 +6,6 @@ import {
 import {
   isSubsetOfLanes,
 } from '@Jeact/vDOM/FiberLane';
-import { markSkippedUpdateLanes } from '@Jeact/vDOM/FiberWorkLoop';
 
 let currentlyProcessingQueue;// to denote currently processing queue in DEV.
 

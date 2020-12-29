@@ -23,10 +23,8 @@ import {
 import {
   mergeLanes,
   getNextLanes,
-  getNextLanesPriority,
   markStarvedLanesAsExpired,
   markRootUpdated,
-  LanePriorityToPriority,
   includesSomeLane,
   markRootFinished,
 } from '@Jeact/vDOM/FiberLane';
@@ -192,26 +190,6 @@ function handleError(root, thrownValue){
     }
     return;
   } while(true);
-}
-
-function pushDispatcher(){
-  const prevDispatcher = CurrentDispatcher.current;
-  CurrentDispatcher.current = ContextOnlyDispatcher;
-  if (prevDispatcher === null){
-    return ContextOnlyDispatcher;
-  }
-  return prevDispatcher;
-}
-
-function popDispatcher(prevDispatcher){
-  CurrentDispatcher.current = prevDispatcher;
-}
-
-export function markSkippedUpdateLanes(lane){
-  wipRootSkippedLanes = mergeLanes(
-    lane,
-    wipRootSkippedLanes,
-  )
 }
 
 function renderRootConcurrent(root, updateLanes){

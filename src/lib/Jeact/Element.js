@@ -11,7 +11,6 @@ const RESERVED_ATTR = {
   ref: true,
 };
 
-
 function JeactElement(type, key, ref, owner, props){
   const element = {
     $$typeof: JEACT_ELEMENT_TYPE,
@@ -30,24 +29,24 @@ function JeactElement(type, key, ref, owner, props){
 
 /**
 * @arg type: Component|DOM
-* @arg config: attributes attached on {type}
-* @arg children: Children of {type}
+* @arg config: attributes attached on {comp}
+* @arg children: Children of {comp}
 */
-export function createElement(type, config, children){
-  let propName; // key in object {config}
-  const props = {};// To keep items in {config}
+export function createElement(comp, attrs, children){
+  let propName; // key in object {attrs}
+  const props = {};// To keep items from {attrs}
   let key = null;
   let ref = null;
 
-  if (config != null) {
-    ref = config.ref;
-    key = '' + config.key;
+  if (attrs != null) {
+    ref = attrs.ref;
+    key = '' + attrs.key;
 
-    for (propName in config){
-      if(config.hasOwnProperty(propName)&&
+    for (propName in attrs){
+      if(attrs.hasOwnProperty(propName)&&
           !RESERVED_ATTR.hasOwnProperty(propName)
       ){
-        props[propName] = config[propName];
+        props[propName] = attrs[propName];
       }
     }
   }
@@ -57,16 +56,16 @@ export function createElement(type, config, children){
     // arguments[2] will be set to props.children.
     props.children = children;
   } else if (childrenLength > 1){
+    console.error('childrenLength > 1');
     const childArray = Array(childrenLength);
     for (let i = 0; i < childrenLength; i++){
       childArray[i] = arguments[i + 2];
-    }
-    
+    }    
     props.children = childArray;
   }
 
   return JeactElement(
-    type,
+    comp,
     key,
     ref,
     CurrentOwner.current,

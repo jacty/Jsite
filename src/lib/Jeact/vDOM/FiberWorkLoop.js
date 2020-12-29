@@ -344,17 +344,14 @@ function commitRootImpl(root, renderPriority){
   markRootFinished(root, remainingLanes);
 
   // Get the list of effects.
-  let firstEffect;
-  if (finishedWork.flags > PerformedWork){
-    if (finishedWork.lastEffect !== null){
-      finishedWork.lastEffect.nextEffect = finishedWork;
-      firstEffect = finishedWork.firstEffect;
-    } else {
-      firstEffect = finishedWork;
-    }
-  } else {
-    firstEffect = finishedWork.firstEffect;
-  }
+  let firstEffect=finishedWork;
+
+  // if (finishedWork.lastEffect !== null){
+  //   finishedWork.lastEffect.nextEffect = finishedWork;
+  //   firstEffect = finishedWork.firstEffect;
+  // } else {
+  //   firstEffect = finishedWork;
+  // }
 
   if(firstEffect!==null){
     const prevExecutionContext = executionContext;
@@ -367,10 +364,10 @@ function commitRootImpl(root, renderPriority){
 
     root.current = finishedWork;
 
-    nextEffect = firstEffect;
-    do{
-      commitLayoutEffects(root, lanes);
-    } while(nextEffect!==null);
+    // nextEffect = firstEffect;
+    // do{
+    //   commitLayoutEffects(root, lanes);
+    // } while(nextEffect!==null);
 
     nextEffect = null;
     executionContext = prevExecutionContext;

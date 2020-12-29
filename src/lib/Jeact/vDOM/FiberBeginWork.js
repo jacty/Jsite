@@ -26,16 +26,16 @@ let didReceiveUpdate = false;
 
 function updateFunctionComponent(alternate,workInProgress,renderLanes){
 
+  if (alternate!==null){
+    console.error('updateFunctionComponent2')
+  };
   let nextChildren = renderWithHooks(
     alternate,
     workInProgress,
     renderLanes,
   );
-
-  if (alternate!==null){
-    console.error('updateFunctionComponent2')
-  };
-
+  
+  CurrentOwner.current = workInProgress;
   workInProgress.flags |= PerformedWork;
   workInProgress.child = reconcileChildFibers(
       workInProgress,

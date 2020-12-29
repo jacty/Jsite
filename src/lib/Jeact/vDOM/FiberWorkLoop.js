@@ -1,5 +1,4 @@
 import {
-  __ENV__,
   NoFlags,
   NoLanes,
   NoTimestamp,
@@ -13,7 +12,6 @@ import {
 } from '@Jeact/shared/Constants';
 import {
   CurrentOwner,
-  CurrentDispatcher
 } from '@Jeact/shared/internals';
 import {
   shouldYieldToHost,
@@ -22,7 +20,6 @@ import {
 } from '@Jeact/scheduler';
 import {
   mergeLanes,
-  getNextLanes,
   markStarvedLanesAsExpired,
   markRootUpdated,
   includesSomeLane,
@@ -31,9 +28,6 @@ import {
 import {
   createWorkInProgress
 } from '@Jeact/vDOM/Fiber';
-import {
-  ContextOnlyDispatcher,
-} from '@Jeact/vDOM/FiberHooks';
 import { beginWork } from '@Jeact/vDOM/FiberBeginWork';
 import {
   throwException
@@ -65,10 +59,7 @@ let wipRootFatalError = null;
 
 let wipRootIncludedLanes = NoLanes;
 
-let wipRootSkippedLanes = NoLanes;
 let wipRootUpdatedLanes = NoLanes;
-
-let wipRootPingedLanes = NoLanes;
 
 let nextEffect = null;
 

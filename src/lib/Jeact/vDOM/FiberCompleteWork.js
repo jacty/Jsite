@@ -5,6 +5,7 @@ import {
   HostRoot,
   NoLanes,
   NoFlags,
+  Snapshot,
 } from '@Jeact/shared/Constants';
 import {
   getRootHostContainer,
@@ -17,35 +18,6 @@ import {
   createElement,
   setInitialDOMProperties,
 } from '@Jeact/vDOM/DOMComponent';
-
-function bubbleProperties(completedWork){
-  const didBailout =
-    completedWork.alternate !== null &&
-    completedWork.alternate.child === completedWork.child;
-
-  let newChildLanes = NoLanes;
-  let subtreeFlags = NoFlags;
-
-  if (!didBailout){
-    let child = completedWork.child;
-    while(child!==null){
-      newChildLanes = mergeLanes(
-        newChildLanes,
-        mergeLanes(child.lanes, child.childLanes),
-      );
-
-      subtreeFlags |= child.subtreeFlags;
-      subtreeFlags |= child.flags;
-
-      child = child.sibling;
-    }
-    completedWork.subtreeFlags |= subtreeFlags;
-  } else {
-    console.error('bubbleProperties1')
-  }
-
-  completedWork.childLanes = newChildLanes;
-}
 
 function appendAllChildren(parent, workInProgress){
   let childFiber = workInProgress.child;
@@ -69,7 +41,12 @@ export function completeWork(workInProgress,renderLanes){
     case FunctionComponent://0
       return null;
     case HostRoot:{//3
-      bubbleProperties(workInProgress);
+      const fiberRoot = workInProgress.stateNode;
+      const current = workInProgress.alternate;
+      if (current === null || current.child === null){
+        // schedule an effect to clear this container at the start of next commit. 
+        workInProgress.flags |= Snapshot;
+      }
       return null;
     }
     case HostComponent:{//5

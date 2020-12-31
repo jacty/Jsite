@@ -81,7 +81,7 @@ export function completeWork(workInProgress,renderLanes){
       );
 
       appendAllChildren(instance, workInProgress);
-      setInitialDOMProperties(workInProgress.pendingProps) 
+      setInitialDOMProperties(instance, workInProgress.pendingProps) 
       workInProgress.stateNode = instance;
       
       return null;

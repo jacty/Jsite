@@ -1,4 +1,5 @@
 const DANGER_HTML = 'dangerouslySetInnerHTML';
+const TEXT_NODE = 3;
 
 export function createElement(type, rootContainerElement){
     return rootContainerElement.ownerDocument.createElement(type);
@@ -6,7 +7,7 @@ export function createElement(type, rootContainerElement){
 export function createTextNode(text, rootContainerElement){
     return rootContainerElement.ownerDocument.createTextNode(text);
 }
-export function setInitialDOMProperties(props){
+export function setInitialDOMProperties(domElement, props){
     for (const propKey in props){
         if (!props.hasOwnProperty(propKey)){
             continue;
@@ -14,6 +15,8 @@ export function setInitialDOMProperties(props){
         const prop = props[propKey];
         if(propKey === DANGER_HTML){
             console.error('setInitialDOMProperties');
+        } else {
+            setTextContent(domElement, prop);
         }
     }
 }
@@ -29,4 +32,19 @@ export function shouldSetTextContent(type, props){
       props.dangerouslySetInnerHTML.__html !== null
     )
   )
+}
+function setTextContent(node, text){
+    if (text){
+        const firstChild = node.firstChild;
+
+        if (
+            firstChild &&
+            firstChild === node.lastChild &&
+            firstChild.nodeType === TEXT_NODE
+        ){            
+        firstChild.nodeValue = text;
+        return;
+        }
+    }
+    node.textContent = text;
 }

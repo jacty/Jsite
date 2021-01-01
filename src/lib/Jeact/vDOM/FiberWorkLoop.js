@@ -341,7 +341,7 @@ function commitRootImpl(root, renderPriority){
     do {
       commitMutationEffects(root, renderPriority);
     } while (nextEffect !== null);
-
+    // now wip tree is now the current tree. 
     root.current = finishedWork;
 
     // nextEffect = firstEffect;
@@ -352,17 +352,17 @@ function commitRootImpl(root, renderPriority){
     nextEffect = null;
     executionContext = prevExecutionContext;
   } else {
+    // No effects.
     root.current = finishedWork;
   }
 
+  // GC
   nextEffect = firstEffect;
   while (nextEffect !== null){
     const nextNextEffect = nextEffect.nextEffect;
     nextEffect.nextEffect = null;
     nextEffect = nextNextEffect;
   }
-
-  remainingLanes = root.pendingLanes;
 
   ensureRootIsScheduled(root, performance.now());
   root.callbackNode = null;

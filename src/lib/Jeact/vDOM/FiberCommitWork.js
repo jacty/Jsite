@@ -4,9 +4,11 @@ import{
  HostComponent,
 } from '@Jeact/shared/Constants';
 
-export function commitBeforeMutationEffectOnFiber(finishedWork){
+export function commitBeforeMutationLifeCycles(current, finishedWork){
   switch(finishedWork.tag){
     case HostRoot:{
+      const container = finishedWork.stateNode.containerInfo;
+      container.textContent = '';
       return;
     }
   }

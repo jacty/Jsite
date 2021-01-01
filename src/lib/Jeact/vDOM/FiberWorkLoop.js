@@ -8,7 +8,8 @@ import {
   RenderContext,
   CommitContext,
   PerformedWork,
-  Placement, 
+  Placement,
+  Snapshot, 
 } from '@Jeact/shared/Constants';
 import {
   CurrentOwner,
@@ -37,6 +38,7 @@ import {
 } from '@Jeact/vDOM/FiberCompleteWork';
 import {
   commitPlacement,
+  commitBeforeMutationLifeCycles,
 } from '@Jeact/vDOM/FiberCommitWork';
 import {
   resetHooksAfterThrow
@@ -313,18 +315,27 @@ function commitRootImpl(root, renderPriority){
   markRootFinished(root, remainingLanes);
 
   // Get the list of effects.
-  let firstEffect=finishedWork;
-
-  // if (finishedWork.lastEffect !== null){
-  //   finishedWork.lastEffect.nextEffect = finishedWork;
-  //   firstEffect = finishedWork.firstEffect;
-  // } else {
-  //   firstEffect = finishedWork;
-  // }
+  let firstEffect;
+  if (finishedWork.flags > PerformedWork){
+    if (finishedWork.lastEffect !== null){
+      finishedWork.lastEffect.nextEffect = finishedWork;
+      firstEffect = finishedWork.firstEffect;
+    } else {
+      firstEffect = finishedWork;
+    }
+  } else {
+    // There is no effect on the root.
+    firstEffect = finishedWork.firstEffect;
+  }
 
   if(firstEffect!==null){
     const prevExecutionContext = executionContext;
     executionContext |= CommitContext;
+
+    nextEffect = firstEffect;
+    do {
+      commitBeforeMutationEffects();
+    } while (nextEffect !== null);
 
     nextEffect = firstEffect
     do {
@@ -360,7 +371,13 @@ function commitRootImpl(root, renderPriority){
 
 function commitBeforeMutationEffects(){
   while (nextEffect !== null){
+    const current = nextEffect.alternate;
+
     const flags = nextEffect.flags;
+    if ((flags & Snapshot )!== NoFlags){
+      commitBeforeMutationLifeCycles(current, nextEffect);
+    }
+
     nextEffect = nextEffect.nextEffect;
   }
 }

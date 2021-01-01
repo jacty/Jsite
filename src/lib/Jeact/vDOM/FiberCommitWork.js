@@ -83,7 +83,15 @@ function insertOrAppendPlacementNodeIntoContainer(node, before, parent){
             parent.append(stateNode);
         }
     } else {
-        console.error('insertOrAppendPlacementNodeIntoContainer')
+        const child = node.child;
+        if (child !== null){
+            insertOrAppendPlacementNodeIntoContainer(child, before, parent);
+            let sibling = child.sibling;
+            while (sibling !== null ){
+                insertOrAppendPlacementNodeIntoContainer(sibling, before, parent);
+                sibling = sibling.sibling;
+            }
+        }
     }
 }
 

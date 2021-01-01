@@ -16,7 +16,9 @@ export function setInitialDOMProperties(domElement, props){
         if(propKey === DANGER_HTML){
             console.error('setInitialDOMProperties');
         } else {
-            setTextContent(domElement, prop);
+            if (typeof prop === 'string' || typeof prop === 'number'){
+                setTextContent(domElement, prop);
+            }
         }
     }
 }

@@ -25,6 +25,7 @@ import {
   markRootUpdated,
   includesSomeLane,
   markRootFinished,
+  getNextLanes,
 } from '@Jeact/vDOM/FiberLane';
 import {
   createWorkInProgress
@@ -93,7 +94,17 @@ function ensureRootIsScheduled(root, currentTime){
   // update root.expirationTime. 
   markStarvedLanesAsExpired(root, currentTime);
 
-  const nextLanes = root.pendingLanes === 512 ? root.pendingLanes : console.error('ensureRootIsScheduled2');
+  const nextLanes = getNextLanes(
+    root, 
+    root===wipRoot ? wipRootRenderLanes : NoLanes,
+  );
+
+  if (nextLanes === NoLanes){
+    if (existingCallbackNode !== null){
+      console.error('ensureRootIsScheduled1')
+    }
+    return;
+  }
   
   // Reuse existing task if there is.
   if (existingCallbackNode !== null){

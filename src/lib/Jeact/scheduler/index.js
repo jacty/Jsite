@@ -5,7 +5,7 @@ import {
   ImmediateSchedulePriority,
   NormalTimeout,
 } from '@Jeact/shared/Constants';
-import {push, peek} from './SchedulerMinHeap';
+import {push,pop, peek} from './SchedulerMinHeap';
 
 // Tasks are stored on a min heap.
 let taskQueue = [];
@@ -59,7 +59,7 @@ function workLoop(){
     //performConcurrentWorkOnRoot()
     const additionalWork = callback();
     if(additionalWork===null){
-      taskQueue = []
+      pop(taskQueue);
     }
     currentTask = peek(taskQueue);
   }

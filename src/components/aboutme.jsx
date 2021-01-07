@@ -5,7 +5,9 @@ import {
 const React = {createElement:createElement};
 
 function Aboutme(){
-    return <h1>It's me!</h1>
+    return <section className='aboutme'>
+                <h1>It's me!</h1>
+            </section>
 }
 
 export default Aboutme;

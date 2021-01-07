@@ -127,11 +127,9 @@ function performConcurrentWorkOnRoot(root, nextLanes){
     console.error('performConcurrentWorkOnRoot4')
   } else if(exitStatus !== RootIncomplete){
     if(exitStatus === RootErrored){
-      console.error('performConcurrentWorkOnRoot5')
+      return null;
     }
-    if (exitStatus === RootFatalErrored){
-      console.error('performConcurrentWorkOnRoot6')
-    }
+
     // now we have a consistent tree.
     const finishedWork = root.current.alternate
     root.finishedWork = finishedWork;
@@ -209,12 +207,14 @@ function renderRootConcurrent(root, updateLanes){
 
   //Keep trying until all caught error handled.
   // do{
-    // try {
+    try {
       workLoopConcurrent();
       // break;
-    // } catch(thrownValue){
-      // handleError(root, thrownValue);
-    // }
+    } catch(thrownValue){
+      console.error('Err:',thrownValue);
+      wip = null;
+      wipRootExitStatus = RootErrored;
+    }
   // } while (true);
  
   executionContext = prevExecutionContext;

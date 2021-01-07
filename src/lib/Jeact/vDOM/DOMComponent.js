@@ -1,4 +1,5 @@
 const DANGER_HTML = 'dangerouslySetInnerHTML';
+const CHILDREN = 'children';
 const TEXT_NODE = 3;
 
 export function createElement(type, rootContainerElement){
@@ -8,17 +9,20 @@ export function createTextNode(text, rootContainerElement){
     return rootContainerElement.ownerDocument.createTextNode(text);
 }
 export function setInitialDOMProperties(domElement, props){
-    for (const propKey in props){
+    for (let propKey in props){
         if (!props.hasOwnProperty(propKey)){
             continue;
         }
         const prop = props[propKey];
         if(propKey === DANGER_HTML){
             console.error('setInitialDOMProperties');
-        } else {
+        } else if(propKey === CHILDREN) {
             if (typeof prop === 'string' || typeof prop === 'number'){
                 setTextContent(domElement, prop);
             }
+        } else if (prop !== null){
+            propKey = propKey === 'className' ? 'class':'';
+            domElement.setAttribute(propKey, prop);
         }
     }
 }

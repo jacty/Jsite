@@ -166,34 +166,6 @@ function prepareFreshStack(root, updateLanes){
   wipRootFatalError = null;
 }
 
-function handleError(root, thrownValue){
-  do {
-    let erroredWork = wip;
-    try{
-      resetContextDependencies();
-      resetHooksAfterThrow();
-      resetCurrentFiber();
-
-      CurrentOwner.current = null;
-      if (erroredWork === null || erroredWork.return === null){
-        console.error('handleError1');
-      }
-      throwException(
-        root,
-        erroredWork.return,
-        erroredWork,
-        thrownValue,
-        wipRootRenderLanes,
-      );
-      console.error('handleError', erroredWork);
-      completeUnitOfWork(erroredWork);
-    } catch (yetAnotherThrownValue){
-      console.error('handleError.catch', wip);
-    }
-    return;
-  } while(true);
-}
-
 function renderRootConcurrent(root, updateLanes){
   const prevExecutionContext = executionContext;
   executionContext |= RenderContext;
@@ -206,16 +178,14 @@ function renderRootConcurrent(root, updateLanes){
   }
 
   //Keep trying until all caught error handled.
-  // do{
+
     try {
       workLoopConcurrent();
-      // break;
     } catch(thrownValue){
       console.error('Err:',thrownValue);
       wip = null;
       wipRootExitStatus = RootErrored;
     }
-  // } while (true);
  
   executionContext = prevExecutionContext;
   // Check if the tree has completed.

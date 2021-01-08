@@ -25,6 +25,16 @@ function appendAllChildren(parent, workInProgress){
     if (childFiber.tag === HostComponent || childFiber.tag === HostText){
       let domInstance = childFiber.stateNode;
       parent.appendChild(domInstance);
+    } else if (childFiber.child !== null){
+      /*  <DOM>
+       *       <Function Component > <- childFiber
+       *          <Dom></Dom>
+       *       </Function Component>
+       *  </DOM>
+       */
+      childFiber.child.return = childFiber;
+      childFiber = childFiber.child;
+      continue;
     }
 
     if (childFiber.sibling === null){

@@ -21,7 +21,7 @@ export function setInitialDOMProperties(domElement, props){
                 setTextContent(domElement, prop);
             }
         } else if (prop !== null){
-            propKey = propKey === 'className' ? 'class':'';
+            propKey = propKey === 'className' ? 'class':propKey;
             domElement.setAttribute(propKey, prop);
         }
     }

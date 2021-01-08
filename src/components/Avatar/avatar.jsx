@@ -1,6 +1,6 @@
 import {createElement} from '@Jeact';
 import Logo from './logo.jpg';
-// import './avatar.sass';
+import './avatar.sass';
 const React = {createElement:createElement};
 
 function Avatar(){

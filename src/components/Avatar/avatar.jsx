@@ -1,6 +1,6 @@
 import React from 'react';
 import Logo from './logo.jpg';
-import './avatar.sass';
+// import './avatar.sass';
 
 class Avatar extends React.Component {
     constructor(props){

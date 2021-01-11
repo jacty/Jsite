@@ -1,7 +1,4 @@
-import {
-    createElement,
-} from '@Jeact';
-const React = {createElement:createElement};
+import { J } from '@Jeact';
 
 function ErrorBoundary(props){
     return props.children;

@@ -3,7 +3,7 @@ import {useState} from '@Jeact/Hooks';
 import { createRoot } from '@Jeact/vDOM/Root';
 
 export {
-  createElement,
+  createElement as J,
   useState,
   createRoot,
 };

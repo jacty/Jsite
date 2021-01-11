@@ -20,28 +20,34 @@ import {
 } from '@Jeact/vDOM/DOMComponent';
 
 function appendAllChildren(parent, workInProgress){
-  let childFiber = workInProgress.child;
-  while (childFiber!==null){
-    if (childFiber.tag === HostComponent || childFiber.tag === HostText){
-      let domInstance = childFiber.stateNode;
+  let node = workInProgress.child;
+  while (node!==null){
+    if (node.tag === HostComponent || node.tag === HostText){
+      let domInstance = node.stateNode;
       parent.appendChild(domInstance);
-    } else if (childFiber.child !== null){
+    } else if (node.child !== null){
       /*  <DOM>
        *       <Function Component > <- childFiber
        *          <Dom></Dom>
        *       </Function Component>
        *  </DOM>
        */
-      childFiber.child.return = childFiber;
-      childFiber = childFiber.child;
+      node.child.return = node;
+      node = node.child;
       continue;
     }
-
-    if (childFiber.sibling === null){
-        return;
+    if (node === workInProgress) {
+      return;
     }
-
-    childFiber = childFiber.sibling;
+    while (node.sibling === null){
+      // when node's parent has siblings
+      if (node.return === workInProgress){
+        return;
+      }
+      node = node.return;
+    }
+    node.sibling.return = node.return;
+    node = node.sibling;
   }
 };
 

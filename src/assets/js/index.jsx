@@ -8,7 +8,7 @@ import {Footer} from '@com/shared.jsx';
 
 createRoot(document.getElementById('root')).render(
     <ErrorBoundary>
-          <Jackie></Jackie>
+          <Jackie lan={'en'}></Jackie>
           <Footer />
      </ErrorBoundary>
 )

@@ -1,12 +1,26 @@
-{"people":{"0":["Stanley Tong","唐季礼"],"1":["xxx","yyy"]},
+{"people":{"0":["Jackie","成龙"],
+            "1":["Stanley Tong","唐季礼"],
+            "2":["Yang Yang","杨洋"],
+            "3":["Allen", "艾伦"],
+            "4":["Ruohan Xu","徐若晗"],
+            "5":["Miya Muqi","母其弥雅"],
+            "6":["Zhengting Zhu","朱正廷"],
+            "7":["Jackson Lau","楼学贤"],
+            "8":["Nikita","郭芷妍"],
+            "9":["Eyad Hourani","埃亚德"],
+            "10":["Jianping Yang","杨建平"],
+            "11":["BinZhou",]
+        },
 "keys":[["director","导演"],["screenplay","编剧"]],
 "movies":[{
     "id":1,
     "name":["Vanguard","急先锋"],
-    "director":[0]
+    "directors":[1],
+    "screenplays":[1],
+    "actors":[0,1,2,3,]
 },{
     "id":2,
     "name":["BleedingSteel","机器之血"],
-    "director":[1]
+    "directors":[1]
 }]
 }

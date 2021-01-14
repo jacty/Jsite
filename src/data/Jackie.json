@@ -1,8 +1,12 @@
-{"people":["Stanley Tong","唐季礼"],
+{"people":{"0":["Stanley Tong","唐季礼"],"1":["xxx","yyy"]},
+"keys":[["director","导演"],["screenplay","编剧"]],
 "movies":[{
     "id":1,
     "name":["Vanguard","急先锋"],
-    "director":["Stanley Tong"],
-    "screenplay":[["Stanley Tong"]]
+    "director":[0]
+},{
+    "id":2,
+    "name":["BleedingSteel","机器之血"],
+    "director":[1]
 }]
 }

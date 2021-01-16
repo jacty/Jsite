@@ -12,14 +12,14 @@ export default function Jackie(prop){
     const list = movies.map((item)=>{
         const path = `./assets/imgs/${item.name[0]}`;
         return <li key={item.id}>
-                    <img className='poster' src={path + '/poster.webp'}  alt={item.name[lan]} title={item.name[lan]} width='135'/>
+                   {/* <img className='poster' src={path + '/poster.webp'}  alt={item.name[lan]} title={item.name[lan]} width='135'/>
                     <div className='info'>
                         <h2>{item.name[lan]}</h2>
                         <div>
                             <em>{keys[0][lan]+': '}</em> 
                             <span>{people[item.directors][lan]}</span>
                         </div>
-                    </div>
+                    </div>*/}
                 </li>
     })
     return <div>

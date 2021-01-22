@@ -7,9 +7,8 @@ import Aboutme from './aboutme.jsx';
 import {Footer} from '@com/shared.jsx';
 
 createRoot(document.getElementById('root')).render(
-    <ErrorBoundary>
-          <Aboutme></Aboutme>
-          <Footer />
-     </ErrorBoundary>
+<ErrorBoundary>
+    <Aboutme></Aboutme>
+    <Footer />
+</ErrorBoundary>
 )
-

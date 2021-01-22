@@ -23,5 +23,13 @@ export function createFiberRoot(container){
   const fiber = createFiber();
   root.current = fiber;
   fiber.stateNode = root;
+
+  const initialCache = new Map();
+  root.pooledCache = initialCache;
+  const initialState = {
+    element: null,
+    cache: initialCache,
+  }
+  fiber.memoizedState = initialState;
   return root;
 }

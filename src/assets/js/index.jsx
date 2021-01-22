@@ -13,7 +13,7 @@ ReactDOM.createRoot = ReactDOM.unstable_createRoot;
 
 ReactDOM.createRoot(document.getElementById('root')).render(
     <Suspense fallback={<div>demo</div>}>
-        <Aboutme></Aboutme> 
+        <Footer></Footer> 
     </Suspense>
 )
 

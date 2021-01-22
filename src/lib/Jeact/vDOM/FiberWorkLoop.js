@@ -70,6 +70,11 @@ let currentEventTime = NoTimestamp;
 
 export function requestEventTime(){
   // This is the first update.
+
+  if (executionContext===NoContext || currentEventTime !== NoTimestamp){
+    console.error('Error:requestEventTime()');
+  }
+  
   currentEventTime = performance.now();
 
   return currentEventTime;

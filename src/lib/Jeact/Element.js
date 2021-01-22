@@ -39,7 +39,7 @@ export function createElement(comp, attrs, children){
   let ref = null;
 
   if (attrs != null) {
-    ref = attrs.ref;
+    ref = attrs.ref; //TD:Support string ref ?
     key = '' + attrs.key;
 
     for (propName in attrs){

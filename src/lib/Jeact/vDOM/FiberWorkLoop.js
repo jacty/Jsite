@@ -86,16 +86,19 @@ export function scheduleUpdateOnFiber(fiber, lane, eventTime){
 
   // update root.pendingLane, eventTimes etc.
   markRootUpdated(root, lane, eventTime);
+
   ensureRootIsScheduled(root, eventTime);
 }
 
 function markUpdateLaneFromFiberToRoot(fiber, lane){
   fiber.lanes = mergeLanes(fiber.lanes, lane);
+
   return fiber.stateNode;
 }
 
 function ensureRootIsScheduled(root, currentTime){
   const existingCallbackNode = root.callbackNode;
+  
   // update root.expirationTime. 
   markStarvedLanesAsExpired(root, currentTime);
 
@@ -103,14 +106,15 @@ function ensureRootIsScheduled(root, currentTime){
     root, 
     root===wipRoot ? wipRootRenderLanes : NoLanes,
   );
-
-  if (nextLanes === NoLanes){
-    if (existingCallbackNode !== null){
-      console.error('ensureRootIsScheduled1')
-    }
-    return;
-  }
   
+  if (nextLanes === NoLanes){
+     if (existingCallbackNode !== null){
+       console.error('ensureRootIsScheduled1')
+     }
+     return;
+   }
+
+
   // Reuse existing task if there is.
   if (existingCallbackNode !== null){
     return;
@@ -163,6 +167,10 @@ function finishConcurrentRender(root, exitStatus){
 }
 
 function prepareFreshStack(root, updateLanes){
+  // to keep next stack fresh.
+  root.finishedWork = null;
+  root.finishedLanes = NoLanes;
+
   wipRoot = root;
   wip = createWorkInProgress(root.current);
   wipRootRenderLanes = subtreeRenderLanes =
@@ -183,7 +191,6 @@ function renderRootConcurrent(root, updateLanes){
   }
 
   //Keep trying until all caught error handled.
-
     try {
       workLoopConcurrent();
     } catch(thrownValue){

@@ -3,7 +3,7 @@ import { J, Suspense } from '@Jeact';
 
 export function Footer(props){
     const year = new Date().getFullYear()
-    return  <Suspense>
+    return  
                 <footer>© {year} Jacty</footer>
-            </Suspense>
+
 }

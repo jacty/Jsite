@@ -71,8 +71,8 @@ let currentEventTime = NoTimestamp;
 export function requestEventTime(){
   // This is the first update.
 
-  if (executionContext===NoContext || currentEventTime !== NoTimestamp){
-    console.error('Error:requestEventTime()');
+  if (executionContext&(RenderContext|CommitContext)!==NoContext || currentEventTime !== NoTimestamp){
+    console.error('Error:requestEventTime()', executionContext, currentEventTime);
   }
   
   currentEventTime = performance.now();

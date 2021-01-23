@@ -8,5 +8,8 @@ module.exports = {
     plugins: ["@snowpack/plugin-sass"],
     mount:{
         src:'/',
+    },
+    buildOptions:{
+        jsxFactory:'J',
     }
 }

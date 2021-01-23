@@ -27,6 +27,8 @@ let didScheduleRenderPhaseUpdateDuringThisPass = false;
 
 const RE_RENDER_LIMIT = 25;
 
+// In DEV, this list ensures that hooks are called in the same order between renders.
+let hookTypesDev = null;
 let hookTypesUpdateIndexDev = -1;
 
 export function renderWithHooks(alternate,workInProgress,nextRenderLanes){
@@ -56,10 +58,7 @@ export function renderWithHooks(alternate,workInProgress,nextRenderLanes){
   CurrentDispatcher.current = ContextOnlyDispatcher;
 
   if (__ENV__){
-    workInProgress._debugHookTypes =  
-        alternate !== null
-        ? alternate._debugHookTypes
-        : null;
+    workInProgress._debugHookTypes = hookTypesDev;
   }
 
   return children

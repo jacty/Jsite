@@ -37,23 +37,23 @@ function markRef(current, workInProgress){
 
 function updateFunctionComponent(alternate,workInProgress,renderLanes){
 
-  if (alternate!==null){
-    console.error('updateFunctionComponent2')
-  };
   let nextChildren = renderWithHooks(
     alternate,
     workInProgress,
     renderLanes,
   );
   
-  CurrentOwner.current = workInProgress;
+  if(alternate!==null){
+    console.error('updateFunctionComponent1')
+  }
+
   workInProgress.flags |= PerformedWork;
   workInProgress.child = reconcileChildFibers(
       workInProgress,
-      alternate === null ? alternate : alternate.child,
+      alternate,
       nextChildren,
       renderLanes,
-      alternate === null ? false : true
+      alternate
     );
 
   return workInProgress.child;
@@ -71,10 +71,10 @@ function updateHostRoot(alternate, workInProgress, renderLanes){
 
   workInProgress.child = reconcileChildFibers(
       workInProgress,
-      alternate === null ? alternate : alternate.child,
+      alternate,
       nextChildren,
       renderLanes,
-      alternate === null ? false : true
+      alternate
   );
   return workInProgress.child;
 }
@@ -96,10 +96,10 @@ function updateHostComponent(alternate, workInProgress,renderLanes){
   
   workInProgress.child = reconcileChildFibers(
       workInProgress,
-      alternate === null ? alternate : alternate.child,
+      alternate,
       nextChildren,
       renderLanes,
-      alternate === null ? false : true
+      alternate
     );
 
   return workInProgress.child;

@@ -18,6 +18,13 @@ export function reconcileChildFibers(
   lanes,
   shouldTrackEffects
 ){
+  if(currentFirstChild === null){
+    currentFirstChild = currentFirstChild;
+    shouldTrackEffects = false;
+  } else {
+    currentFirstChild = currentFirstChild.child;
+    shouldTrackEffects = true;
+  }
   // Handle object types
   const isObject = typeof newChild === 'object' && newChild !== null;
   if (isObject){

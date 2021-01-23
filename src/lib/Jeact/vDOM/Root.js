@@ -1,5 +1,6 @@
 import { createFiberRoot } from '@Jeact/vDOM/FiberRoot';
 import { updateContainer } from '@Jeact/vDOM/FiberReconcile';
+import {listenToAllSupportedEvents} from '@Jeact/vDOM/events/DOMPluginEventSystem';
 
 function vRoot(container){
   this._Root = createRootImpl(container);
@@ -11,6 +12,7 @@ vRoot.prototype.render = function(children){
 
 function createRootImpl(container){
   const root = createFiberRoot(container);
+  listenToAllSupportedEvents(container);
   return root;
 }
 

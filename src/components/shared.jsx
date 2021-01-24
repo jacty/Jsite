@@ -2,9 +2,9 @@
 import React from 'react';
 
 export function Footer(props){
-    function handleClick(){
-        console.log(1);
+    function handleClick(x){
+        console.log(x);
     }
     const year = new Date().getFullYear()
-    return <footer>© {year} <a onClick={handleClick}>Jacty</a></footer>
+    return <footer><img src='#' onError={handleClick(1)} onLoad={handleClick(2)}/>© {year} <a onClick={handleClick}>Jacty</a></footer>
 }

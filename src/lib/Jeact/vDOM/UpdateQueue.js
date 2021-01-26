@@ -9,6 +9,17 @@ import {
 
 let currentlyProcessingQueue;// to denote currently processing queue in DEV.
 
+export function initializeUpdateQueue(fiber){
+  const queue = {
+    baseState: fiber.memoizedState,
+    firstBaseUpdate: null,
+    lastBaseUpdate: null,
+    pending: null,
+    effects: null
+  };
+  fiber.updateQueue = queue;
+}
+
 export function createUpdate(eventTime, lane){
   const update = {
     eventTime,
@@ -32,7 +43,6 @@ export function enqueueUpdate(fiber, update){
     pending.next = update;
   }
   updateQueue.pending = update;
-
 }
 
 function getStateFromUpdate(update, prevState){

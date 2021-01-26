@@ -3,7 +3,10 @@ import Logo from './logo.jpg';
 import './avatar.sass';
 
 function Avatar(){
-    return <img className='avatar' src={Logo} alt="Jacty" title="Jacty"/>
+    function handleError(){
+        console.log('error')
+    }
+    return <img className='avatar' onError={handleError} src={Logo} alt="Jacty" title="Jacty"/>
 }
 
 export default Avatar

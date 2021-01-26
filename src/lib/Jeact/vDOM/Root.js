@@ -1,5 +1,5 @@
-import { createFiberRoot } from '@Jeact/vDOM/FiberRoot';
-import { updateContainer } from '@Jeact/vDOM/FiberReconcile';
+import {createFiberRoot} from '@Jeact/vDOM/FiberRoot';
+import {updateContainer} from '@Jeact/vDOM/FiberReconcile';
 import {listenToAllSupportedEvents} from '@Jeact/vDOM/events/DOMPluginEventSystem';
 
 function vRoot(container){

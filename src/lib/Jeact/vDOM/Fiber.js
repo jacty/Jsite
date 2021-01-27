@@ -56,7 +56,6 @@ export const createFiber = function(tag, pendingProps, key){
 // This is used to create an alternate fiber to do work on.
 // Why it is not a completed copy of current?
 export function createWorkInProgress(current){
-  //TODO: Optimize the clone part using a function to iterate.
   let workInProgress = current.alternate;
   let cloneKeys = [];
   if (workInProgress === null){

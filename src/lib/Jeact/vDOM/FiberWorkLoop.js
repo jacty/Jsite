@@ -171,12 +171,16 @@ function prepareFreshStack(root, updateLanes){
   root.finishedWork = null;
   root.finishedLanes = NoLanes;
 
+  if (wip !== null){
+    console.log('interruptedWork');
+  }
   wipRoot = root;
   wip = createWorkInProgress(root.current);
   wipRootRenderLanes = subtreeRenderLanes =
     wipRootIncludedLanes = updateLanes;
   wipRootExitStatus = RootIncomplete;
   wipRootFatalError = null;
+  wipRootUpdatedLanes = NoLanes;
 }
 
 function renderRootConcurrent(root, updateLanes){
@@ -220,10 +224,11 @@ function workLoopConcurrent(){
 }
 
 function performUnitOfWork(unitOfWork){
-  const alternate = unitOfWork.alternate;
+  const current = unitOfWork.alternate;
 
-  let next = beginWork(alternate, unitOfWork, subtreeRenderLanes);
+  let next = beginWork(current, unitOfWork, subtreeRenderLanes);
 
+  unitOfWork.memoizedProps = unitOfWork.pendingProps;
   if (next === null){
     // If this doesn't spawn new work, complete the current work.
     completeUnitOfWork(unitOfWork);

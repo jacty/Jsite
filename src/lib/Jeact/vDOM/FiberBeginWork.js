@@ -59,7 +59,7 @@ function updateFunctionComponent(alternate,workInProgress,renderLanes){
   return workInProgress.child;
 }
 
-function updateHostRoot(alternate, workInProgress, renderLanes){
+function updateHostRoot(current, workInProgress, renderLanes){
   // push host container like div#root into stack, so we can get it to refer in any depth when we are reconcile fiber children.
   pushHostContainer(workInProgress);
   const prevState = workInProgress.memoizedState;
@@ -71,10 +71,10 @@ function updateHostRoot(alternate, workInProgress, renderLanes){
 
   workInProgress.child = reconcileChildFibers(
       workInProgress,
-      alternate,
+      current,
       nextChildren,
       renderLanes,
-      alternate
+      current
   );
   return workInProgress.child;
 }
@@ -104,15 +104,25 @@ function updateHostComponent(alternate, workInProgress,renderLanes){
 
   return workInProgress.child;
 }
-// Iterate from parent fibers to children fibers(including sibling fibers) to build the whole fiber chain.
-export function beginWork(alternate, workInProgress, renderLanes){
+// Iterate from parent fibers to child fibers(including sibling fibers) to build the whole fiber chain.
+export function beginWork(current, workInProgress, renderLanes){
+  const updateLanes = workInProgress.lanes;
+  if(current!==null){
+    const oldProps = current.memoizedProps;
+    const newProps = workInProgress.pendingProps;
+    if(oldProps !== newProps){
+      console.log('beginWork1')
+    } else if(!includesSomeLane(renderLanes, updateLanes)){
+      console.log('beginWork2');
+    }
+  }
   switch (workInProgress.tag){
     case FunctionComponent://0
-      return updateFunctionComponent(alternate,workInProgress,renderLanes);
+      return updateFunctionComponent(current,workInProgress,renderLanes);
     case HostRoot://3
-      return updateHostRoot(alternate, workInProgress, renderLanes);
+      return updateHostRoot(current, workInProgress, renderLanes);
     case HostComponent://5
-      return updateHostComponent(alternate, workInProgress, renderLanes);
+      return updateHostComponent(current, workInProgress, renderLanes);
     case HostText://6
       return null;
     default:

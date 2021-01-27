@@ -61,7 +61,6 @@ let wipRootExitStatus = RootIncomplete;
 let wipRootFatalError = null;
 
 let wipRootIncludedLanes = NoLanes;
-
 let wipRootUpdatedLanes = NoLanes;
 
 let nextEffect = null;
@@ -83,7 +82,6 @@ export function requestEventTime(){
 export function scheduleUpdateOnFiber(fiber, lane, eventTime){
   // Update fiber.lanes
   const root = markUpdateLaneFromFiberToRoot(fiber, lane);
-
   // update root.pendingLane, eventTimes etc.
   markRootUpdated(root, lane, eventTime);
 

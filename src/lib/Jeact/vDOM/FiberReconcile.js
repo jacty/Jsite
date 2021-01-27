@@ -13,7 +13,6 @@ export function updateContainer(children, container){
 
   const eventTime =requestEventTime();
   const lane = requestUpdateLane();
-
   const update = createUpdate(eventTime, lane, children);
 
   enqueueUpdate(current, update);//update fiber.updateQueue.pending.

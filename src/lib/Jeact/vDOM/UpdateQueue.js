@@ -35,6 +35,7 @@ export function createUpdate(eventTime, lane, children=null){
 export function enqueueUpdate(fiber, update){
   const updateQueue = fiber.updateQueue;
   let pending = updateQueue.pending;
+
   if (pending === null) {
     // First update.
     update.next = update;

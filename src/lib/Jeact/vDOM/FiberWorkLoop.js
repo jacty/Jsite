@@ -10,6 +10,7 @@ import {
   PerformedWork,
   Placement,
   Snapshot, 
+  RetryAfterError,
 } from '@Jeact/shared/Constants';
 import {
   CurrentOwner,
@@ -63,6 +64,7 @@ let wipRootFatalError = null;
 let wipRootIncludedLanes = NoLanes;
 let wipRootUpdatedLanes = NoLanes;
 
+let nextLanes = NoLanes;
 let nextEffect = null;
 
 let currentEventTime = NoTimestamp;
@@ -100,7 +102,7 @@ function ensureRootIsScheduled(root, currentTime){
   // update root.expirationTime. 
   markStarvedLanesAsExpired(root, currentTime);
 
-  const nextLanes = getNextLanes(
+  nextLanes = getNextLanes(
     root, 
     root===wipRoot ? wipRootRenderLanes : NoLanes,
   );
@@ -112,14 +114,13 @@ function ensureRootIsScheduled(root, currentTime){
      return;
    }
 
-
   // Reuse existing task if there is.
   if (existingCallbackNode !== null){
     return;
   }
 
   let newCallbackNode = scheduleCallback(
-    performConcurrentWorkOnRoot.bind(null, root, nextLanes),
+    performConcurrentWorkOnRoot.bind(null, root),
   )
 
   root.callbackNode = newCallbackNode;
@@ -127,13 +128,14 @@ function ensureRootIsScheduled(root, currentTime){
 
 // Entry point for every concurrent task, i.e. anything that
 // goes through Scheduler.
-function performConcurrentWorkOnRoot(root, nextLanes){
-
+function performConcurrentWorkOnRoot(root){
   let exitStatus = renderRootConcurrent(root, nextLanes);
   if (includesSomeLane(wipRootIncludedLanes, wipRootUpdatedLanes)){
     console.error('performConcurrentWorkOnRoot4')
   } else if(exitStatus !== RootIncomplete){
-    if(exitStatus === RootErrored){
+    if(exitStatus === RootErrored || exitStatus===RootFatalErrored){
+      console.error('Error')
+      executionContext |= RetryAfterError;
       return null;
     }
 

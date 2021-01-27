@@ -32,6 +32,10 @@ let scheduledHostCallback = null;
 
 function flushWork(){
   isHostCallbackScheduled = false;
+  if(isHostCallbackScheduled){
+    console.error('flushWork');
+  }
+
   isPerformingWork = true;
 
   try{
@@ -46,6 +50,7 @@ function flushWork(){
 function workLoop(){
   const currentTime = performance.now();
   deadline = currentTime + yieldInterval;
+  
   currentTask = peek(taskQueue);
   while(currentTask !== null){
     if(currentTask.expirationTime > currentTime &&

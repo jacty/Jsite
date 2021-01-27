@@ -17,6 +17,8 @@ function FiberRootNode(containerInfo){
 
   this.pendingLanes = NoLanes;
   this.finishedLanes = NoLanes;
+
+  this.pooledCache = null;
 }
 
 export function createFiberRoot(container){

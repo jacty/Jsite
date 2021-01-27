@@ -96,7 +96,6 @@ function reconcileSingleElement(
   children,
   lanes
 ){
-
   const key = children.key;
   let child = currentFirstChild;
   if (child !== null){

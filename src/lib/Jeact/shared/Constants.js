@@ -4,6 +4,7 @@ export const NoTimestamp = -1;
 * JeactSymbols
 */
 export let JEACT_ELEMENT_TYPE = Symbol.for('jeact.element');
+export let JEACT_CONTEXT_TYPE = Symbol.for('jeact.context');
 
 /*
 *JeactWorkTags

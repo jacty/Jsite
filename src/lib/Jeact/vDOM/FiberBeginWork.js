@@ -8,21 +8,18 @@ import {
   PerformedWork,
   Ref,
 } from '@Jeact/shared/Constants';
-import {
-  CurrentOwner
-} from '@Jeact/shared/internals';
-import {
-  includesSomeLane,
-} from '@Jeact/vDOM/FiberLane';
-import {
-  reconcileChildFibers,
-} from '@Jeact/vDOM/ChildFiber';
-import {
-  processUpdateQueue,
-} from '@Jeact/vDOM/UpdateQueue';
+import {CurrentOwner} from '@Jeact/shared/internals';
+import {includesSomeLane} from '@Jeact/vDOM/FiberLane';
+import {reconcileChildFibers} from '@Jeact/vDOM/ChildFiber';
+import {processUpdateQueue} from '@Jeact/vDOM/UpdateQueue';
 import {renderWithHooks} from '@Jeact/vDOM/FiberHooks';
-import { pushHostContainer } from '@Jeact/vDOM/FiberHostContext';
-import { shouldSetTextContent } from '@Jeact/vDOM/DOMComponent';
+import {pushHostContainer} from '@Jeact/vDOM/FiberHostContext';
+import {shouldSetTextContent} from '@Jeact/vDOM/DOMComponent';
+import {
+  pushRootCachePool,
+  pushCacheProvider
+} from '@Jeact/vDOM/FiberCacheComponent';
+
 let didReceiveUpdate = false;
 
 function markRef(current, workInProgress){
@@ -61,13 +58,28 @@ function updateFunctionComponent(alternate,workInProgress,renderLanes){
 
 function updateHostRoot(current, workInProgress, renderLanes){
   // push host container like div#root into stack, so we can get it to refer in any depth when we are reconcile fiber children.
-  pushHostContainer(workInProgress);
-  const prevState = workInProgress.memoizedState;
-  const prevChildren = prevState !== null ? prevState.element : null;
+  pushHostContainer(workInProgress);//pushHostRootContext()
 
+  const prevState = workInProgress.memoizedState;
+  const prevChildren = prevState.element;
+  if(current.updateQueue !== workInProgress.updateQueue){
+    console.error('updateHostRoot.cloneUpdateQueue()')
+  }
   //update wip.lanes, wip.memoizedState;
   processUpdateQueue(workInProgress, renderLanes);
-  const nextChildren = workInProgress.memoizedState;
+  const nextState = workInProgress.memoizedState;
+
+  const nextCache = nextState.cache;
+  pushRootCachePool(workInProgress.stateNode);
+  pushCacheProvider(workInProgress, nextCache);
+  if(nextCache !== prevState.cache){
+    console.error('updateHostRoot')
+  }
+
+  const nextChildren = nextState.element;
+  if(nextChildren === prevChildren){
+    console.error('updateHostRoot1');
+  }
 
   workInProgress.child = reconcileChildFibers(
       workInProgress,

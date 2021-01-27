@@ -20,12 +20,12 @@ export function initializeUpdateQueue(fiber){
   fiber.updateQueue = queue;
 }
 
-export function createUpdate(eventTime, lane, children=null){
+export function createUpdate(eventTime, lane){
   const update = {
     eventTime,
     lane,
     tag: UpdateState,
-    payload: children,
+    payload: null,
     callback: null,
     next: null,
   };
@@ -49,8 +49,7 @@ export function enqueueUpdate(fiber, update){
 function getStateFromUpdate(update, prevState){
   switch (update.tag){
     case UpdateState: {
-      const payload = update.payload;
-      let partialState = payload;      
+      let partialState = update.payload;     
       if (partialState === null || partialState === undefined){
         return prevState;
       }
@@ -65,7 +64,7 @@ function getStateFromUpdate(update, prevState){
 export function processUpdateQueue(workInProgress,renderLanes){
 
   const queue = workInProgress.updateQueue;
-  const props = workInProgress.pendingProps;
+  const nextProps = workInProgress.pendingProps;
 
   let firstBaseUpdate = queue.firstBaseUpdate;
   let lastBaseUpdate = queue.lastBaseUpdate;
@@ -116,19 +115,26 @@ export function processUpdateQueue(workInProgress,renderLanes){
       let newLastBaseUpdate = null;
 
       let update = firstBaseUpdate;
-
       do {
         const updateLane = update.lane;
-        // Process this update.
-        newState = getStateFromUpdate(
-          update,
-          newState
-        );
-        const callback = update.callback;
-        if (callback !== null) {
-          console.error('processUpdateQueue5');
+        if(!isSubsetOfLanes(renderLanes, updateLane)){
+          console.error('processUpdateQueue')
+        } else {
+          if(newLastBaseUpdate!==null){
+            console.error('processUpdateQueue1')
+          }
+
+          // Process this update.
+          newState = getStateFromUpdate(
+            update,
+            newState
+          );
+
+          const callback = update.callback;
+          if (callback !== null) {
+            console.error('processUpdateQueue5');
+          }        
         }
-        
         update = update.next;
         if (update=== null){
           pendingQueue = queue.pending;

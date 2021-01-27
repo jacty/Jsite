@@ -20,12 +20,12 @@ export function initializeUpdateQueue(fiber){
   fiber.updateQueue = queue;
 }
 
-export function createUpdate(eventTime, lane){
+export function createUpdate(eventTime, lane, children=null){
   const update = {
     eventTime,
     lane,
     tag: UpdateState,
-    payload: null,
+    payload: children,
     callback: null,
     next: null,
   };

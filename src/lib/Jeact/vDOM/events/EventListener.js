@@ -1,8 +1,8 @@
-export function addEventBubbleListener(
-  target,
-  eventType,
-  listener
-){
-  target.addEventListener(eventType, listener, false);
-  return listener;
+import {getClosestFiberFromNode} from '@Jeact/vDOM/DOMComponentTree';
+
+export function dispatchEvent(domEventName, targetContainer, nativeEvent){
+    const nativeEventTarget = nativeEvent.target;
+    let targetFiber = getClosestFiberFromNode(nativeEventTarget);
+
+    console.error('dispatchEvent', closestMounted);
 }

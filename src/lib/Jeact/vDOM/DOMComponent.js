@@ -1,4 +1,5 @@
 import {registrationNameDependencies} from '@Jeact/vDOM/events/EventRegistry';
+import {listenToNonDelegatedEvent} from '@Jeact/vDOM/events/DOMPluginEventSystem';
 
 const DANGER_HTML = 'dangerouslySetInnerHTML';
 const CHILDREN = 'children';
@@ -7,10 +8,26 @@ const TEXT_NODE = 3;
 export function createElement(type, rootContainerElement){
     return rootContainerElement.ownerDocument.createElement(type);
 }
+
 export function createTextNode(text, rootContainerElement){
     return rootContainerElement.ownerDocument.createTextNode(text);
 }
-export function setInitialDOMProperties(domElement, props){
+
+export function setInitialDOMProperties(domElement, workInProgress){
+    let rawProps = workInProgress.pendingProps;
+    let props;
+    let type = workInProgress.type;
+    switch(type){
+        case 'img':
+            listenToNonDelegatedEvent('error', domElement);
+            listenToNonDelegatedEvent('load', domElement);
+            props = rawProps;
+            break;
+        default:
+            props = rawProps;
+    }
+
+    // setInitialDOMProperties()
     for (let propKey in props){
         if (!props.hasOwnProperty(propKey)){
             continue;
@@ -29,7 +46,12 @@ export function setInitialDOMProperties(domElement, props){
             domElement.setAttribute(propKey, prop);
         }
     }
+
+    if(typeof props.onClick==='function'){
+        console.error('x');
+    }
 }
+
 export function shouldSetTextContent(type, props){
   return (
     type === 'textarea' ||
@@ -43,6 +65,7 @@ export function shouldSetTextContent(type, props){
     )
   )
 }
+
 function setTextContent(node, text){
     if (text){
         const firstChild = node.firstChild;

@@ -104,7 +104,7 @@ export function completeWork(workInProgress,renderLanes){
       updateFiberProps(instance, newProps);
 
       appendAllChildren(instance, workInProgress);
-      setInitialDOMProperties(instance, workInProgress.pendingProps) 
+      setInitialDOMProperties(instance, workInProgress) 
       
       workInProgress.stateNode = instance;
       bubbleProperties(workInProgress);

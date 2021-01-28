@@ -31,7 +31,7 @@ const RE_RENDER_LIMIT = 25;
 let hookTypesDev = null;
 let hookTypesUpdateIndexDev = -1;
 
-export function renderWithHooks(alternate,workInProgress,nextRenderLanes){
+export function renderWithHooks(current,workInProgress,nextRenderLanes){
 
   const Component = workInProgress.type;
   const props = workInProgress.pendingProps;
@@ -44,7 +44,7 @@ export function renderWithHooks(alternate,workInProgress,nextRenderLanes){
   }
 
   CurrentDispatcher.current =
-    alternate === null || alternate.memoizedState === null
+    current === null || current.memoizedState === null
     ? HooksDispatcherOnMount
     : HooksDispatcherOnUpdate;
 

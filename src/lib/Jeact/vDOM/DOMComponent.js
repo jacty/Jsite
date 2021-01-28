@@ -1,3 +1,5 @@
+import {registrationNameDependencies} from '@Jeact/vDOM/events/EventRegistry';
+
 const DANGER_HTML = 'dangerouslySetInnerHTML';
 const CHILDREN = 'children';
 const TEXT_NODE = 3;
@@ -20,6 +22,8 @@ export function setInitialDOMProperties(domElement, props){
             if (typeof prop === 'string' || typeof prop === 'number'){
                 setTextContent(domElement, prop);
             }
+        } else if (registrationNameDependencies.hasOwnProperty(propKey)){
+            console.error('setInitialDOMProperties')
         } else if (prop !== null){
             propKey = propKey === 'className' ? 'class':propKey;
             domElement.setAttribute(propKey, prop);

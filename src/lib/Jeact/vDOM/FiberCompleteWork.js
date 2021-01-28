@@ -18,6 +18,10 @@ import {
   createElement,
   setInitialDOMProperties,
 } from '@Jeact/vDOM/DOMComponent';
+import {
+  precacheFiberNode,
+  updateFiberProps
+} from '@Jeact/vDOM/DOMComponentTree';
 
 function appendAllChildren(parent, workInProgress){
   let node = workInProgress.child;
@@ -51,8 +55,27 @@ function appendAllChildren(parent, workInProgress){
   }
 };
 
+function bubbleProperties(completedWork){
+  const didBailout = completedWork.alternate !== null && 
+    completedWork.alternate.child === completedWork.child;
+
+    let newChildLanes = NoLanes;
+    let subtreeFlags = NoFlags;
+
+  if (!didBailout){
+    let child = completedWork.child;
+    if (child !== null){
+
+    }
+    completedWork.subtreeFlags |= subtreeFlags;
+  }
+
+  completedWork.childLanes = newChildLanes;
+}
+
 export function completeWork(workInProgress,renderLanes){
   const newProps = workInProgress.pendingProps;
+  
   switch(workInProgress.tag){
     case FunctionComponent://0
       return null;
@@ -68,15 +91,23 @@ export function completeWork(workInProgress,renderLanes){
     case HostComponent:{//5
       const rootContainerInstance = getRootHostContainer();
       const type = workInProgress.type;
+      if(workInProgress.alternate !== null && workInProgress.stateNode !== null){
+        console.error('completeWork')
+      }
+
       const instance = createElement(
         type,
         rootContainerInstance,
       );
+      
+      precacheFiberNode(workInProgress, instance);
+      updateFiberProps(instance, newProps);
 
       appendAllChildren(instance, workInProgress);
       setInitialDOMProperties(instance, workInProgress.pendingProps) 
-      workInProgress.stateNode = instance;
       
+      workInProgress.stateNode = instance;
+      bubbleProperties(workInProgress);
       return null;
     }
     case HostText: {//6

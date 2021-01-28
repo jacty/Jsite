@@ -32,25 +32,25 @@ function markRef(current, workInProgress){
   } 
 }
 
-function updateFunctionComponent(alternate,workInProgress,renderLanes){
+function updateFunctionComponent(current,workInProgress,renderLanes){
 
   let nextChildren = renderWithHooks(
-    alternate,
+    current,
     workInProgress,
     renderLanes,
   );
   
-  if(alternate!==null){
+  if(current!==null){
     console.error('updateFunctionComponent1')
   }
 
   workInProgress.flags |= PerformedWork;
   workInProgress.child = reconcileChildFibers(
       workInProgress,
-      alternate,
+      current,
       nextChildren,
       renderLanes,
-      alternate
+      current
     );
 
   return workInProgress.child;
@@ -98,6 +98,7 @@ function updateHostComponent(alternate, workInProgress,renderLanes){
 
   let nextChildren = nextProps.children;
   const isDirectTextChild = shouldSetTextContent(type, nextProps);
+
   if (isDirectTextChild){
     // Handle direct text node in host environment to avoid another traversing.
     nextChildren = null;

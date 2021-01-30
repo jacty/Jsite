@@ -6,5 +6,5 @@ export function Footer(props){
         console.error('error');
     }
     const year = new Date().getFullYear()
-    return <footer><img src='#' onError={handleClick} />© {year} Jacty</footer>
+    return <footer><a href='#' onClick={handleClick}>©</a> {year} Jacty</footer>
 }

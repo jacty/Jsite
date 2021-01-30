@@ -6,5 +6,6 @@ export function Footer(props){
         console.error('error');
     }
     const year = new Date().getFullYear()
-    return <footer><a href='#' onClick={handleClick}>©</a> {year} Jacty</footer>
+
+    return <footer>© {year} <a onClick={handleClick}>Jacty</a></footer>
 }

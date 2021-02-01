@@ -11,7 +11,9 @@ const listeningMarker = '_jeactListening' +
 export function dispatchEvents(domEventName, container, targetFiber){
   const dispatchQueue = [];
   const listener = getListener(targetFiber, domEventName);
-  return listener();
+  if(!!listener){
+    return listener();
+  }
 }
 
 export function listenToAllSupportedEvents(container){

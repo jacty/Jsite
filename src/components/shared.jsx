@@ -8,5 +8,5 @@ export function Footer(props){
         // setCur()
     }
     const year = new Date().getFullYear()
-    return  <footer>© {year} <a onClick={handleClick}>Jacty</a></footer>
+    return <footer>© {year} <a onClick={handleClick}>Jacty</a></footer>
 }

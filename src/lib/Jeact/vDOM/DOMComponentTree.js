@@ -15,6 +15,10 @@ export function getClosestFiberFromNode(targetNode){
     console.error('getClosestFiberFromNode', targetFiber)
 }
 
+export function getPropsFromFiber(stateNode){
+    return stateNode[internalPropsKey] || null;
+}
+
 export function updateFiberProps(node, props){
     node[internalPropsKey] = props;
 }

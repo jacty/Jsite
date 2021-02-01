@@ -56,8 +56,6 @@ export const Incomplete = /*                   */ 0b0000001000000000000;
 export const noTimeout = -1;
 export const NormalTimeout = 5000;
 
-/* EventPriority */
-export const DiscreteEvent = 0;
 
 
 

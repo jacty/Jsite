@@ -202,7 +202,7 @@ function renderRootConcurrent(root, updateLanes){
       wip = null;
       wipRootExitStatus = RootErrored;
     }
-  console.log('x');//popDispatcher()
+
   executionContext = prevExecutionContext;
   // Check if the tree has completed.
   if ( wip !== null){

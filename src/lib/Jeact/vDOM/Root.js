@@ -1,6 +1,6 @@
 import {createFiberRoot} from '@Jeact/vDOM/FiberRoot';
 import {updateContainer} from '@Jeact/vDOM/FiberReconcile';
-import {listenToAllSupportedEvents} from '@Jeact/vDOM/events/DOMPluginEventSystem';
+import {listenToAllSupportedEvents} from '@Jeact/vDOM/events/EventSystem';
 
 function vRoot(container){
   this._Root = createRootImpl(container);

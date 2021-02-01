@@ -1,3 +1,2 @@
-export const allNativeEvents = new Set();
-
-export const registrationNameDependencies = {};
+export const allNativeEvents = new Set(['click']);
+export const registrationNameDependencies=[];

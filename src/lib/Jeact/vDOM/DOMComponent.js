@@ -1,5 +1,4 @@
 import {registrationNameDependencies} from '@Jeact/vDOM/events/EventRegistry';
-import {listenToNonDelegatedEvent} from '@Jeact/vDOM/events/DOMPluginEventSystem';
 
 const DANGER_HTML = 'dangerouslySetInnerHTML';
 const CHILDREN = 'children';
@@ -19,8 +18,7 @@ export function setInitialDOMProperties(domElement, workInProgress){
     let type = workInProgress.type;
     switch(type){
         case 'img':
-            listenToNonDelegatedEvent('error', domElement);
-            listenToNonDelegatedEvent('load', domElement);
+            // listenToNonDelegatedEvent('error', domElement);
             props = rawProps;
             break;
         default:
@@ -45,10 +43,6 @@ export function setInitialDOMProperties(domElement, workInProgress){
             propKey = propKey === 'className' ? 'class':propKey;
             domElement.setAttribute(propKey, prop);
         }
-    }
-
-    if(typeof props.onClick==='function'){
-        console.error('x');
     }
 }
 

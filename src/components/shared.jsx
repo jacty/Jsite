@@ -4,7 +4,7 @@ import {J, useState} from '@Jeact';
 export function Footer(props){
     // const [cur, setCur] = useState(0);
     function handleClick(){
-        console.log(1,props);
+        console.log(1,props.handlers());
         // setCur()
     }
     const year = new Date().getFullYear()

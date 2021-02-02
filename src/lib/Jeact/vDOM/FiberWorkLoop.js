@@ -71,13 +71,17 @@ let currentEventTime = NoTimestamp;
 
 export function requestEventTime(){
   // This is the first update.
-
-  if (executionContext&(RenderContext|CommitContext)!==NoContext || currentEventTime !== NoTimestamp){
-    console.error('Error:requestEventTime()', executionContext, currentEventTime);
+  if (executionContext&(RenderContext|CommitContext)!==NoContext){
+    // We're inside Jeact, so it's fine to read the actual time.
+    console.error('Error in requestEventTime')
   }
-  
+  // We're not inside Jeact, so we may be in the middle of a browser event like click.
+  if (currentEventTime !== NoTimestamp){
+    // Use the same start time for all updates until we enter Jeact again.
+    return currentEventTime;
+  }
+  // First update.
   currentEventTime = performance.now();
-
   return currentEventTime;
 }
 

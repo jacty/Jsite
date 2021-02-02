@@ -3,7 +3,8 @@ import React from 'react';
 
 export function Footer(props){
     function handleClick(x){
-        console.error('error');
+        console.log('xx',props)
+        props.data();
     }
     const year = new Date().getFullYear()
 

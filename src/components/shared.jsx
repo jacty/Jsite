@@ -1,12 +1,7 @@
 //Shared Components like Footer, Header and so on.
-import {J, useState} from '@Jeact';
+import {J} from '@Jeact';
 
 export function Footer(props){
-    // const [cur, setCur] = useState(0);
-    function handleClick(){
-        console.log(1,props.handlers());
-        // setCur()
-    }
     const year = new Date().getFullYear()
-    return <footer>© {year} <a onClick={handleClick}>Jacty</a></footer>
+    return <footer>© {year} <a onClick={props.handlers}>Jacty</a></footer>
 }

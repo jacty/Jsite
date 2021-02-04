@@ -4,6 +4,7 @@ import {
   NoLanePriority,
   NormalPriority,
   DefaultLanePriority,
+  InputDiscreteLanePriority,
   DefaultLanes,
   NonIdleLanes,
   TotalLanes,
@@ -126,8 +127,11 @@ export function requestUpdateLane(lanePriority=1, wipLanes=0){
   switch (lanePriority) {
     case DefaultLanePriority: {//1
       let lane = getHighestPriorityLane(DefaultLanes & ~wipLanes);
-
       return lane;
+    }
+    case InputDiscreteLanePriority:{
+      console.error('zz');
+      break;
     }
     default:
       // The remaining priorities are not valid for updates

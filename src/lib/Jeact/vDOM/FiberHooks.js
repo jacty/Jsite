@@ -1,10 +1,11 @@
 import {
+  InputDiscreteLanePriority,
   NoLanes,
   __ENV__,
 } from '@Jeact/shared/Constants';
-import {
-  CurrentDispatcher
-} from '@Jeact/shared/internals';
+import {CurrentDispatcher} from '@Jeact/shared/internals';
+import {requestEventTime} from '@Jeact/vDOM/FiberWorkLoop';
+import {requestUpdateLane} from '@Jeact/vDOM/FiberLane';
 
 // Set right before calling the component.
 let renderLanes = NoLanes;
@@ -109,11 +110,13 @@ function mountState(initialState){
     initialState = initialState(); //TODO: make initialState([args...]) work here?
   }
   hook.memoizedState = hook.baseState = initialState;
-  const queue = {
+  const queue = hook.queue = {
     pending: null,
+    lanes: NoLanes,
     dispatch: null,
     lastRenderedState: initialState, 
   }
+
   const dispatch = dispatchAction.bind(null, currentlyRenderingFiber, queue);
   queue.dispatch = dispatch;
   
@@ -122,7 +125,9 @@ function mountState(initialState){
 
 function dispatchAction(fiber, queue, action){
   const eventTime = requestEventTime();
-  console.error('dispatchAction', eventTime);
+  const currentEventWipLanes = fiber.lanes;
+  const lane = requestUpdateLane(InputDiscreteLanePriority,fiber.lanes);
+  console.error('dispatchAction');
 }
 
 export const ContextOnlyDispatcher = {

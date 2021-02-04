@@ -4,7 +4,8 @@ import {
 } from '@Jeact/vDOM/FiberWorkLoop';
 import {
   createUpdate,
-  enqueueUpdate
+  enqueueUpdate,
+  entangleTransitions,
 } from '@Jeact/vDOM/UpdateQueue';
 import { requestUpdateLane } from '@Jeact/vDOM/FiberLane';
 
@@ -17,7 +18,10 @@ export function updateContainer(element, container){
   update.payload = {element}
   
   enqueueUpdate(current, update);//update fiber.updateQueue.pending.
-  scheduleUpdateOnFiber(current, lane, eventTime);
+  const rootFiber = scheduleUpdateOnFiber(current, lane, eventTime);
+  if(rootFiber !== null){
+    entangleTransitions(rootFiber, current, lane);
+  }
 }
 
 

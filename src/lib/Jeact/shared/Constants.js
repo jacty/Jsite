@@ -24,6 +24,7 @@ export const TotalLanes = 31;
 export const NoLanes=/*                          */ 0b0000000000000000000000000000000;
 export const NoLane =/*                          */ 0b0000000000000000000000000000000;
 export const DefaultLanes = /*                   */ 0b0000000000000000000111000000000;
+export const TransitionLanes = /*                */ 0b0000000001111111110000000000000;
 export const NonIdleLanes = /*                   */ 0b0000111111111111111111111111111;
 
 /* core Priorities */

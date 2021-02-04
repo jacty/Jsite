@@ -107,7 +107,7 @@ function mountWorkInProgressHook(){
 function mountState(initialState){
   const hook = mountWorkInProgressHook()
   if (typeof initialState === 'function'){
-    initialState = initialState(); //TODO: make initialState([args...]) work here?
+    initialState = initialState();
   }
   hook.memoizedState = hook.baseState = initialState;
   const queue = hook.queue = {

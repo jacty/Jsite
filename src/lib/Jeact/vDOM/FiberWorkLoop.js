@@ -92,6 +92,8 @@ export function scheduleUpdateOnFiber(fiber, lane, eventTime){
   markRootUpdated(root, lane, eventTime);
 
   ensureRootIsScheduled(root, eventTime);
+
+  return root;
 }
 
 function markUpdateLaneFromFiberToRoot(fiber, lane){

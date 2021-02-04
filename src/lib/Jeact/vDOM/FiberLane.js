@@ -6,6 +6,7 @@ import {
   DefaultLanePriority,
   InputDiscreteLanePriority,
   DefaultLanes,
+  TransitionLanes,
   NonIdleLanes,
   TotalLanes,
   NoTimestamp,
@@ -117,6 +118,10 @@ export function markStarvedLanesAsExpired(root, currentTime){
     }
     lanes &= ~lane;
   }
+}
+
+export function isTransitionLane(lane){
+  return (lane & TransitionLanes) !== 0;
 }
 
 export function getNextLanesPriority(){

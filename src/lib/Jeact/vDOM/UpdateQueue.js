@@ -5,6 +5,7 @@ import {
 } from '@Jeact/shared/Constants';
 import {
   isSubsetOfLanes,
+  isTransitionLane,
 } from '@Jeact/vDOM/FiberLane';
 
 let currentlyProcessingQueue;// to denote currently processing queue in DEV.
@@ -44,6 +45,13 @@ export function enqueueUpdate(fiber, update){
     pending.next = update;
   }
   updateQueue.pending = update;
+}
+
+export function entangleTransitions(rootFiber, currentFiber, lane){
+  const updateQueue = currentFiber.updateQueue;
+  if (isTransitionLane(lane)){
+    console.error('entangleTransitions');
+  }
 }
 
 function getStateFromUpdate(update, prevState){

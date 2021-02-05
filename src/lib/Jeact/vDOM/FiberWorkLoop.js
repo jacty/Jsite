@@ -98,7 +98,10 @@ export function scheduleUpdateOnFiber(fiber, lane, eventTime){
 
 function markUpdateLaneFromFiberToRoot(fiber, lane){
   fiber.lanes = mergeLanes(fiber.lanes, lane);
-
+  const alternate = fiber.alternate;
+  if(alternate !== null || fiber.return !== null || fiber.tag !== 3){
+    console.error('markUpdateLaneFromFiberToRoot')
+  }
   return fiber.stateNode;
 }
 

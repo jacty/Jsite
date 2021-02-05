@@ -88,8 +88,17 @@ export function requestEventTime(){
 export function scheduleUpdateOnFiber(fiber, lane, eventTime){
   // Update fiber.lanes
   const root = markUpdateLaneFromFiberToRoot(fiber, lane);
+  if(root === null){
+    console.error('scheduleUpdateOnFiber');
+  }
   // update root.pendingLane, eventTimes etc.
   markRootUpdated(root, lane, eventTime);
+  if(root === wipRoot){
+    console.error('scheduleUpdateOnFiber');
+  }
+  if (executionContext!==0){
+    console.error('scheduleUpdateOnFiber1')
+  }
 
   ensureRootIsScheduled(root, eventTime);
 

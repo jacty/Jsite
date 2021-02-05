@@ -127,7 +127,7 @@ function dispatchAction(fiber, queue, action){
   const eventTime = requestEventTime();
   const currentEventWipLanes = fiber.lanes;
   const lane = requestUpdateLane(InputDiscreteLanePriority,fiber.lanes);
-  console.error('dispatchAction');
+  console.error('dispatchAction', lane);
 }
 
 export const ContextOnlyDispatcher = {

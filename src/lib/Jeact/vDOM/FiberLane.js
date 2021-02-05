@@ -87,6 +87,11 @@ export function getNextLanes(root, wipLanes){
     console.error('getNextLanes4', wipLanes, nextLanes)
   }
 
+  const entangledLanes = root.entangledLanes;
+  if(entangledLanes&&entangledLanes!==NoLanes){
+    console.error('getNextLanes5');
+  }
+
   return nextLanes;
 }
 

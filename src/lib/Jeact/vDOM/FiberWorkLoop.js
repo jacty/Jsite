@@ -90,7 +90,7 @@ export function scheduleUpdateOnFiber(fiber, lane, eventTime){
   // Update fiber.lanes
   const root = markUpdateLaneFromFiberToRoot(fiber, lane);
   if(root === null){
-    console.error('scheduleUpdateOnFiber');
+    return null;
   }
   // update root.pendingLane, eventTimes etc.
   markRootUpdated(root, lane, eventTime);

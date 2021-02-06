@@ -8,7 +8,10 @@ import {
   requestEventTime,
   scheduleUpdateOnFiber
 } from '@Jeact/vDOM/FiberWorkLoop';
-import {requestUpdateLane} from '@Jeact/vDOM/FiberLane';
+import {
+  requestUpdateLane,
+  isTransitionLane
+} from '@Jeact/vDOM/FiberLane';
 
 // Set right before calling the component.
 let renderLanes = NoLanes;

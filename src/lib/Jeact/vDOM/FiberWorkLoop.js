@@ -108,10 +108,27 @@ export function scheduleUpdateOnFiber(fiber, lane, eventTime){
 
 function markUpdateLaneFromFiberToRoot(fiber, lane){
   fiber.lanes = mergeLanes(fiber.lanes, lane);
-  const alternate = fiber.alternate;
-  
-  if(fiber.tag === HostRoot){
-    return fiber.stateNode;
+  let alternate = fiber.alternate;
+  if(alternate!==null){
+    console.error('markUpdateLaneFromFiberToRoot');
+  }
+
+  let node = fiber;
+  let parent = fiber.return;
+  while(parent!==null){
+    parent.childLanes = mergeLanes(parent.childLanes, lane);
+    alternate = parent.alternate;
+    if (alternate !== null){
+      alternate.childLanes = mergeLanes(alternate.childLanes, lane);
+    }
+
+    node = parent;
+    parent = parent.return;
+  }
+
+
+  if(node.tag === HostRoot){
+    return node.stateNode;
   }
   return null;
 }

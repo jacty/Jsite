@@ -4,7 +4,10 @@ import {
   __ENV__,
 } from '@Jeact/shared/Constants';
 import {CurrentDispatcher} from '@Jeact/shared/internals';
-import {requestEventTime} from '@Jeact/vDOM/FiberWorkLoop';
+import {
+  requestEventTime,
+  scheduleUpdateOnFiber
+} from '@Jeact/vDOM/FiberWorkLoop';
 import {requestUpdateLane} from '@Jeact/vDOM/FiberLane';
 
 // Set right before calling the component.
@@ -127,7 +130,41 @@ function dispatchAction(fiber, queue, action){
   const eventTime = requestEventTime();
   const currentEventWipLanes = fiber.lanes;
   const lane = requestUpdateLane(InputDiscreteLanePriority,fiber.lanes);
-  console.error('dispatchAction', lane);
+
+  const update = {
+    lane,
+    action,
+    next:null,
+  };
+  const alternate = fiber.alternate;
+  if(
+    fiber === currentlyRenderingFiber ||
+    (alternate !== null && alternate === currentlyRenderingFiber)
+  ){
+    console.error('dispatchAction1');
+  } else {
+    const pending = queue.pending;
+    if(pending === null){
+      // First update.
+      update.next = update;
+    } else {
+      console.error('dispatchAction2');
+    }
+    queue.pending = update;
+
+    if(
+      fiber.lanes === NoLanes &&
+      (alternate === null || alternate.lanes === NoLanes)
+      ){
+      console.error('dispatchAction3')
+    }
+
+    const root = scheduleUpdateOnFiber(fiber, lane, eventTime);
+
+    if(isTransitionLane(lane) && root !== null){
+      console.error('dispatchAction4')
+    }
+  }
 }
 
 export const ContextOnlyDispatcher = {

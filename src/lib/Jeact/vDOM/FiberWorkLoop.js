@@ -65,6 +65,7 @@ let wipRootFatalError = null;
 let wipRootIncludedLanes = NoLanes;
 let wipRootUpdatedLanes = NoLanes;
 
+let nextLanesPriority = 0;
 let nextLanes = NoLanes;
 let nextEffect = null;
 
@@ -139,7 +140,7 @@ function ensureRootIsScheduled(root, currentTime){
   // update root.expirationTime. 
   markStarvedLanesAsExpired(root, currentTime);
 
-  nextLanes = getNextLanes(
+  [nextLanes, nextLanesPriority] = getNextLanes(
     root, 
     root===wipRoot ? wipRootRenderLanes : NoLanes,
   );

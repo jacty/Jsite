@@ -44,35 +44,24 @@ export function getNextLanes(root, wipLanes){
   const pendingLanes = root.pendingLanes;
   if (pendingLanes === NoLanes){
     highestLanePriority = NoLanePriority;
-    return NoLanes;
+    return [NoLanes, highestLanePriority];
   }
-
+  
   let nextLanes = NoLanes;
-  let nextLanePriority = NoLanePriority;
-
-  const expiredLanes = root.expiredLanes;
   const suspendedLanes = root.suspendedLanes;
-  const pingedLanes = root.pingedLanes;
-  // Check if any work has expired.
-  if (expiredLanes !== NoLanes){
-    nextLanes = expiredLanes;
-    nextLanePriority = highestLanePriority;
-  } else {
-    // Do not work on any idle work until all the non-idle work has finished,
-    // even it the work is suspended.
-    const nonIdlePendingLanes = pendingLanes & NonIdleLanes;
-    if (nonIdlePendingLanes !== NoLanes){
-      const nonIdleUnblockedLanes = nonIdlePendingLanes & ~suspendedLanes;
-      if (nonIdleUnblockedLanes !== NoLanes){
-        nextLanes = getHighestPriorityLanes(nonIdleUnblockedLanes);
-        nextLanePriority = highestLanePriority;
-      } else {
-        console.log('getNextLanes3')
-      }
+  // Do not work on any idle work until all the non-idle work has finished,
+  // even it the work is suspended.
+  const nonIdlePendingLanes = pendingLanes & NonIdleLanes;
+  if (nonIdlePendingLanes !== NoLanes){
+    const nonIdleUnblockedLanes = nonIdlePendingLanes & ~suspendedLanes;
+    if (nonIdleUnblockedLanes !== NoLanes){
+      nextLanes = getHighestPriorityLanes(nonIdleUnblockedLanes);
     } else {
-      // The only remaining work is Idle.
       console.log('getNextLanes3')
     }
+  } else {
+    // The only remaining work is Idle.
+    console.log('getNextLanes3')
   }
 
   if (nextLanes === NoLanes){
@@ -97,7 +86,7 @@ export function getNextLanes(root, wipLanes){
     console.error('getNextLanes5');
   }
 
-  return nextLanes;
+  return [nextLanes, highestLanePriority];
 }
 
 function computeExpirationTime(lane, currentTime){

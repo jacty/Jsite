@@ -17,6 +17,11 @@ import {
 let highestLanePriority = DefaultLanePriority;
 
 function getHighestPriorityLanes(lanes){
+  const inputDiscreteLanes = InputDiscreteLanes & lanes;
+  if (inputDiscreteLanes !== NoLanes){
+    highestLanePriority = InputDiscreteLanePriority;
+    return inputDiscreteLanes;
+  }
   const defaultLanes = DefaultLanes & lanes;
   if (defaultLanes !== 0){
     highestLanePriority = DefaultLanePriority;

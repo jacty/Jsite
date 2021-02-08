@@ -1,9 +1,8 @@
 import {
-  NormalSchedulePriority,
-  NormalPriority,
-  ImmediatePriority,
-  ImmediateSchedulePriority,
-  NormalTimeout,
+  DefaultLanePriority,
+  InputDiscreteLanePriority,
+  NORMAL_PRIORITY_TIMEOUT,
+  USER_BLOCKING_PRIORITY_TIMEOUT
 } from '@Jeact/shared/Constants';
 import {push,pop, peek} from './SchedulerMinHeap';
 
@@ -83,10 +82,20 @@ export function runWithPriority(priority,fn){
   }
 }
 
-export function scheduleCallback(callback){
+export function scheduleCallback(priority, callback){
   
   let startTime = performance.now();
-  let timeout = NormalTimeout;
+  let timeout;
+  switch (priority){
+    case InputDiscreteLanePriority:
+      timeout = USER_BLOCKING_PRIORITY_TIMEOUT;
+      break;
+    case DefaultLanePriority:
+    default:
+      timeout = NORMAL_PRIORITY_TIMEOUT;
+      break;
+  }
+
   let expirationTime = startTime + timeout;
 
   const newTask = {

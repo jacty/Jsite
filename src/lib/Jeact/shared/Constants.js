@@ -57,7 +57,9 @@ export const Incomplete = /*                   */ 0b0000001000000000000;
 
 /* Timeouts */
 export const noTimeout = -1;
-export const NormalTimeout = 5000;
+// Eventually times out
+export const USER_BLOCKING_PRIORITY_TIMEOUT = 250;
+export const NORMAL_PRIORITY_TIMEOUT = 5000;
 
 
 

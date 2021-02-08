@@ -158,6 +158,7 @@ function ensureRootIsScheduled(root, currentTime){
   }
 
   let newCallbackNode = scheduleCallback(
+    nextLanesPriority,
     performConcurrentWorkOnRoot.bind(null, root),
   )
 

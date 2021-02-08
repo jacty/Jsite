@@ -6,6 +6,7 @@ import {
 import {
   createFiberFromElement,
   createFiberFromText,
+  createWorkInProgress
 } from '@Jeact/vDOM/Fiber';
 
 // This API will tag the children with the side-effect of the reconciliation
@@ -176,3 +177,13 @@ function placeChild(
   return lastPlacedIndex;
 }
 
+export function cloneChildFibers(current, workInProgress){
+  let currentChild = workInProgress.child;
+  let newChild = createWorkInProgress(currentChild, currentChild.pendingProps);
+  workInProgress.child = newChild;
+  newChild.return = workInProgress;
+
+  if (currentChild.sibling!==null){
+    console.error('cloneChildFibers');
+  }
+}

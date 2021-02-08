@@ -10,7 +10,10 @@ import {
 } from '@Jeact/shared/Constants';
 import {CurrentOwner} from '@Jeact/shared/internals';
 import {includesSomeLane} from '@Jeact/vDOM/FiberLane';
-import {reconcileChildFibers} from '@Jeact/vDOM/ChildFiber';
+import {
+  reconcileChildFibers,
+  cloneChildFibers,
+} from '@Jeact/vDOM/ChildFiber';
 import {processUpdateQueue} from '@Jeact/vDOM/UpdateQueue';
 import {renderWithHooks} from '@Jeact/vDOM/FiberHooks';
 import {pushHostContainer} from '@Jeact/vDOM/FiberHostContext';
@@ -117,6 +120,18 @@ function updateHostComponent(alternate, workInProgress,renderLanes){
 
   return workInProgress.child;
 }
+
+function bailoutOnAlreadyFinishedWork(current, workInProgress, renderLanes){
+  // Check if the children have any pending work.
+  if (!includesSomeLane(renderLanes, workInProgress.childLanes)){
+    // The children don't have any work either.
+    return null;
+  } else {
+    // This fiber doesn't have work, but its subtree does. Clone the child fibers and continue.
+    cloneChildFibers(current, workInProgress);
+    return workInProgress.child;
+  }
+}
 // Iterate from parent fibers to child fibers(including sibling fibers) to build the whole fiber chain.
 export function beginWork(current, workInProgress, renderLanes){
   const updateLanes = workInProgress.lanes;
@@ -126,7 +141,15 @@ export function beginWork(current, workInProgress, renderLanes){
     if(oldProps !== newProps){
       console.log('beginWork1')
     } else if(!includesSomeLane(renderLanes, updateLanes)){
-      console.log('beginWork2');
+      didReceiveUpdate = false;
+      // This fiber does not have any pending work. Bailout without entering 
+      // the begin phase.
+      switch (workInProgress.tag){
+        case HostRoot:
+          pushHostContainer(workInProgress);
+          break;
+      }
+      return bailoutOnAlreadyFinishedWork(current, workInProgress, renderLanes)
     }
   }
   switch (workInProgress.tag){

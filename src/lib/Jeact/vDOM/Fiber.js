@@ -83,9 +83,7 @@ export function createWorkInProgress(current){
 
     workInProgress.alternate = current;
     current.alternate = workInProgress;
-  } else{
-    console.error('createWorkInProgress1')
-  }
+  } else{}
   cloneKeys = [
     'childLanes',
     'lanes',
@@ -95,6 +93,7 @@ export function createWorkInProgress(current){
     'updateQueue',
     'sibling',
     'index',
+    'ref',
   ];
   clone(current,workInProgress,cloneKeys);
 

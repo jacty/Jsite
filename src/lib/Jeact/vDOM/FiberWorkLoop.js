@@ -209,7 +209,6 @@ function prepareFreshStack(root, updateLanes){
   // to keep next stack fresh.
   root.finishedWork = null;
   root.finishedLanes = NoLanes;
-
   if (wip !== null){
     console.log('interruptedWork');
   }

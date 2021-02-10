@@ -55,7 +55,7 @@ export const createFiber = function(tag, pendingProps, key){
 
 // This is used to create an alternate fiber to do work on.
 // Why it is not a completed copy of current?
-export function createWorkInProgress(current){
+export function createWorkInProgress(current, pendingProps){
   let workInProgress = current.alternate;
   let cloneKeys = [];
   if (workInProgress === null){
@@ -65,6 +65,7 @@ export function createWorkInProgress(current){
     // than totally clone to avoid allocating extra objects for things that are never updated. It also allows us to reclaim the extra memory if needed.
     workInProgress = createFiber(
       current.tag,
+      pendingProps
     );
 
     cloneKeys = [

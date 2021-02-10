@@ -177,7 +177,7 @@ function placeChild(
   return lastPlacedIndex;
 }
 
-export function cloneChildFibers(current, workInProgress){
+export function cloneChildFibers(workInProgress){
   let currentChild = workInProgress.child;
   let newChild = createWorkInProgress(currentChild, currentChild.pendingProps);
   workInProgress.child = newChild;

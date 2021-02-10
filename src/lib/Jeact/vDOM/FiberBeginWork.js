@@ -128,7 +128,7 @@ function bailoutOnAlreadyFinishedWork(current, workInProgress, renderLanes){
     return null;
   } else {
     // This fiber doesn't have work, but its subtree does. Clone the child fibers and continue.
-    cloneChildFibers(current, workInProgress);
+    cloneChildFibers(workInProgress);
     return workInProgress.child;
   }
 }
@@ -152,6 +152,7 @@ export function beginWork(current, workInProgress, renderLanes){
       return bailoutOnAlreadyFinishedWork(current, workInProgress, renderLanes)
     }
   }
+
   switch (workInProgress.tag){
     case FunctionComponent://0
       return updateFunctionComponent(current,workInProgress,renderLanes);

@@ -178,6 +178,10 @@ export function mergeLanes(a, b){
   return a | b;
 }
 
+export function removeLanes(set, subset){
+  return set & ~subset;
+}
+
 export function createLaneMap(initial){
   // Intentionally pushing one by one.
   // https://v8.dev/blog/elements-kinds#avoid-creating-holes

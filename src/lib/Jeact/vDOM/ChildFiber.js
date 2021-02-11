@@ -99,8 +99,9 @@ function reconcileSingleElement(
 ){
   const key = children.key;
   let child = currentFirstChild;
-  if (child !== null){
-    console.error('reconcileSingleElement1')
+  while (child !== null){
+    deleteChild(returnFiber, child);
+    child = child.sibling;
   }
   const created = createFiberFromElement(children, lanes);
   created.return = returnFiber;
@@ -175,6 +176,10 @@ function placeChild(
   newIndex
 ){
   return lastPlacedIndex;
+}
+
+function deleteChild(returnFiber, childToDelete){
+  const deletions = returnFiber.deletions;    
 }
 
 export function cloneChildFibers(workInProgress){

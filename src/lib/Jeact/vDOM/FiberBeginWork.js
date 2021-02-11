@@ -15,7 +15,10 @@ import {
   cloneChildFibers,
 } from '@Jeact/vDOM/ChildFiber';
 import {processUpdateQueue} from '@Jeact/vDOM/UpdateQueue';
-import {renderWithHooks} from '@Jeact/vDOM/FiberHooks';
+import {
+  renderWithHooks,
+  bailoutHooks
+} from '@Jeact/vDOM/FiberHooks';
 import {pushHostContainer} from '@Jeact/vDOM/FiberHostContext';
 import {shouldSetTextContent} from '@Jeact/vDOM/DOMComponent';
 import {
@@ -43,8 +46,9 @@ function updateFunctionComponent(current,workInProgress,renderLanes){
     renderLanes,
   );
   
-  if(current!==null){
-    console.error('updateFunctionComponent1')
+  if(current!==null && !didReceiveUpdate){
+    bailoutHooks(current, workInProgress, renderLanes);
+    return bailoutOnAlreadyFinishedWork(current, workInProgress, renderLanes);
   }
 
   workInProgress.flags |= PerformedWork;

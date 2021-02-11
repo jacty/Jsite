@@ -2,6 +2,8 @@ import {
   InputDiscreteLanePriority,
   NoLanes,
   __ENV__,
+  Passive,
+  Update
 } from '@Jeact/shared/Constants';
 import {CurrentDispatcher} from '@Jeact/shared/internals';
 import {
@@ -11,7 +13,8 @@ import {
 import {
   requestUpdateLane,
   isTransitionLane,
-  isSubsetOfLanes
+  isSubsetOfLanes,
+  removeLanes
 } from '@Jeact/vDOM/FiberLane';
 import { markWorkInProgressReceivedUpdate } from '@Jeact/vDOM/FiberBeginWork';
 
@@ -71,6 +74,13 @@ export function renderWithHooks(current,workInProgress,nextRenderLanes){
   }
 
   return children
+}
+
+export function bailoutHooks(current, workInProgress, lanes){
+  workInProgress.updateQueue = current.updateQueue;
+  workInProgress.flags &= ~(Passive | Update);
+
+  current.lanes = removeLanes(current.lanes, lanes);
 }
 
 export function resetHooksAfterThrow(){

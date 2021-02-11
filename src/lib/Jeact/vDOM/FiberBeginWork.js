@@ -121,6 +121,10 @@ function updateHostComponent(alternate, workInProgress,renderLanes){
   return workInProgress.child;
 }
 
+export function markWorkInProgressReceivedUpdate(){
+  didReceiveUpdate = true;
+}
+
 function bailoutOnAlreadyFinishedWork(current, workInProgress, renderLanes){
   // Check if the children have any pending work.
   if (!includesSomeLane(renderLanes, workInProgress.childLanes)){

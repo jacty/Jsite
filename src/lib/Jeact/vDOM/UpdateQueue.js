@@ -8,8 +8,6 @@ import {
   isTransitionLane,
 } from '@Jeact/vDOM/FiberLane';
 
-let currentlyProcessingQueue;// to denote currently processing queue in DEV.
-
 export function initializeUpdateQueue(fiber){
   const queue = {
     baseState: fiber.memoizedState,

@@ -7,6 +7,7 @@ import {
   NoContext,
   RenderContext,
   CommitContext,
+  DiscreteEventContext,
   PerformedWork,
   Placement,
   Snapshot, 
@@ -69,6 +70,8 @@ let nextLanesPriority = 0;
 let nextLanes = NoLanes;
 let nextEffect = null;
 
+let rootsWithPendingDiscreteUpdates = null;
+
 let currentEventTime = NoTimestamp;
 let currentEventWipLanes = NoLanes;
 
@@ -91,6 +94,7 @@ export function requestEventTime(){
 export function scheduleUpdateOnFiber(fiber, lane, eventTime){
   // Update fiber.lanes
   const root = markUpdateLaneFromFiberToRoot(fiber, lane);
+
   if(root === null){
     return null;
   }
@@ -99,8 +103,12 @@ export function scheduleUpdateOnFiber(fiber, lane, eventTime){
   if(root === wipRoot){
     console.error('scheduleUpdateOnFiber');
   }
-  if (executionContext!==0){
-    console.error('scheduleUpdateOnFiber1')
+  if((executionContext & DiscreteEventContext)!==NoContext){
+    if(rootsWithPendingDiscreteUpdates === null){
+      rootsWithPendingDiscreteUpdates = new Set([root]);
+    } else {
+      rootsWithPendingDiscreteUpdates.add(root);
+    }
   }
 
   ensureRootIsScheduled(root, eventTime);

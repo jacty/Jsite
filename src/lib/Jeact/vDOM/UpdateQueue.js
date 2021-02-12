@@ -23,9 +23,11 @@ export function createUpdate(eventTime, lane){
   const update = {
     eventTime,
     lane,
+
     tag: UpdateState,
     payload: null,
     callback: null,
+    
     next: null,
   };
   return update;

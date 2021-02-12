@@ -10,15 +10,19 @@ import {
 import { requestUpdateLane } from '@Jeact/vDOM/FiberLane';
 
 export function updateContainer(element, container){
-  const current = container.current;//uninitialized fiber.
+  //uninitialized fiber.
+  const current = container.current;
 
   const eventTime =requestEventTime();
   const lane = requestUpdateLane();
   const update = createUpdate(eventTime, lane);
+
   update.payload = {element}
   
-  enqueueUpdate(current, update);//update fiber.updateQueue.pending.
+  //update fiber.updateQueue.pending.
+  enqueueUpdate(current, update);
   const rootFiber = scheduleUpdateOnFiber(current, lane, eventTime);
+  
   if(rootFiber !== null){
     entangleTransitions(rootFiber, current, lane);
   }

@@ -70,6 +70,7 @@ let nextLanes = NoLanes;
 let nextEffect = null;
 
 let currentEventTime = NoTimestamp;
+let currentEventWipLanes = NoLanes;
 
 export function requestEventTime(){
   // This is the first update.
@@ -444,5 +445,11 @@ function commitLayoutEffects(root, committedLanes){
 
 
     nextEffect = nextEffect.nextEffect;
+  }
+}
+
+export function updateEventWipLanes(){
+  if (currentEventWipLanes === NoLanes){
+    currentEventWipLanes = wipRootIncludedLanes;
   }
 }

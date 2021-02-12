@@ -12,6 +12,7 @@ import {
   TotalLanes,
   NoTimestamp,
 } from '@Jeact/shared/Constants';
+import {updateEventWipLanes} from '@Jeact/vDOM/FiberWorkLoop';
 
 // Used by getHighestPriorityLanes and getNextLanes:
 let highestLanePriority = DefaultLanePriority;
@@ -129,6 +130,7 @@ export function getNextLanesPriority(){
 }
 
 export function requestUpdateLane(lanePriority=1, wipLanes=0){
+  updateEventWipLanes()
   switch (lanePriority) {
     case DefaultLanePriority: {//1
       const lane = getHighestPriorityLane(DefaultLanes & ~wipLanes);

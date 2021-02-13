@@ -59,13 +59,10 @@ export function createWorkInProgress(current, pendingProps){
   let workInProgress = current.alternate;
   let cloneKeys = [];
   if (workInProgress === null){
-    // We use a double buffering pooling technique because we know that we'll
-    // only ever need at most two versions of a tree. We pool the "other"
-    // unused node that we're free to reuse. This is lazily created rather
-    // than totally clone to avoid allocating extra objects for things that are never updated. It also allows us to reclaim the extra memory if needed.
     workInProgress = createFiber(
       current.tag,
-      pendingProps
+      pendingProps,
+      current.key,
     );
 
     cloneKeys = [
@@ -84,7 +81,7 @@ export function createWorkInProgress(current, pendingProps){
 
     workInProgress.alternate = current;
     current.alternate = workInProgress;
-  } else{}
+  }else{}
   cloneKeys = [
     'childLanes',
     'lanes',

@@ -177,10 +177,14 @@ function ensureRootIsScheduled(root, currentTime){
 // Entry point for every concurrent task, i.e. anything that
 // goes through Scheduler.
 function performConcurrentWorkOnRoot(root){
-  let exitStatus = renderRootConcurrent(root, nextLanes);
-  if (includesSomeLane(wipRootIncludedLanes, wipRootUpdatedLanes)){
-    console.error('performConcurrentWorkOnRoot4')
-  } else if(exitStatus !== RootIncomplete){
+  
+  currentEventTime = NoTimestamp;
+  currentEventWipLanes = NoLanes;
+
+  const originalCallbackNode = root.callbackNode;
+
+  let exitStatus = renderRootConcurrent(root, nextLanes);  
+  if(exitStatus !== RootIncomplete){
     if(exitStatus === RootErrored || exitStatus===RootFatalErrored){
       console.error('Error')
       executionContext |= RetryAfterError;
@@ -218,6 +222,7 @@ function prepareFreshStack(root, updateLanes){
   // to keep next stack fresh.
   root.finishedWork = null;
   root.finishedLanes = NoLanes;
+
   if (wip !== null){
     console.log('interruptedWork');
   }

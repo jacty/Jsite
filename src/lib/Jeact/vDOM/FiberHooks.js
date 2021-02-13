@@ -44,7 +44,6 @@ let hookTypesDev = null;
 let hookTypesUpdateIndexDev = -1;
 
 export function renderWithHooks(current,workInProgress,nextRenderLanes){
-  debugger;
   const Component = workInProgress.type;
   const props = workInProgress.pendingProps;
 
@@ -63,12 +62,6 @@ export function renderWithHooks(current,workInProgress,nextRenderLanes){
     console.error('renderWithHooks1')
   }
 
-  CurrentDispatcher.current = ContextOnlyDispatcher;
-
-  if (__ENV__){
-    workInProgress._debugHookTypes = hookTypesDev;
-  }
-
   return children
 }
 
@@ -77,25 +70,6 @@ export function bailoutHooks(current, workInProgress, lanes){
   workInProgress.flags &= ~(Passive | Update);
 
   current.lanes = removeLanes(current.lanes, lanes);
-}
-
-export function resetHooksAfterThrow(){
-  CurrentDispatcher.current = ContextOnlyDispatcher;
-  if (didScheduleRenderPhaseUpdate){
-    console.error('resetHooksAfterThrow1')
-  }
-  renderLanes = NoLanes;
-  currentlyRenderingFiber = null;
-
-  currentHook = null;
-  workInProgressHook = null;
-
-  if (__ENV__){
-    hookTypesDev = null;
-    hookTypesUpdateIndexDev = -1;
-  }
-
-  didScheduleRenderPhaseUpdateDuringThisPass = false;
 }
 
 function mountWorkInProgressHook(){

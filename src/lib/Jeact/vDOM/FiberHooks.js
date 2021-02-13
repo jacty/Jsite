@@ -44,16 +44,12 @@ let hookTypesDev = null;
 let hookTypesUpdateIndexDev = -1;
 
 export function renderWithHooks(current,workInProgress,nextRenderLanes){
-
+  debugger;
   const Component = workInProgress.type;
   const props = workInProgress.pendingProps;
 
   renderLanes = nextRenderLanes;
   currentlyRenderingFiber = workInProgress;
-
-  if (__ENV__){
-    hookTypesUpdateIndexDev = -1;
-  }
 
   CurrentDispatcher.current =
     current === null || current.memoizedState === null

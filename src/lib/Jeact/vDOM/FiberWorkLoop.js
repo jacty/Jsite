@@ -44,9 +44,6 @@ import {
   commitPlacement,
   commitBeforeMutationLifeCycles,
 } from '@Jeact/vDOM/FiberCommitWork';
-import {
-  resetHooksAfterThrow
-} from '@Jeact/vDOM/FiberHooks';
 
 const RootIncomplete = 0;
 const RootFatalErrored = 1;

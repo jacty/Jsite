@@ -45,7 +45,7 @@ function updateFunctionComponent(current,workInProgress,renderLanes){
     workInProgress,
     renderLanes,
   );
-  
+  debugger;
   if(current!==null && !didReceiveUpdate){
     bailoutHooks(current, workInProgress, renderLanes);
     return bailoutOnAlreadyFinishedWork(current, workInProgress, renderLanes);

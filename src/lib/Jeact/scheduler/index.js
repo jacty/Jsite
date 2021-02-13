@@ -58,14 +58,21 @@ function workLoop(){
       // deadline reached but currentTask hasn't expired.
       break;
     }
-    const callback = currentTask.callback;
-
     //performConcurrentWorkOnRoot()
-    const additionalWork = callback();
-    if(additionalWork===null){
+    const callback = currentTask.callback;
+    if(typeof callback === 'function'){
+      currentTask.callback = null;
+      const continuationCallback = callback();
+      if(typeof continuationCallback === 'function'){
+        currentTask.callback = continuationCallback
+      } else {
+        if(currentTask === peek(taskQueue)){
+          pop(taskQueue);
+        }
+      }
+    } else {
       pop(taskQueue);
     }
-    currentTask = peek(taskQueue);
   }
   // Return whether there's additional work.
   if (currentTask !== null){

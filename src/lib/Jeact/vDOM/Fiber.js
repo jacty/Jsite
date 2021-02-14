@@ -40,7 +40,6 @@ function FiberNode(tag=HostRoot, pendingProps=null, key=null){
   this.childLanes = NoLanes;
 
   this.alternate = null; 
-
   if (__ENV__){
     this._debugID = debugCounter++;
     this._debugOwner = null;

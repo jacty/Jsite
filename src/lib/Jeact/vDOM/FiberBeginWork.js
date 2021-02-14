@@ -45,7 +45,7 @@ function updateFunctionComponent(current,workInProgress,renderLanes){
     workInProgress,
     renderLanes,
   );
-  debugger;
+
   if(current!==null && !didReceiveUpdate){
     bailoutHooks(current, workInProgress, renderLanes);
     return bailoutOnAlreadyFinishedWork(current, workInProgress, renderLanes);
@@ -69,9 +69,6 @@ function updateHostRoot(current, workInProgress, renderLanes){
 
   const prevState = workInProgress.memoizedState;
   const prevChildren = prevState.element;
-  if(current.updateQueue !== workInProgress.updateQueue){
-    console.error('updateHostRoot.cloneUpdateQueue()')
-  }
   //update wip.lanes, wip.memoizedState;
   processUpdateQueue(workInProgress, renderLanes);
   const nextState = workInProgress.memoizedState;

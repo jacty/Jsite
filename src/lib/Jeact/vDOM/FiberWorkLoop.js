@@ -219,7 +219,6 @@ function prepareFreshStack(root, updateLanes){
   // to keep next stack fresh.
   root.finishedWork = null;
   root.finishedLanes = NoLanes;
-
   if (wip !== null){
     console.log('interruptedWork');
   }
@@ -274,7 +273,6 @@ function workLoopConcurrent(){
 
 function performUnitOfWork(unitOfWork){
   const current = unitOfWork.alternate;
-
   let next = beginWork(current, unitOfWork, subtreeRenderLanes);
 
   unitOfWork.memoizedProps = unitOfWork.pendingProps;

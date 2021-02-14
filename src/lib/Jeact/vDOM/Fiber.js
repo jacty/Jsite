@@ -43,7 +43,6 @@ function FiberNode(tag=HostRoot, pendingProps=null, key=null){
   if (__ENV__){
     this._debugID = debugCounter++;
     this._debugOwner = null;
-    this._debugHookTypes = null;
     Object.preventExtensions(this);
   }
 }

@@ -289,34 +289,12 @@ function completeUnitOfWork(unitOfWork){
   do {
     const returnFiber = completedWork.return;
 
-    if ((completedWork.flags & Incomplete) === NoFlags){
-      
-      completeWork(completedWork, subtreeRenderLanes);
-
-      if(returnFiber !== null &&
-          (returnFiber.flags & Incomplete) === NoFlags){
-        // Append all the effects of the subtree and this fiber onto the effect
-        // list of the parent. The completion order of the children affects the
-        // side-effect order.
-        if (returnFiber.firstEffect === null){
-          returnFiber.firstEffect = completedWork.firstEffect;
-        }
-        if (completedWork.lastEffect !== null){
-          if (returnFiber.lastEffect !== null){
-            returnFiber.lastEffect.nextEffect = completedWork.firstEffect;
-          }
-          returnFiber.lastEffect = completedWork.lastEffect;
-        }
-
-        const flags = completedWork.flags;
-        if (flags > PerformedWork){
-          if(returnFiber.lastEffect !== null){// next sibling effect.
-            returnFiber.lastEffect.nextEffect = completedWork;
-          } else {
-            returnFiber.firstEffect = completedWork;
-          }
-          returnFiber.lastEffect = completedWork;
-        }
+    if ((completedWork.flags & Incomplete) === NoFlags){      
+      let next = completeWork(completedWork, subtreeRenderLanes);
+      if (next !== null) {
+        console.error('x');
+        wip = next;
+        return;
       }
     } else {
       console.error('completeUnitOfWork2')

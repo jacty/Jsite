@@ -114,11 +114,17 @@ export function completeWork(workInProgress,renderLanes){
     }
     case HostText: {//6
       const newText = newProps;
+      if (workInProgress.alternate& workInProgress.stateNode!==null){
+        console.error('x');
+      }
       const rootContainerInstance = getRootHostContainer();
-      workInProgress.stateNode = createTextNode(
+      const instance = createTextNode(
         newText,
         rootContainerInstance,
       );
+      workInProgress.stateNode = instance;
+      precacheFiberNode(workInProgress, instance)
+      bubbleProperties(workInProgress);
       return null;
     }
     default:

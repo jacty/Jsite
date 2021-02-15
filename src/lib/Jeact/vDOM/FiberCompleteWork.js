@@ -9,6 +9,7 @@ import {
 } from '@Jeact/shared/Constants';
 import {
   getRootHostContainer,
+  popHostContainer
 } from '@Jeact/vDOM/FiberHostContext';
 import {
   mergeLanes
@@ -22,6 +23,10 @@ import {
   precacheFiberNode,
   updateFiberProps
 } from '@Jeact/vDOM/DOMComponentTree';
+import {
+  popRootCachePool,
+  popCacheProvider,
+} from '@Jeact/vDOM/FiberCacheComponent';
 
 function appendAllChildren(parent, workInProgress){
   let node = workInProgress.child;
@@ -64,8 +69,17 @@ function bubbleProperties(completedWork){
 
   if (!didBailout){
     let child = completedWork.child;
-    if (child !== null){
-      console.error('x');
+    while (child !== null){
+      newChildLanes = mergeLanes(
+        newChildLanes,
+        mergeLanes(child.lanes, child.childLanes),
+      );
+
+      subtreeFlags |= child.subtreeFlags;
+      subtreeFlags |= child.flags;
+
+      child.return = completedWork
+      child = child.sibling;
     }
     completedWork.subtreeFlags |= subtreeFlags;
   } else {
@@ -80,14 +94,16 @@ export function completeWork(workInProgress,renderLanes){
   
   switch(workInProgress.tag){
     case FunctionComponent://0
+      bubbleProperties(workInProgress);
       return null;
     case HostRoot:{//3
       const fiberRoot = workInProgress.stateNode;
-      const current = workInProgress.alternate;
-      if (current === null || current.child === null){
-        // schedule an effect to clear this container at the start of next commit. 
-        workInProgress.flags |= Snapshot;
-      }
+      popRootCachePool(fiberRoot, renderLanes);
+      const cache = workInProgress.memoizedState.cache;
+      popCacheProvider(workInProgress, cache);
+      popHostContainer(workInProgress);
+      bubbleProperties(workInProgress);
+      workInProgress.flags |= Snapshot;
       return null;
     }
     case HostComponent:{//5

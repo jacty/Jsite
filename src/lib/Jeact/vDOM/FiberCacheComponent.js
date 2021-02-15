@@ -17,6 +17,17 @@ export function pushCacheProvider(workInProgress, cache){
     pushProvider(workInProgress, CacheContext, cache);
 }
 
+export function popCacheProvider(workInProgress, cache){
+    // popProvider(CacheContext, workInProgress);
+}
+
 export function pushRootCachePool(root){
     pooledCache = root.pooledCache;
+}
+
+export function popRootCachePool(root, renderLanes){
+    root.pooledCache = pooledCache;
+    if(pooledCache !== null){
+        root.pooledCacheLanes |= renderLanes;
+    }
 }

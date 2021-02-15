@@ -22,3 +22,7 @@ export function getRootHostContainer(){
 export function pushHostContainer(fiber){
   push(rootInstanceStackCursor,  fiber.stateNode.containerInfo, fiber);
 }
+
+export function popHostContainer(fiber){
+    pop(rootInstanceStackCursor, fiber);
+}

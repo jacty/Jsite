@@ -157,7 +157,8 @@ export function beginWork(current, workInProgress, renderLanes){
       return bailoutOnAlreadyFinishedWork(current, workInProgress, renderLanes)
     }
   }
-
+  // stop lanes pass to fiber.childLane
+  workInProgress.lanes = NoLanes;
   switch (workInProgress.tag){
     case FunctionComponent://0
       return updateFunctionComponent(current,workInProgress,renderLanes);

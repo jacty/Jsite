@@ -15,7 +15,7 @@ function App(){
                     <div>222</div>
                 }
 
-                <Footer handlers={()=>{setNav(nav+1)}}/>
+                <Footer handlers={()=>{setNav(0)}}/>
             </ErrorBoundary>
         )
 }

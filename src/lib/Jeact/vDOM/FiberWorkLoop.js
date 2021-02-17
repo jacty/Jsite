@@ -12,7 +12,11 @@ import {
   Placement,
   Snapshot, 
   RetryAfterError,
-  HostRoot
+  HostRoot,
+  PassiveMask,
+  BeforeMutationMask,
+  MutationMask,
+  LayoutMask
 } from '@Jeact/shared/Constants';
 import {
   CurrentOwner,
@@ -41,8 +45,9 @@ import {
   completeWork
 } from '@Jeact/vDOM/FiberCompleteWork';
 import {
-  commitPlacement,
-  commitBeforeMutationLifeCycles,
+  commitBeforeMutationEffects,
+  commitMutationEffects,
+  commitLayoutEffects,
 } from '@Jeact/vDOM/FiberCommitWork';
 
 const RootIncomplete = 0;
@@ -67,6 +72,7 @@ let nextLanesPriority = 0;
 let nextLanes = NoLanes;
 let nextEffect = null;
 
+let rootDoesHavePassiveEffects = false;
 let rootsWithPendingDiscreteUpdates = null;
 
 let currentEventTime = NoTimestamp;
@@ -336,102 +342,34 @@ function commitRootImpl(root, renderPriority){
   let remainingLanes = mergeLanes(finishedWork.lanes, finishedWork.childLanes);
   //update lanes and eventTimes
   markRootFinished(root, remainingLanes);
-
-  // Get the list of effects.
-  let firstEffect;
-  if (finishedWork.flags > PerformedWork){
-    if (finishedWork.lastEffect !== null){
-      finishedWork.lastEffect.nextEffect = finishedWork;
-      firstEffect = finishedWork.firstEffect;
-    } else {
-      firstEffect = finishedWork;
-    }
-  } else {
-    // There is no effect on the root.
-    firstEffect = finishedWork.firstEffect;
+  if((finishedWork.subtreeFlags & PassiveMask)!== NoFlags ||
+      (finishedWork.flags & PassiveMask) !== NoFlags
+    ){
+    console.error('y');
   }
+  const subtreeHasEffects = (finishedWork.subtreeFlags &
+    (BeforeMutationMask | MutationMask | LayoutMask | PassiveMask)) !== NoFlags;
+  const rootHasEffect = (finishedWork.flags &
+    (BeforeMutationMask | MutationMask | LayoutMask | PassiveMask)) !== NoFlags;
 
-  if(firstEffect!==null){
-    const prevExecutionContext = executionContext;
+  if (subtreeHasEffects || rootHasEffect){
+    const prevExecutionContext= executionContext;
     executionContext |= CommitContext;
-
-    nextEffect = firstEffect;
-    do {
-      commitBeforeMutationEffects();
-    } while (nextEffect !== null);
-
-    nextEffect = firstEffect
-    do {
-      commitMutationEffects(root, renderPriority);
-    } while (nextEffect !== null);
-    // now wip tree is now the current tree. 
+    commitBeforeMutationEffects(finishedWork);
+    commitMutationEffects(root, finishedWork);
     root.current = finishedWork;
-
-    // nextEffect = firstEffect;
-    // do{
-    //   commitLayoutEffects(root, lanes);
-    // } while(nextEffect!==null);
-
-    nextEffect = null;
+    commitLayoutEffects(finishedWork, root, lanes);
     executionContext = prevExecutionContext;
   } else {
-    // No effects.
-    root.current = finishedWork;
+    debugger;
   }
 
-  // GC
-  nextEffect = firstEffect;
-  while (nextEffect !== null){
-    const nextNextEffect = nextEffect.nextEffect;
-    nextEffect.nextEffect = null;
-    nextEffect = nextNextEffect;
+  const rootDidHavePassiveEffects = rootDoesHavePassiveEffects;
+  if (rootDoesHavePassiveEffects){
+    debugger;
   }
 
-  ensureRootIsScheduled(root, performance.now());
-  root.callbackNode = null;
   return null;
-}
-
-function commitBeforeMutationEffects(){
-  while (nextEffect !== null){
-    const current = nextEffect.alternate;
-
-    const flags = nextEffect.flags;
-    if ((flags & Snapshot )!== NoFlags){
-      commitBeforeMutationLifeCycles(current, nextEffect);
-    }
-
-    nextEffect = nextEffect.nextEffect;
-  }
-}
-
-function commitMutationEffects(root, renderPriority){
-  while (nextEffect !== null){   
-    const flags = nextEffect.flags;
-    const primaryFlags = flags & Placement;
-    switch(primaryFlags){
-      case Placement:{//2
-        commitPlacement(nextEffect);
-        nextEffect.flags &= ~Placement;
-        break;
-      }
-      default:
-        primaryFlags !== 0 ?
-        console.error('commitMutationEffects3', primaryFlags):0;
-     }
-
-    nextEffect = nextEffect.nextEffect;
-  }
-}
-
-function commitLayoutEffects(root, committedLanes){
-  while(nextEffect!== null){
-    
-    const flags = nextEffect.flags;
-
-
-    nextEffect = nextEffect.nextEffect;
-  }
 }
 
 export function updateEventWipLanes(){

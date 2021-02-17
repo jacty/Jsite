@@ -2,17 +2,181 @@ import{
  HostRoot,
  HostText,
  HostComponent,
+ BeforeMutationMask,
+ MutationMask,
+ NoFlags,
+ Snapshot,
+ Ref,
+ Placement,
+ Update,
+ LayoutMask,
 } from '@Jeact/shared/Constants';
 
-export function commitBeforeMutationLifeCycles(current, finishedWork){
-  switch(finishedWork.tag){
-    case HostRoot:{
-      const container = finishedWork.stateNode.containerInfo;
-      container.textContent = '';
-      return;
+let nextEffect = null;
+
+export function commitBeforeMutationEffects(firstChild){
+    nextEffect = firstChild;
+    commitBeforeMutationEffects_begin();
+}
+
+function commitBeforeMutationEffects_begin(){
+    while(nextEffect !== null){
+        const fiber = nextEffect;
+
+        const child = fiber.child;
+        if(
+            (fiber.subtreeFlags & BeforeMutationMask) !== NoFlags &&
+            child !== null
+            ){
+            nextEffect = child;
+        } else {
+            commitBeforeMutationEffects_complete();
+        }
     }
-  }
-  console.error('commitBeforeMutationEffectOnFiber', finishedWork.tag);
+}
+
+function commitBeforeMutationEffects_complete(){
+    while(nextEffect !== null){
+        const fiber = nextEffect;
+        try {
+            commitBeforeMutationEffectsOnFiber(fiber);
+        } catch (error){
+            console.error('x', error);
+        }
+
+        const sibling = fiber.sibling;
+        if(sibling !== null){
+            nextEffect = sibling;
+            return;
+        }
+
+        nextEffect = fiber.return;
+    }
+}
+
+function commitBeforeMutationEffectsOnFiber(finishedWork){
+    const current = finishedWork.alternate;
+    const flags = finishedWork.flags;
+    if((flags & Snapshot) !== NoFlags){
+        switch(finishedWork.tag){
+            case HostRoot:{
+                // clear container;
+                finishedWork.stateNode.containerInfo.textContent = '';
+            }
+        }
+    }
+}
+
+export function commitMutationEffects(root, firstChild){
+    nextEffect = firstChild;
+    commitMutationEffects_begin(root);
+}
+
+function commitMutationEffects_begin(root){
+    while(nextEffect !== null){
+        const fiber = nextEffect;
+
+        const child = fiber.child;
+        if((fiber.subtreeFlags & MutationMask) !== NoFlags && child !== null){
+            nextEffect = child;
+        } else {
+            commitMutationEffects_complete(root);
+        }
+    }
+}
+
+function commitMutationEffects_complete(root){
+    while(nextEffect !== null){
+        const fiber = nextEffect;
+        try {
+            commitMutationEffectsOnFiber(fiber, root);
+        } catch(error){
+            console.error('x', error);
+        }
+
+        const sibling = fiber.sibling;
+        if (sibling !== null){
+            nextEffect = sibling;
+            return;
+        }
+
+        nextEffect = fiber.return;
+    }
+}
+
+function commitMutationEffectsOnFiber(finishedWork, root){
+    const flags = finishedWork.flags;
+    if (flags & Ref){
+        debugger;
+    }
+    const primaryFlags = flags & (Placement | Update);
+    switch(primaryFlags){
+        case Placement:{
+            commitPlacement(finishedWork);
+            finishedWork.flags &= ~Placement;
+            break;
+        }
+        case Update:{
+            debugger;
+        }
+    }
+}
+
+export function commitLayoutEffects(finishedWork, root, committedLanes){
+    nextEffect = finishedWork;
+    commitLayoutEffects_begin(finishedWork, root, committedLanes);
+}
+
+function commitLayoutEffects_begin(subtreeRoot, root, committedLanes){
+    while (nextEffect !== null){
+        const fiber = nextEffect;
+        const firstChild = fiber.child;
+        if ((fiber.subtreeFlags & LayoutMask) !== NoFlags && firstChild !== null){
+            nextEffect = firstChild;
+        } else {
+            commitLayoutMountEffects_complete(subtreeRoot, root, committedLanes);
+        }
+    }
+}
+
+function commitLayoutMountEffects_complete(subtreeRoot, root, committedLanes){
+    while (nextEffect !== null){
+        const fiber = nextEffect;
+        if((fiber.flags & LayoutMask) !== NoFlags){
+            const current = fiber.alternate;
+            try{
+                commitLayoutEffectOnFiber(root, current, fiber, committedLanes);
+            } catch(error){
+                console.error('x', error);
+            }
+        }
+
+        if (fiber === subtreeRoot){
+            nextEffect = null;
+            return;
+        }
+
+        const sibling = fiber.sibling;
+        if (sibling !== null){
+            nextEffect = sibling;
+            return;
+        }
+
+        nextEffect = fiber.return;
+    }
+}
+
+function commitLayoutEffectOnFiber(finishedRoot, current, finishedWork, committedLanes){
+    if ((finishedWork.flags & Update) !== NoFlags){
+        switch(finishedWork.tag){
+            case HostRoot:{
+                debugger;
+            }
+            case HostComponent:{
+                debugger;
+            }
+        }
+    }
 }
 
 function getHostParentFiber(fiber){
@@ -47,7 +211,7 @@ function getHostSibling(fiber){
     console.error('getHostSibling');
 }
 
-export function commitPlacement(finishedWork){
+function commitPlacement(finishedWork){
     const parentFiber = getHostParentFiber(finishedWork);
     let parent;
     let isContainer;

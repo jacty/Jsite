@@ -57,6 +57,10 @@ export const Passive = /*                      */ 0b00000000010000000000;
 // These are not really side effects, but we still reuse this field.
 export const Incomplete = /*                   */ 0b0000001000000000000;
 
+export const BeforeMutationMask = Update | Snapshot;
+export const MutationMask = Placement | Update | Ref;
+export const LayoutMask = Update | Ref;
+export const PassiveMask = Passive;
 /* Timeouts */
 export const noTimeout = -1;
 // Eventually times out

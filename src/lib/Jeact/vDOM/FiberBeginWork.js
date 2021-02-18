@@ -152,6 +152,10 @@ export function beginWork(current, workInProgress, renderLanes){
       switch (workInProgress.tag){
         case HostRoot:
           pushHostContainer(workInProgress);
+          const root = workInProgress.stateNode;
+          const cache = current.memoizedState.cache;
+          pushCacheProvider(workInProgress, cache);
+          pushRootCachePool(root);
           break;
       }
       return bailoutOnAlreadyFinishedWork(current, workInProgress, renderLanes)

@@ -9,8 +9,8 @@
     "author": "Jacty",
     "devDependencies": {
         "@snowpack/plugin-sass": "^1.1.1",
-        "react": "0.0.0-experimental-6f8843837",
-        "react-dom": "0.0.0-experimental-6f8843837",
+        "react": "0.0.0-experimental-af3d52611",
+        "react-dom": "0.0.0-experimental-af3d52611",
         "react-router-dom": "^5.2.0",
         "snowpack": "^2.17.0"
     }

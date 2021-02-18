@@ -4,19 +4,17 @@ import {Footer} from '@com/shared.jsx';
 
 export function App(){
     let [nav, setNav] = useState(1);
-    function handleClick(){
-        nav=nav+1;
-        console.log(nav);
+    function handleClickx(x){
+        setNav(x)
     }
-    if(nav===1){
-        return <div>
-                    <div>111</div>
-                    <Footer data={()=>{setNav(nav+1)}}/>
-                </div>
-    } else {
-        return <div>
-                    <div>222</div>
-                    <Footer />
-                </div>
-    }
+    return (
+        <div>
+        { nav === 1 ?
+            <div> 111</div>:
+            <div>222</div>
+        }
+            <Footer data={()=>handleClickx(0)}/>
+        </div>
+        )
+    
 }

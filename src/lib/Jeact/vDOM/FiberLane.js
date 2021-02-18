@@ -5,9 +5,9 @@ import {
   NormalPriority,
   DefaultLanePriority,
   InputDiscreteLanePriority,
-  DefaultLanes,
+  DefaultLane,
   TransitionLanes,
-  InputDiscreteLanes,
+  InputDiscreteLane,
   NonIdleLanes,
   TotalLanes,
   NoTimestamp,
@@ -18,17 +18,16 @@ import {updateEventWipLanes} from '@Jeact/vDOM/FiberWorkLoop';
 let highestLanePriority = DefaultLanePriority;
 
 function getHighestPriorityLanes(lanes){
-  const inputDiscreteLanes = InputDiscreteLanes & lanes;
-  if (inputDiscreteLanes !== NoLanes){
-    highestLanePriority = InputDiscreteLanePriority;
-    return inputDiscreteLanes;
+  switch(getHighestPriorityLane(lanes)){
+    case InputDiscreteLane:
+      highestLanePriority = InputDiscreteLanePriority;
+      return InputDiscreteLane
+    case DefaultLane:
+      highestLanePriority = DefaultLanePriority;
+      return DefaultLane
+    default:
+      console.error('error', lanes);
   }
-  const defaultLanes = DefaultLanes & lanes;
-  if (defaultLanes !== 0){
-    highestLanePriority = DefaultLanePriority;
-    return defaultLanes;
-  }
-  console.log('getHighestPriorityLanes', defaultLanes);
 }
 
 export function LanePriorityToPriority(lanePriority){
@@ -133,15 +132,10 @@ export function requestUpdateLane(lanePriority=1, wipLanes=0){
   updateEventWipLanes()
   switch (lanePriority) {
     case DefaultLanePriority: {//1
-      const lane = getHighestPriorityLane(DefaultLanes & ~wipLanes);
-      return lane;
+      return DefaultLane;
     }
     case InputDiscreteLanePriority:{
-      const lane = getHighestPriorityLane(InputDiscreteLanes & ~wipLanes);
-      if (lane === NoLane){
-        console.error('requestUpdateLane');
-      }
-      return lane;
+      return InputDiscreteLane;
     }
     default:
       // The remaining priorities are not valid for updates

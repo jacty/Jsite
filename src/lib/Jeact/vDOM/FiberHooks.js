@@ -241,7 +241,7 @@ function mountState(initialState){
 
   const dispatch = dispatchAction.bind(null, currentlyRenderingFiber, queue);
   queue.dispatch = dispatch;
-  
+
   return [hook.memoizedState, dispatch];
 }
 
@@ -280,7 +280,16 @@ function dispatchAction(fiber, queue, action){
       fiber.lanes === NoLanes &&
       (alternate === null || alternate.lanes === NoLanes)
       ){
-      console.error('dispatchAction3')
+      const lastRenderedReducer = queue.lastRenderedReducer;
+      if (lastRenderedReducer !== null){
+          const currentState = queue.lastRenderedState;
+          const eagerState = lastRenderedReducer(currentState, action);
+          update.eagerReducer = lastRenderedReducer;
+          update.eagerState = eagerState;
+          if (Object.is(eagerState, currentState)){
+            return;
+          }
+      }
     }
 
     const root = scheduleUpdateOnFiber(fiber, lane, eventTime);

@@ -377,3 +377,7 @@ export function updateEventWipLanes(){
     currentEventWipLanes = wipRootIncludedLanes;
   }
 }
+
+export function updateExecutionContext(){
+  executionContext |= DiscreteEventContext;
+}

@@ -102,7 +102,9 @@ function updateWorkInProgressHook(){
     const current = currentlyRenderingFiber.alternate;
     if (current !== null){
       nextCurrentHook = current.memoizedState;
-    } 
+    } else {
+      nextCurrentHook = null;
+    }
   } else {
     nextCurrentHook = currentHook.next;
   }
@@ -193,7 +195,7 @@ function updateReducer(reducer, initial){
 
         // Process this update.
         if(update.eagerReducer === reducer){
-          console.error('x')
+          newState = update.eagerState;
         } else {
           const action = update.action;
           newState = reducer(newState, action);

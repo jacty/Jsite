@@ -3,7 +3,6 @@ import {
   NoLanes,
 } from '@Jeact/shared/Constants';
 import { createFiber } from '@Jeact/vDOM/Fiber';
-import { createLaneMap } from '@Jeact/vDOM/FiberLane';
 import {initializeUpdateQueue} from '@Jeact/vDOM/UpdateQueue';
 
 function FiberRootNode(containerInfo){
@@ -12,8 +11,8 @@ function FiberRootNode(containerInfo){
   this.finishedWork = null; 
 
   this.callbackNode = null;
-  this.eventTimes = createLaneMap(0);
-  this.expirationTimes = createLaneMap(NoTimestamp);
+  this.eventTimes = Array(31).fill(0);
+  this.expirationTimes = Array(31).fill(NoTimestamp);;
 
   this.pendingLanes = NoLanes;
   this.finishedLanes = NoLanes;
@@ -24,7 +23,7 @@ function FiberRootNode(containerInfo){
 export function createFiberRoot(container){
   const root = new FiberRootNode(container);
   const fiber = createFiber();//uninitializedFiber
-  
+
   root.current = fiber;
   fiber.stateNode = root;
 

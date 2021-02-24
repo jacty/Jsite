@@ -141,6 +141,7 @@ function bailoutOnAlreadyFinishedWork(current, workInProgress, renderLanes){
 export function beginWork(current, workInProgress, renderLanes){
   const updateLanes = workInProgress.lanes;
   if(current!==null){
+    // Update phase
     const oldProps = current.memoizedProps;
     const newProps = workInProgress.pendingProps;
     if(oldProps !== newProps){

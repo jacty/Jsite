@@ -9,7 +9,6 @@ import {
   TransitionLanes,
   InputDiscreteLane,
   NonIdleLanes,
-  TotalLanes,
   NoTimestamp,
 } from '@Jeact/shared/Constants';
 import {updateEventWipLanes} from '@Jeact/vDOM/FiberWorkLoop';
@@ -176,16 +175,6 @@ export function mergeLanes(a, b){
 
 export function removeLanes(set, subset){
   return set & ~subset;
-}
-
-export function createLaneMap(initial){
-  // Intentionally pushing one by one.
-  // https://v8.dev/blog/elements-kinds#avoid-creating-holes
-  const laneMap = [];
-  for (let i = 0; i < TotalLanes; i++){
-    laneMap.push(initial);
-  }
-  return laneMap;
 }
 
 export function markRootUpdated(root, updateLane, eventTime){

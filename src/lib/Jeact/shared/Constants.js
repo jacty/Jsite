@@ -21,7 +21,6 @@ export const RenderContext = /*         */ 0b0010000;
 export const CommitContext = /*         */ 0b0100000;
 export const RetryAfterError = /*       */ 0b1000000;
 /* JeactFiberLane */
-export const TotalLanes = 31;
 export const NoLanes=/*                          */ 0b0000000000000000000000000000000;
 export const NoLane =/*                          */ 0b0000000000000000000000000000000;
 export const InputDiscreteLane = /*             */ 0b0000000000000000000000000001000;

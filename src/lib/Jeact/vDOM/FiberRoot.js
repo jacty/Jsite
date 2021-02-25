@@ -15,6 +15,7 @@ function FiberRootNode(containerInfo){
   this.expirationTimes = Array(31).fill(NoTimestamp);;
 
   this.pendingLanes = NoLanes;
+  this.suspendedLanes = NoLanes;
   this.finishedLanes = NoLanes;
 
   this.pooledCache = null;

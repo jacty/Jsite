@@ -102,7 +102,7 @@ export function markStarvedLanesAsExpired(root, currentTime){
   // Iterate through the pending lanes and check if we've reached their expiration time. If so, we'll assume the update is being starved and mark it as expired to force it to finish.
   let lanes = root.pendingLanes;
   while (lanes>0) {
-    const index = pickArbitraryLaneIndex(lanes);
+    const index = laneToIndex(lanes);
     const lane = 1 << index; // move 1 towards left for {index} bits.
     const expirationTime = expirationTimes[index];
     if (expirationTime === NoTimestamp){
@@ -157,7 +157,7 @@ function getEqualOrHigherPriorityLanes(lanes){
   return (getLowestPriorityLane(lanes) << 1) -1;
 }
 
-function pickArbitraryLaneIndex(lanes){
+function laneToIndex(lanes){
   return 31 - Math.clz32(lanes);
 }
 
@@ -179,14 +179,9 @@ export function removeLanes(set, subset){
 
 export function markRootUpdated(root, updateLane, eventTime){
   root.pendingLanes |= updateLane;
-
-  // Unsuspend any update at equal or lower priority.
-  const higherPriorityLanes = updateLane - 1; // Turns 0b1000 into 0b0111
-
-  root.suspendedLanes &= higherPriorityLanes;
-
+  
   const eventTimes = root.eventTimes;
-  const index = pickArbitraryLaneIndex(updateLane);
+  const index = laneToIndex(updateLane);
 
   eventTimes[index] = eventTime;
 }

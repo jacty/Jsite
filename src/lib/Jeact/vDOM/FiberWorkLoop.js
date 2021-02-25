@@ -84,17 +84,18 @@ export function requestEventTime(){
 }
 
 export function scheduleUpdateOnFiber(fiber, lane, eventTime){
-  // Update fiber.lanes
   const root = markUpdateLaneFromFiberToRoot(fiber, lane);
 
   if(root === null){
+    debugger;
     return null;
-  }
+  } 
   // update root.pendingLane, eventTimes etc.
   markRootUpdated(root, lane, eventTime);
   if(root === wipRoot){
-    console.error('scheduleUpdateOnFiber');
+    debugger;
   }
+
   if((executionContext & DiscreteEventContext)!==NoContext){
     if(rootsWithPendingDiscreteUpdates === null){
       rootsWithPendingDiscreteUpdates = new Set([root]);
@@ -112,12 +113,13 @@ function markUpdateLaneFromFiberToRoot(fiber, lane){
   fiber.lanes = mergeLanes(fiber.lanes, lane);
   let alternate = fiber.alternate;
   if(alternate!==null){
-    console.error('markUpdateLaneFromFiberToRoot');
+    debugger;
   }
 
   let node = fiber;
   let parent = fiber.return;
   while(parent!==null){
+    debugger;
     parent.childLanes = mergeLanes(parent.childLanes, lane);
     alternate = parent.alternate;
     if (alternate !== null){

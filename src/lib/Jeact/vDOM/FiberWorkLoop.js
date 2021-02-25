@@ -7,10 +7,7 @@ import {
   NoContext,
   RenderContext,
   CommitContext,
-  DiscreteEventContext,
-  PerformedWork,
-  Placement,
-  Snapshot, 
+  DiscreteEventContext, 
   RetryAfterError,
   HostRoot,
   PassiveMask,
@@ -18,9 +15,6 @@ import {
   MutationMask,
   LayoutMask
 } from '@Jeact/shared/Constants';
-import {
-  CurrentOwner,
-} from '@Jeact/shared/internals';
 import {
   shouldYieldToHost,
   scheduleCallback,
@@ -30,7 +24,6 @@ import {
   mergeLanes,
   markStarvedLanesAsExpired,
   markRootUpdated,
-  includesSomeLane,
   markRootFinished,
   getNextLanes,
 } from '@Jeact/vDOM/FiberLane';
@@ -38,9 +31,6 @@ import {
   createWorkInProgress
 } from '@Jeact/vDOM/Fiber';
 import { beginWork } from '@Jeact/vDOM/FiberBeginWork';
-import {
-  throwException
-} from '@Jeact/vDOM/FiberThrow';
 import {
   completeWork
 } from '@Jeact/vDOM/FiberCompleteWork';
@@ -70,7 +60,6 @@ let wipRootUpdatedLanes = NoLanes;
 
 let nextLanesPriority = 0;
 let nextLanes = NoLanes;
-let nextEffect = null;
 
 let rootDoesHavePassiveEffects = false;
 let rootsWithPendingDiscreteUpdates = null;

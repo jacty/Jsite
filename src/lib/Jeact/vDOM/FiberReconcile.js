@@ -9,9 +9,9 @@ import {
 } from '@Jeact/vDOM/UpdateQueue';
 import { requestUpdateLane } from '@Jeact/vDOM/FiberLane';
 
-export function updateContainer(element, container){
+export function updateContainer(element, root){
   //uninitialized fiber.
-  const current = container.current;
+  const current = root.current;
 
   const eventTime =requestEventTime();
   const lane = requestUpdateLane();

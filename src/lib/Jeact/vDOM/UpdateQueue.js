@@ -39,16 +39,19 @@ export function createUpdate(eventTime, lane){
 
 export function enqueueUpdate(fiber, update){
   const updateQueue = fiber.updateQueue;
-  let pending = updateQueue.pending;
+
+  const sharedQueue = updateQueue.shared;
+  const pending = sharedQueue.pending;
 
   if (pending === null) {
     // First update.
     update.next = update;
   } else {
+    // TD: Add more explanation
     update.next = pending.next;
     pending.next = update;
   }
-  updateQueue.pending = update;
+  sharedQueue.pending = update;
 }
 
 export function entangleTransitions(rootFiber, currentFiber, lane){

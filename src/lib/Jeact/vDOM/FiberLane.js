@@ -42,12 +42,18 @@ export function getNextLanes(root, wipLanes){
 
   const pendingLanes = root.pendingLanes;
   if (pendingLanes === NoLanes){
-    highestLanePriority = NoLanePriority;
-    return [NoLanes, highestLanePriority];
+    return [NoLanes, NoLanePriority];
   }
   
   let nextLanes = NoLanes;
+  let nextLanePriority = NoLanePriority;
+
   const suspendedLanes = root.suspendedLanes;
+
+  if(root.expiredLanes || wipLanes!== 0|| root.entangledLanes){
+    debugger;
+  }
+
   // Do not work on any idle work until all the non-idle work has finished,
   // even it the work is suspended.
   const nonIdlePendingLanes = pendingLanes & NonIdleLanes;
@@ -55,34 +61,13 @@ export function getNextLanes(root, wipLanes){
     const nonIdleUnblockedLanes = nonIdlePendingLanes & ~suspendedLanes;
     if (nonIdleUnblockedLanes !== NoLanes){
       nextLanes = getHighestPriorityLanes(nonIdleUnblockedLanes);
+      nextLanePriority = highestLanePriority;
     } else {
-      console.log('getNextLanes3')
+      debugger;
     }
   } else {
     // The only remaining work is Idle.
-    console.log('getNextLanes3')
-  }
-
-  if (nextLanes === NoLanes){
-    console.log('getNextLanes4')
-    return NoLanes;
-  }
-
-  // If there are higher priority lanes, we'll include them even if they are
-  // suspended.
-  nextLanes = pendingLanes & getEqualOrHigherPriorityLanes(nextLanes);
-
-  // If we're already in the middle of a render, switching lanes will interrupt
-  // it and we'll lose our progress. We should only do this if the new lanes
-  // are higher priority.
-  if(wipLanes !== NoLanes &&
-      wipLanes !== nextLanes){
-    console.error('getNextLanes4', wipLanes, nextLanes)
-  }
-
-  const entangledLanes = root.entangledLanes;
-  if(entangledLanes&&entangledLanes!==NoLanes){
-    console.error('getNextLanes5');
+    debugger;
   }
 
   return [nextLanes, highestLanePriority];

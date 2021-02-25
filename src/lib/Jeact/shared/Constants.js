@@ -26,7 +26,7 @@ export const NoLane =/*                          */ 0b00000000000000000000000000
 export const InputDiscreteLane = /*             */ 0b0000000000000000000000000001000;
 export const DefaultLane = /*                    */ 0b0000000000000000000000010000000;
 export const TransitionLanes = /*                */ 0b0000000001111111110000000000000;
-export const NonIdleLanes = /*                   */ 0b0000111111111111111111111111111;
+export const NonIdleLanes = /*                   */ 0b0001111111111111111111111111111;
 
 /* core Priorities */
 export const ImmediatePriority = 99;

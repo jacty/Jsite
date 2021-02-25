@@ -58,9 +58,6 @@ let wipRootFatalError = null;
 let wipRootIncludedLanes = NoLanes;
 let wipRootUpdatedLanes = NoLanes;
 
-let nextLanesPriority = 0;
-let nextLanes = NoLanes;
-
 let rootDoesHavePassiveEffects = false;
 let rootsWithPendingDiscreteUpdates = null;
 
@@ -139,18 +136,18 @@ function markUpdateLaneFromFiberToRoot(fiber, lane){
 
 function ensureRootIsScheduled(root, currentTime){
   const existingCallbackNode = root.callbackNode;
-  
+
   // update root.expirationTime. 
   markStarvedLanesAsExpired(root, currentTime);
 
-  [nextLanes, nextLanesPriority] = getNextLanes(
+  const [nextLanes, nextLanesPriority] = getNextLanes(
     root, 
     root===wipRoot ? wipRootRenderLanes : NoLanes,
   );
   
   if (nextLanes === NoLanes){
      if (existingCallbackNode !== null){
-       console.error('ensureRootIsScheduled1')
+       debugger;
      }
      return;
    }

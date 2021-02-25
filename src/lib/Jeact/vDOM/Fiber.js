@@ -11,18 +11,17 @@ import {
 let debugCounter = 1;
 
 function FiberNode(tag=HostRoot, pendingProps=null, key=null){
-  // Instance
-  this.tag = tag; // Decides which kind of component the fiber is
-  this.key = key; // {key} attribute in lists' items
+  this.tag = tag; 
+  this.key = key;
   this.type = null;
-  this.stateNode = null; // point to FiberRootNode or DOMNode.
+  this.stateNode = null; 
 
-  // Fiber
-  this.return = null; // point to parent
+  // Fiber chain
+  this.return = null; 
   this.child = null;
   this.sibling = null;
   this.index = 0;
-  // props and states
+  
   this.pendingProps = pendingProps;
   this.memoizedProps = null;
   this.memoizedState = null; // As baseState in update queue.
@@ -30,11 +29,8 @@ function FiberNode(tag=HostRoot, pendingProps=null, key=null){
 
   // Effects
   this.flags = NoFlags;
-  this.firstEffect = null;
-  this.lastEffect = null;
-  this.nextEffect = null;
-
   this.subtreeFlags = NoFlags;
+  this.deletions = null;
 
   this.lanes = NoLanes;
   this.childLanes = NoLanes;

@@ -28,8 +28,8 @@ function JeactElement(type, key, ref, owner, props){
 };
 
 /**
-* @arg type: Component|DOM
-* @arg config: attributes attached on {comp}
+* @arg comp: Component|DOM
+* @arg attrs: attributes attached on {comp}
 * @arg children: Children of {comp}
 */
 export function createElement(comp, attrs, children){

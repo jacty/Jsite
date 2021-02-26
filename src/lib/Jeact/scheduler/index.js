@@ -40,7 +40,6 @@ function flushWork(){
   try{
      return workLoop();
   } finally {
-    debugger;
     // flags may be set in workLoop should be reset finally.
     currentTask = null;
     isPerformingWork = false;

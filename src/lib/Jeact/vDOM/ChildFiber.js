@@ -14,16 +14,19 @@ import {
 // children and the parent.
 export function reconcileChildFibers(
   returnFiber,
-  currentFirstChild,
+  current,
   newChild,// from payload.element
-  lanes,
-  shouldTrackEffects
+  lanes
 ){
-  if(currentFirstChild === null){
-    currentFirstChild = currentFirstChild;
+  let shouldTrackEffects;
+  let currentFirstChild;
+  if(current === null){
+    //mount
+    currentFirstChild = current;
     shouldTrackEffects = false;
   } else {
-    currentFirstChild = currentFirstChild.child;
+    // update
+    currentFirstChild = current.child;
     shouldTrackEffects = true;
   }
   // Handle object types

@@ -60,29 +60,27 @@ function updateHostRoot(current, workInProgress, renderLanes){
   const prevState = workInProgress.memoizedState;
   const prevChildren = prevState.element;
   cloneUpdateQueue(current, workInProgress);
-  debugger;
-  //update wip.lanes, wip.memoizedState;
   processUpdateQueue(workInProgress, renderLanes);
+
   const nextState = workInProgress.memoizedState;
 
   const nextCache = nextState.cache;
   pushRootCachePool(workInProgress.stateNode);
   pushCacheProvider(workInProgress, nextCache);
   if(nextCache !== prevState.cache){
-    console.error('updateHostRoot')
+    debugger;
   }
 
   const nextChildren = nextState.element;
   if(nextChildren === prevChildren){
-    console.error('updateHostRoot1');
+    debugger;
   }
-
+  debugger;
   workInProgress.child = reconcileChildFibers(
       workInProgress,
       current,
       nextChildren,
-      renderLanes,
-      current
+      renderLanes
   );
   return workInProgress.child;
 }

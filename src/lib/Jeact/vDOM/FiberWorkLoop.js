@@ -57,6 +57,7 @@ let wipRootExitStatus = RootIncomplete;
 let wipRootFatalError = null;
 
 let wipRootIncludedLanes = NoLanes;
+let wipRootSkippedLanes = NoLanes;
 let wipRootUpdatedLanes = NoLanes;
 
 let rootDoesHavePassiveEffects = false;
@@ -227,7 +228,15 @@ function prepareFreshStack(root, updateLanes){
     wipRootIncludedLanes = updateLanes;
   wipRootExitStatus = RootIncomplete;
   wipRootFatalError = null;
+  wipRootSkippedLanes = NoLanes;
   wipRootUpdatedLanes = NoLanes;
+}
+
+export function markSkippedUpdateLanes(lane){
+  wipRootSkippedLanes = mergeLanes(
+    lane, 
+    wipRootSkippedLanes,
+  )
 }
 
 function renderRootConcurrent(root, updateLanes){

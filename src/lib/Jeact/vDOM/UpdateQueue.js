@@ -7,6 +7,7 @@ import {
   isSubsetOfLanes,
   isTransitionLane,
 } from '@Jeact/vDOM/FiberLane';
+import {markSkippedUpdateLanes} from '@Jeact/vDOM/FiberWorkLoop';
 
 export function initializeUpdateQueue(fiber){
   const queue = {
@@ -24,7 +25,7 @@ export function initializeUpdateQueue(fiber){
 }
 
 export function cloneUpdateQueue(current, workInProgress){
-  // Clone the update queue from current and break the pointer connection between them.
+  // Clone the update queue from current and disconnect the pointer between them.
   const queue = workInProgress.updateQueue;
   const currentQueue = current.updateQueue;
   if(queue === currentQueue){
@@ -80,8 +81,10 @@ export function entangleTransitions(rootFiber, currentFiber, lane){
 function getStateFromUpdate(update, prevState){
   switch (update.tag){
     case UpdateState: {
+      if(typeof update.payload === 'function') debugger;
       let partialState = update.payload;     
       if (partialState === null || partialState === undefined){
+        debugger;
         return prevState;
       }
       return Object.assign({}, prevState, partialState);
@@ -93,17 +96,15 @@ function getStateFromUpdate(update, prevState){
 }
 
 export function processUpdateQueue(workInProgress,renderLanes){
-
   const queue = workInProgress.updateQueue;
-  const nextProps = workInProgress.pendingProps;
 
   let firstBaseUpdate = queue.firstBaseUpdate;
   let lastBaseUpdate = queue.lastBaseUpdate;
 
   // Check if there are pending updates. If so, transfer them to the base queue.
-  let pendingQueue = queue.pending;
+  let pendingQueue = queue.shared.pending;
   if (pendingQueue !== null){
-    queue.pending = null;
+    queue.shared.pending = null;
 
     const lastPendingUpdate = pendingQueue;
     const firstPendingUpdate = lastPendingUpdate.next;
@@ -114,6 +115,7 @@ export function processUpdateQueue(workInProgress,renderLanes){
     if (lastBaseUpdate === null){
       firstBaseUpdate = firstPendingUpdate;
     } else {
+      debugger;
       lastBaseUpdate.next = firstPendingUpdate;
     }
     lastBaseUpdate = lastPendingUpdate;
@@ -126,6 +128,7 @@ export function processUpdateQueue(workInProgress,renderLanes){
         if (currentLastBaseUpdate === null){
           currentQueue.firstBaseUpdate = firstPendingUpdate;
         } else {
+          debugger;
           currentLastBaseUpdate.next = firstPendingUpdate;
         }
         currentQueue.lastBaseUpdate = lastPendingUpdate;
@@ -133,12 +136,8 @@ export function processUpdateQueue(workInProgress,renderLanes){
     }
   }
 
-  // These values may change as we process the queue.
   if (firstBaseUpdate !== null){
-      // Iterate through the list of updates to compute the result.
       let newState = queue.baseState;
-      // TODO: Don't need to accumulate this. Instead, we can remove
-      // renderLanes from the original lanes.
       let newLanes = NoLanes;
 
       let newBaseState = null;
@@ -148,11 +147,12 @@ export function processUpdateQueue(workInProgress,renderLanes){
       let update = firstBaseUpdate;
       do {
         const updateLane = update.lane;
+        const updateEventTime = update.eventTime;
         if(!isSubsetOfLanes(renderLanes, updateLane)){
-          console.error('processUpdateQueue')
+          debugger;
         } else {
           if(newLastBaseUpdate!==null){
-            console.error('processUpdateQueue1')
+            debugger;
           }
 
           // Process this update.
@@ -163,16 +163,16 @@ export function processUpdateQueue(workInProgress,renderLanes){
 
           const callback = update.callback;
           if (callback !== null) {
-            console.error('processUpdateQueue5');
+            debugger;
           }        
         }
         update = update.next;
         if (update=== null){
-          pendingQueue = queue.pending;
+          pendingQueue = queue.shared.pending;
           if (pendingQueue === null){
             break;
           } else {
-            console.error('processUpdateQueue7');
+            debugger;
           }
         }
       } while(true);
@@ -185,6 +185,14 @@ export function processUpdateQueue(workInProgress,renderLanes){
       queue.firstBaseUpdate = newFirstBaseUpdate;
       queue.lastBaseUpdate = newLastBaseUpdate;
 
+      const lastInterleaved = queue.shared.interleaved;
+      if (lastInterleaved !== null){
+        debugger;
+      } else if (firstBaseUpdate === null){
+        debugger;
+      }
+
+      markSkippedUpdateLanes(newLanes);
       workInProgress.lanes = newLanes;
       workInProgress.memoizedState = newState;
   }

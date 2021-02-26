@@ -50,9 +50,10 @@ export function getNextLanes(root, wipLanes){
 
   const suspendedLanes = root.suspendedLanes;
 
-  if(root.expiredLanes || wipLanes!== 0|| root.entangledLanes){
+  if(root.expiredLanes || root.entangledLanes){
     debugger;
   }
+
 
   // Do not work on any idle work until all the non-idle work has finished,
   // even it the work is suspended.
@@ -69,6 +70,7 @@ export function getNextLanes(root, wipLanes){
     // The only remaining work is Idle.
     debugger;
   }
+  if(wipLanes !== 0 && wipLanes !== nextLanes){debugger}
 
   return [nextLanes, highestLanePriority];
 }
@@ -136,10 +138,6 @@ function getLowestPriorityLane(lanes){
   // This finds the most significant non-zero bit.
   const index = 31 - Math.clz32(lanes);
   return index < 0 ? NoLanes : 1 << index;
-}
-
-function getEqualOrHigherPriorityLanes(lanes){
-  return (getLowestPriorityLane(lanes) << 1) -1;
 }
 
 function laneToIndex(lanes){

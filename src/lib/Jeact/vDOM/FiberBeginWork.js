@@ -1,5 +1,4 @@
 import {
-  __ENV__,
   HostRoot,
   HostText,
   HostComponent,
@@ -8,7 +7,6 @@ import {
   PerformedWork,
   Ref,
 } from '@Jeact/shared/Constants';
-import {CurrentOwner} from '@Jeact/shared/internals';
 import {includesSomeLane} from '@Jeact/vDOM/FiberLane';
 import {
   reconcileChildFibers,
@@ -27,16 +25,6 @@ import {
 } from '@Jeact/vDOM/FiberCacheComponent';
 
 let didReceiveUpdate = false;
-
-function markRef(current, workInProgress){
-  const ref = workInProgress.ref;
-  if(
-      (current === null && ref!== null) ||
-      (current !== null && current.ref !== ref)
-  ){
-    workInProgress.flags |= Ref;
-  } 
-}
 
 function updateFunctionComponent(current,workInProgress,renderLanes){
 
@@ -109,7 +97,6 @@ function updateHostComponent(alternate, workInProgress,renderLanes){
   } else if(prevProps !== null && shouldSetTextContent(type, prevProps)) {
     console.error('updateHostComponent1')
   }
-  // markRef(alternate, workInProgress);
   
   workInProgress.child = reconcileChildFibers(
       workInProgress,
@@ -145,7 +132,7 @@ export function beginWork(current, workInProgress, renderLanes){
     const oldProps = current.memoizedProps;
     const newProps = workInProgress.pendingProps;
     if(oldProps !== newProps){
-      console.log('beginWork1')
+      debugger;
     } else if(!includesSomeLane(renderLanes, updateLanes)){
       didReceiveUpdate = false;
       // This fiber does not have any pending work. Bailout without entering 
@@ -161,6 +148,8 @@ export function beginWork(current, workInProgress, renderLanes){
       }
       return bailoutOnAlreadyFinishedWork(current, workInProgress, renderLanes)
     }
+  } else {
+    debugger;
   }
   // stop lanes pass to fiber.childLane
   workInProgress.lanes = NoLanes;

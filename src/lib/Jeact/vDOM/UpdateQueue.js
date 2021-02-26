@@ -23,6 +23,22 @@ export function initializeUpdateQueue(fiber){
   fiber.updateQueue = queue;
 }
 
+export function cloneUpdateQueue(current, workInProgress){
+  // Clone the update queue from current and break the pointer connection between them.
+  const queue = workInProgress.updateQueue;
+  const currentQueue = current.updateQueue;
+  if(queue === currentQueue){
+    const clone = {
+      baseState: currentQueue.baseState,
+      firstBaseUpdate: currentQueue.firstBaseUpdate,
+      lastBaseUpdate: currentQueue.lastBaseUpdate,
+      shared: currentQueue.shared,
+      effects: currentQueue.effects,
+    };
+    workInProgress.updateQueue = clone;
+  }
+}
+
 export function createUpdate(eventTime, lane){
   const update = {
     eventTime,

@@ -12,7 +12,10 @@ import {
   reconcileChildFibers,
   cloneChildFibers,
 } from '@Jeact/vDOM/ChildFiber';
-import {processUpdateQueue} from '@Jeact/vDOM/UpdateQueue';
+import {
+  cloneUpdateQueue,
+  processUpdateQueue
+} from '@Jeact/vDOM/UpdateQueue';
 import {
   renderWithHooks,
   bailoutHooks
@@ -54,9 +57,10 @@ function updateFunctionComponent(current,workInProgress,renderLanes){
 function updateHostRoot(current, workInProgress, renderLanes){
   // push host container like div#root into stack, so we can get it to refer in any depth when we are reconcile fiber children.
   pushHostContainer(workInProgress);//pushHostRootContext()
-
   const prevState = workInProgress.memoizedState;
   const prevChildren = prevState.element;
+  cloneUpdateQueue(current, workInProgress);
+  debugger;
   //update wip.lanes, wip.memoizedState;
   processUpdateQueue(workInProgress, renderLanes);
   const nextState = workInProgress.memoizedState;

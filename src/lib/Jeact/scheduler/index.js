@@ -4,7 +4,7 @@ import {
   NORMAL_PRIORITY_TIMEOUT,
   USER_BLOCKING_PRIORITY_TIMEOUT
 } from '@Jeact/shared/Constants';
-import {push,pop, peek} from './SchedulerMinHeap';
+import {push,pop,peek} from './SchedulerMinHeap';
 
 // Tasks are stored on a min heap.
 let taskQueue = [];
@@ -32,7 +32,7 @@ let scheduledHostCallback = null;
 function flushWork(){
   isHostCallbackScheduled = false;
   if(isHostCallbackScheduled){
-    console.error('flushWork');
+    debugger;
   }
 
   isPerformingWork = true;
@@ -40,6 +40,7 @@ function flushWork(){
   try{
      return workLoop();
   } finally {
+    debugger;
     // flags may be set in workLoop should be reset finally.
     currentTask = null;
     isPerformingWork = false;
@@ -49,15 +50,15 @@ function flushWork(){
 function workLoop(){
   const currentTime = performance.now();
   deadline = currentTime + yieldInterval;
-  
   currentTask = peek(taskQueue);
   while(currentTask !== null){
     if(currentTask.expirationTime > currentTime &&
-       shouldYieldToHost()
-      ){
+      shouldYieldToHost()
+      ){ debugger;
       // deadline reached but currentTask hasn't expired.
       break;
     }
+
     //performConcurrentWorkOnRoot()
     const callback = currentTask.callback;
     if(typeof callback === 'function'){
@@ -90,7 +91,6 @@ export function runWithPriority(priority,fn){
 }
 
 export function scheduleCallback(priority, callback){
-  
   let startTime = performance.now();
   let timeout;
   switch (priority){
@@ -108,17 +108,14 @@ export function scheduleCallback(priority, callback){
   const newTask = {
     id: taskIdCount++,
     callback,
+    priority,
     startTime,
     expirationTime,
-    sortIndex: -1,
+    sortIndex: expirationTime,
   };
 
-  // to sort task order in siftUp();  
-  newTask.sortIndex = expirationTime;
   push(taskQueue, newTask);
 
-  // Schedule a host callback, if needed. If we're already performing work,
-  // wait until the next time we yield.
   if (!isHostCallbackScheduled && !isPerformingWork){
     isHostCallbackScheduled = true;
     requestHostCallback(flushWork)
@@ -148,6 +145,7 @@ function performWorkUntilDeadline(){
       }
     }
   } else {
+    debugger;
     isMessageLoopRunning = false;
   }
 };

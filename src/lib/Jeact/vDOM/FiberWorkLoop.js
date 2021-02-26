@@ -168,7 +168,7 @@ function ensureRootIsScheduled(root, currentTime){
 // Entry point for every concurrent task, i.e. anything that
 // goes through Scheduler.
 function performConcurrentWorkOnRoot(root){
-  
+  debugger;
   currentEventTime = NoTimestamp;
   currentEventWipLanes = NoLanes;
 

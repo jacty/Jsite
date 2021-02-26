@@ -97,16 +97,17 @@ function reconcileSingleTextNode(returnFiber, currentFirstChild, text, lanes){
 function reconcileSingleElement(
   returnFiber,
   currentFirstChild,
-  children,
+  element,
   lanes
 ){
-  const key = children.key;
+  const key = element.key;
   let child = currentFirstChild;
   while (child !== null){
+    debugger;
     deleteChild(returnFiber, child);
     child = child.sibling;
   }
-  const created = createFiberFromElement(children, lanes);
+  const created = createFiberFromElement(element, lanes);
   created.return = returnFiber;
   return created;
 }

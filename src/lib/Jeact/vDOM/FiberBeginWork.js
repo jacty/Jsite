@@ -75,7 +75,7 @@ function updateHostRoot(current, workInProgress, renderLanes){
   if(nextChildren === prevChildren){
     debugger;
   }
-  debugger;
+
   workInProgress.child = reconcileChildFibers(
       workInProgress,
       current,
@@ -128,6 +128,7 @@ function bailoutOnAlreadyFinishedWork(current, workInProgress, renderLanes){
 }
 // Iterate from parent fibers to child fibers(including sibling fibers) to build the whole fiber chain.
 export function beginWork(current, workInProgress, renderLanes){
+  if (workInProgress._debugID === 3) debugger;
   const updateLanes = workInProgress.lanes;
   if(current!==null){
     // Update phase

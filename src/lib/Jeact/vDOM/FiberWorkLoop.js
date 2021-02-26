@@ -39,6 +39,7 @@ import {
   commitMutationEffects,
   commitLayoutEffects,
 } from '@Jeact/vDOM/FiberCommitWork';
+import {CurrentDispatcher} from '@Jeact/shared/internals';
 
 const RootIncomplete = 0;
 const RootFatalErrored = 1;
@@ -168,13 +169,17 @@ function ensureRootIsScheduled(root, currentTime){
 // Entry point for every concurrent task, i.e. anything that
 // goes through Scheduler.
 function performConcurrentWorkOnRoot(root){
-  debugger;
   currentEventTime = NoTimestamp;
   currentEventWipLanes = NoLanes;
 
   const originalCallbackNode = root.callbackNode;
 
-  let exitStatus = renderRootConcurrent(root, nextLanes);  
+  let [lanes] = getNextLanes(
+    root,
+    root === wipRoot ? wipRootRenderLanes : NoLanes,
+  )
+
+  let exitStatus = renderRootConcurrent(root, lanes);  
   if(exitStatus !== RootIncomplete){
     if(exitStatus === RootErrored || exitStatus===RootFatalErrored){
       console.error('Error')
@@ -214,7 +219,7 @@ function prepareFreshStack(root, updateLanes){
   root.finishedWork = null;
   root.finishedLanes = NoLanes;
   if (wip !== null){
-    console.log('interruptedWork');
+    debugger;
   }
   wipRoot = root;
   wip = createWorkInProgress(root.current);
@@ -228,11 +233,12 @@ function prepareFreshStack(root, updateLanes){
 function renderRootConcurrent(root, updateLanes){
   const prevExecutionContext = executionContext;
   executionContext |= RenderContext;
-
+  const prevDispatcher = CurrentDispatcher.current;
+  
   // If the root or lanes have changed, throw out the existing stack
   // and prepare a fresh one. Otherwise we'll continue where we left off.
   if (wipRoot !== root || wipRootRenderLanes !== updateLanes){
-    // GET WIP:create a new Node by cloning root.current and set it to wip.
+    //create a new FiberNode by cloning root.current and set it to wip.
     prepareFreshStack(root, updateLanes);
   }
 

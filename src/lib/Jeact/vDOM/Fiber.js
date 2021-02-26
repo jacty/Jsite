@@ -76,6 +76,9 @@ export function createWorkInProgress(current, pendingProps){
     workInProgress.alternate = current;
     current.alternate = workInProgress;
   }else{}
+  if (current.flags !== 0){
+    debugger;
+  }
   cloneKeys = [
     'childLanes',
     'lanes',

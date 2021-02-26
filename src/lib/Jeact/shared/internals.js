@@ -27,9 +27,3 @@ export const CurrentDispatcher = {
    */
   current: null,
 };
-
-export const DebugCurrentFrame = {};
-
-if (__ENV__){
-    DebugCurrentFrame.getCurrentStack = null;
-}

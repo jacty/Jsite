@@ -2,7 +2,6 @@ import {
   __ENV__,  
   JEACT_ELEMENT_TYPE,
 } from '@Jeact/shared/Constants';
-import {CurrentOwner} from '@Jeact/shared/internals';
 
 const hasOwnProperty = Object.prototype.hasOwnProperty;
 // Attributes reserved for internal usage.
@@ -11,7 +10,7 @@ const RESERVED_ATTR = {
   ref: true,
 };
 
-function JeactElement(type, key, ref, owner, props){
+function JeactElement(type, key, ref, props){
   const element = {
     $$typeof: JEACT_ELEMENT_TYPE,
 
@@ -20,8 +19,6 @@ function JeactElement(type, key, ref, owner, props){
     key: key,
     ref: ref,
     props: props,
-    // Who created this element. From CurrentOwner.current
-    _owner: owner,
   };
 
   return element;
@@ -64,7 +61,6 @@ export function createElement(comp, attrs, children){
     comp,
     key,
     ref,
-    CurrentOwner.current,
     props,
   );
 }

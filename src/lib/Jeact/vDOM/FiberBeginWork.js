@@ -152,7 +152,7 @@ export function beginWork(current, workInProgress, renderLanes){
       return bailoutOnAlreadyFinishedWork(current, workInProgress, renderLanes)
     }
   } else {
-    debugger;
+    didReceiveUpdate = false;
   }
   // stop lanes pass to fiber.childLane
   workInProgress.lanes = NoLanes;

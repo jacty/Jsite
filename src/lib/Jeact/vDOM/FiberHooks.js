@@ -1,7 +1,6 @@
 import {
   InputDiscreteLanePriority,
   NoLanes,
-  __ENV__,
   Passive,
   Update
 } from '@Jeact/shared/Constants';
@@ -36,12 +35,6 @@ let didScheduleRenderPhaseUpdate = false;
 // TODO: Maybe there's some way to consolidate this with
 // `didScheduleRenderPhaseUpdate`. Or with `numberOfReRenders`.
 let didScheduleRenderPhaseUpdateDuringThisPass = false;
-
-const RE_RENDER_LIMIT = 25;
-
-// In DEV, this list ensures that hooks are called in the same order between renders.
-let hookTypesDev = null;
-let hookTypesUpdateIndexDev = -1;
 
 export function renderWithHooks(current,workInProgress,nextRenderLanes){
   const Component = workInProgress.type;

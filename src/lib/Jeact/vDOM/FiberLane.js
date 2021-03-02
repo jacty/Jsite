@@ -173,7 +173,15 @@ export function markRootFinished(root, remainingLanes){
   const noLongerPendingLanes = root.pendingLanes & ~remainingLanes;
 
   root.pendingLanes = remainingLanes;
+
   root.suspendedLanes = 0;
+
+  if(remainingLanes !== 0) debugger;
+
+  const pooledCacheLanes = root.pooledCacheLanes &= remainingLanes;
+  if(pooledCacheLanes === NoLanes){
+    root.pooledCache = null;
+  }
 
   const eventTimes = root.eventTimes;
   const expirationTimes = root.expirationTimes;
@@ -181,10 +189,10 @@ export function markRootFinished(root, remainingLanes){
   // Clear the lanes that no longer have pending work
   let lanes = noLongerPendingLanes;
   while(lanes > 0){
-    const index = pickArbitraryLaneIndex(lanes);
+    const index = laneToIndex(lanes);
     const lane = 1 << index;
 
-    eventTimes[index] = NoTimestamp;
+    eventTimes[index] = 0;
     expirationTimes[index] = NoTimestamp;
 
     lanes &= ~lane;

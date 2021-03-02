@@ -82,7 +82,7 @@ function workLoop(){
   }
 }
 
-export function runWithPriority(priority,fn){
+export function runWithPriority(fn){
   try {
     return fn()
   } finally{

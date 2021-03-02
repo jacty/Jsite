@@ -187,18 +187,17 @@ function performConcurrentWorkOnRoot(root){
       executionContext |= RetryAfterError;
       return null;
     }
-
     // now we have a consistent tree.
     const finishedWork = root.current.alternate
     root.finishedWork = finishedWork;
-    root.finishedLanes = nextLanes;
+    root.finishedLanes = lanes;
     finishConcurrentRender(root, exitStatus);
   }
   //schedule to finish Incomplete work.
   ensureRootIsScheduled(root, performance.now());
   if (exitStatus!==RootCompleted){
     // Continue expired tasks.
-    return performConcurrentWorkOnRoot.bind(null, root, nextLanes);
+    return performConcurrentWorkOnRoot.bind(null, root, lanes);
   }
   return null;
 }
@@ -327,8 +326,7 @@ function completeUnitOfWork(unitOfWork){
 
 function commitRoot(root){
   runWithPriority(
-    ImmediatePriority,
-    commitRootImpl.bind(null, root),
+    commitRootImpl.bind(null, root, ImmediatePriority)
   );
   return null;
 }
@@ -336,14 +334,16 @@ function commitRoot(root){
 function commitRootImpl(root, renderPriority){
   const finishedWork = root.finishedWork;
   const lanes = root.finishedLanes;
-
+  if (finishedWork === null){
+    debugger;
+  }
   root.finishedWork = null;
   root.finishedLanes = NoLanes;
   root.callbackNode = null;
 
   let remainingLanes = mergeLanes(finishedWork.lanes, finishedWork.childLanes);
   //update lanes and eventTimes
-  markRootFinished(root, remainingLanes);
+  markRootFinished(root, remainingLanes);  debugger;
   if((finishedWork.subtreeFlags & PassiveMask)!== NoFlags ||
       (finishedWork.flags & PassiveMask) !== NoFlags
     ){

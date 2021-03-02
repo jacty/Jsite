@@ -54,7 +54,7 @@ export function renderWithHooks(current,workInProgress,nextRenderLanes){
   if (didScheduleRenderPhaseUpdateDuringThisPass){
     console.error('renderWithHooks1')
   }
-
+  
   return children
 }
 

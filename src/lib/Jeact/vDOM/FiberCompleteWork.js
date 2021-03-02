@@ -89,7 +89,7 @@ function bubbleProperties(completedWork){
   completedWork.childLanes = newChildLanes;
 }
 
-export function completeWork(workInProgress,renderLanes){
+export function completeWork(current, workInProgress,renderLanes){
   const newProps = workInProgress.pendingProps;
   
   switch(workInProgress.tag){
@@ -109,8 +109,8 @@ export function completeWork(workInProgress,renderLanes){
     case HostComponent:{//5
       const rootContainerInstance = getRootHostContainer();
       const type = workInProgress.type;
-      if(workInProgress.alternate !== null && workInProgress.stateNode !== null){
-        console.error('completeWork')
+      if(current !== null && workInProgress.stateNode !== null){
+        debugger;
       }
 
       const instance = createElement(

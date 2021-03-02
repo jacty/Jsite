@@ -47,8 +47,7 @@ function updateFunctionComponent(current,workInProgress,renderLanes){
       workInProgress,
       current,
       nextChildren,
-      renderLanes,
-      current
+      renderLanes
     );
 
   return workInProgress.child;
@@ -85,10 +84,10 @@ function updateHostRoot(current, workInProgress, renderLanes){
   return workInProgress.child;
 }
 
-function updateHostComponent(alternate, workInProgress,renderLanes){
+function updateHostComponent(current, workInProgress,renderLanes){
   const type = workInProgress.type;
   const nextProps = workInProgress.pendingProps;
-  const prevProps = alternate !== null ? alternate.memoizedProps : null;
+  const prevProps = current !== null ? current.memoizedProps : null;
 
   let nextChildren = nextProps.children;
   const isDirectTextChild = shouldSetTextContent(type, nextProps);
@@ -102,10 +101,9 @@ function updateHostComponent(alternate, workInProgress,renderLanes){
   
   workInProgress.child = reconcileChildFibers(
       workInProgress,
-      alternate,
+      current,
       nextChildren,
       renderLanes,
-      alternate
     );
 
   return workInProgress.child;
@@ -128,7 +126,6 @@ function bailoutOnAlreadyFinishedWork(current, workInProgress, renderLanes){
 }
 // Iterate from parent fibers to child fibers(including sibling fibers) to build the whole fiber chain.
 export function beginWork(current, workInProgress, renderLanes){
-  if (workInProgress._debugID === 3) debugger;
   const updateLanes = workInProgress.lanes;
   if(current!==null){
     // Update phase
@@ -154,7 +151,7 @@ export function beginWork(current, workInProgress, renderLanes){
   } else {
     didReceiveUpdate = false;
   }
-  // stop lanes pass to fiber.childLane
+  // prevent lanes from passing to fiber.lanes of HostComponent's child fibers, and further to childLanes in bubbleProperties().
   workInProgress.lanes = NoLanes;
   switch (workInProgress.tag){
     case FunctionComponent://0

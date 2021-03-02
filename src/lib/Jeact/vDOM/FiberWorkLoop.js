@@ -296,10 +296,10 @@ function performUnitOfWork(unitOfWork){
 function completeUnitOfWork(unitOfWork){
   let completedWork = unitOfWork;
   do {
+    const current = completedWork.alternate;
     const returnFiber = completedWork.return;
-
     if ((completedWork.flags & Incomplete) === NoFlags){      
-      let next = completeWork(completedWork, subtreeRenderLanes);
+      let next = completeWork(current, completedWork, subtreeRenderLanes);
       if (next !== null) {
         console.error('x');
         wip = next;
@@ -314,7 +314,6 @@ function completeUnitOfWork(unitOfWork){
       wip = siblingFiber;
       return;
     }
-
     completedWork = returnFiber;
     // when reached the root, returnFiber is null, set wip to null to make sure performUnitOfWork() in workLoopConcurrent() wont keep running.
     wip = completedWork;

@@ -126,10 +126,10 @@ function reconcileChildrenArray(
   let newIdx = 0;
   let nextOldFiber = null;
   for (; oldFiber!==null && newIdx < newChildren.length; newIdx++){
-    console.error('reconcileChildrenArray1')
+    debugger;
   }
   if (newIdx === newChildren.length){
-    console.error('reconcileChildrenArray2')
+    debugger;
   }
 
   if (oldFiber === null){
@@ -147,6 +147,7 @@ function reconcileChildrenArray(
 
     return resultingFirstChild;
   }
+  debugger;
 }
 
 function createChild(returnFiber, newChild, lanes){

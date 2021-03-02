@@ -53,7 +53,7 @@ function workLoop(){
   while(currentTask !== null){
     if(currentTask.expirationTime > currentTime &&
       shouldYieldToHost()
-      ){ debugger;
+      ){
       // deadline reached but currentTask hasn't expired.
       break;
     }

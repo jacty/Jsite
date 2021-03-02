@@ -89,7 +89,7 @@ export function scheduleUpdateOnFiber(fiber, lane, eventTime){
     debugger;
     return null;
   } 
-  // update root.pendingLane, eventTimes etc.
+  // update root.pendingLanes, eventTimes etc.
   markRootUpdated(root, lane, eventTime);
   if(root === wipRoot){
     debugger;
@@ -343,22 +343,31 @@ function commitRootImpl(root, renderPriority){
 
   let remainingLanes = mergeLanes(finishedWork.lanes, finishedWork.childLanes);
   //update lanes and eventTimes
-  markRootFinished(root, remainingLanes);  debugger;
+  markRootFinished(root, remainingLanes);  
+  if(rootsWithPendingDiscreteUpdates !== null){
+    debugger;
+  }
+  if (root === wipRoot) debugger;
+
   if((finishedWork.subtreeFlags & PassiveMask)!== NoFlags ||
       (finishedWork.flags & PassiveMask) !== NoFlags
     ){
-    console.error('y');
+    debugger;
   }
-  const subtreeHasEffects = (finishedWork.subtreeFlags &
-    (BeforeMutationMask | MutationMask | LayoutMask | PassiveMask)) !== NoFlags;
+
+  const subtreeHasEffects = 
+    (finishedWork.subtreeFlags &
+      (BeforeMutationMask | MutationMask | LayoutMask | PassiveMask)) !== 
+    NoFlags;
   const rootHasEffect = (finishedWork.flags &
-    (BeforeMutationMask | MutationMask | LayoutMask | PassiveMask)) !== NoFlags;
+    (BeforeMutationMask | MutationMask | LayoutMask | PassiveMask)) !==
+    NoFlags;
 
   if (subtreeHasEffects || rootHasEffect){
     const prevExecutionContext= executionContext;
     executionContext |= CommitContext;
     commitBeforeMutationEffects(finishedWork);
-    commitMutationEffects(root, finishedWork);
+    commitMutationEffects(root, renderPriority, finishedWork);
     root.current = finishedWork;
     commitLayoutEffects(finishedWork, root, lanes);
     executionContext = prevExecutionContext;
@@ -370,6 +379,8 @@ function commitRootImpl(root, renderPriority){
   if (rootDoesHavePassiveEffects){
     debugger;
   }
+
+  ensureRootIsScheduled(root, performance.now())
 
   return null;
 }

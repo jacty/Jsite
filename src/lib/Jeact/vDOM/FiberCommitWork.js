@@ -6,9 +6,11 @@ import{
  MutationMask,
  NoFlags,
  Snapshot,
+ ContentReset,
  Ref,
  Placement,
  Update,
+ PlacementAndUpdate,
  LayoutMask,
 } from '@Jeact/shared/Constants';
 
@@ -23,6 +25,10 @@ function commitBeforeMutationEffects_begin(){
     while(nextEffect !== null){
         const fiber = nextEffect;
 
+        const deletions = fiber.deletions;
+        if(deletions !== null){
+            debugger;
+        }
         const child = fiber.child;
         if(
             (fiber.subtreeFlags & BeforeMutationMask) !== NoFlags &&
@@ -67,29 +73,32 @@ function commitBeforeMutationEffectsOnFiber(finishedWork){
     }
 }
 
-export function commitMutationEffects(root, firstChild){
+export function commitMutationEffects(root, renderPriority, firstChild){
     nextEffect = firstChild;
-    commitMutationEffects_begin(root);
+    commitMutationEffects_begin(root, renderPriority);
 }
 
-function commitMutationEffects_begin(root){
+function commitMutationEffects_begin(root, renderPriority){
     while(nextEffect !== null){
         const fiber = nextEffect;
+
+        const deletions = fiber.deletions;
+        if(deletions !==null ) debugger;
 
         const child = fiber.child;
         if((fiber.subtreeFlags & MutationMask) !== NoFlags && child !== null){
             nextEffect = child;
         } else {
-            commitMutationEffects_complete(root);
+            commitMutationEffects_complete(root, renderPriority);
         }
     }
 }
 
-function commitMutationEffects_complete(root){
+function commitMutationEffects_complete(root, renderPriority){
     while(nextEffect !== null){
         const fiber = nextEffect;
         try {
-            commitMutationEffectsOnFiber(fiber, root);
+            commitMutationEffectsOnFiber(fiber, root, renderPriority);
         } catch(error){
             console.error('x', error);
         }
@@ -106,15 +115,17 @@ function commitMutationEffects_complete(root){
 
 function commitMutationEffectsOnFiber(finishedWork, root){
     const flags = finishedWork.flags;
-    if (flags & Ref){
-        debugger;
-    }
+    if (flags & ContentReset) debugger;
+    if (flags & Ref) debugger;
     const primaryFlags = flags & (Placement | Update);
     switch(primaryFlags){
         case Placement:{
             commitPlacement(finishedWork);
             finishedWork.flags &= ~Placement;
             break;
+        }
+        case PlacementAndUpdate:{
+            debugger;
         }
         case Update:{
             debugger;
@@ -155,7 +166,7 @@ function commitLayoutMountEffects_complete(subtreeRoot, root, committedLanes){
             nextEffect = null;
             return;
         }
-
+        debugger;
         const sibling = fiber.sibling;
         if (sibling !== null){
             nextEffect = sibling;
@@ -228,6 +239,7 @@ function commitPlacement(finishedWork){
         default:
             console.error('commitPlacement1', parentFiber.tag);
     }
+    if (parentFiber.flags & ContentReset) debugger;
     const before = getHostSibling(finishedWork);
     if(isContainer){
         insertOrAppendPlacementNodeIntoContainer(finishedWork, before, parent);
@@ -242,7 +254,7 @@ function insertOrAppendPlacementNodeIntoContainer(node, before, parent){
     if (isHost){
         const stateNode =node.stateNode;
         if (before){
-            console.error('insertOrAppendPlacementNodeIntoContainer3')
+            debugger;
         } else {
             parent.append(stateNode);
         }

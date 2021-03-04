@@ -1,9 +1,9 @@
-import {J, createRoot,useState} from '@Jeact';
+import {J, createRoot,useState, lazy} from '@Jeact';
 
 import ErrorBoundary from '@com/Errors/ErrorBoundary.jsx';
 import '@assets/styles/main.sass';
+const AboutMe = lazy(()=>import('@assets/js/aboutme'));
 
-import Aboutme from './aboutme.jsx';
 import {Footer} from '@com/shared.jsx';
 
 function App(){
@@ -11,7 +11,7 @@ function App(){
     return( 
             <ErrorBoundary>
                 {nav ===0?
-                    <div>111</div>:
+                    <AboutMe />:
                     <div>222</div>
                 }
 

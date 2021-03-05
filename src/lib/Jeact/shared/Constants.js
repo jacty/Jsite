@@ -13,6 +13,7 @@ export const FunctionComponent = 0;
 export const HostRoot = 3; // Root of a host tree.
 export const HostComponent = 5;
 export const HostText = 6;
+export const LazyComponent = 16;
 
 /* JeactFiberWorkLoop */
 export const NoContext = /*             */ 0b0000000;

@@ -6,6 +6,8 @@ import {
   HostText,
   HostComponent,
   FunctionComponent,
+  LazyComponent,
+  JEACT_LAZY_TYPE
 } from '@Jeact/shared/Constants';
 
 let debugCounter = 1;
@@ -106,7 +108,20 @@ export function createFiberFromTypeAndProps(element,lanes, owner){
   } else if(typeof type === 'string'){
     fiberTag = HostComponent;
   } else {
-    debugger;
+    switch(type){
+      default:{
+        if (typeof type ==='object' && type !== null){
+          switch (type.$$typeof){
+            case JEACT_LAZY_TYPE:
+              fiberTag = LazyComponent;
+              break;
+            default:{
+              debugger;
+            }
+          }
+        }
+      }
+    }
   }
 
   const fiber = createFiber(fiberTag, pendingProps, key);

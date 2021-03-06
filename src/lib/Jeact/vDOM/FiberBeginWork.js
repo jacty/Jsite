@@ -3,6 +3,7 @@ import {
   HostText,
   HostComponent,
   FunctionComponent,
+  LazyComponent,
   NoLanes,
   PerformedWork,
   Ref,
@@ -109,6 +110,21 @@ function updateHostComponent(current, workInProgress,renderLanes){
   return workInProgress.child;
 }
 
+function mountLazyComponent(
+  _current, 
+  workInProgress,
+  updateLanes, 
+  renderLanes
+){
+  if (_current !== null) debugger;
+  const props = workInProgress.pendingProps;
+  const lazyComponent = workInProgress.type;
+  const payload = lazyComponent._payload;
+  const init = lazyComponent._init;
+  let Component = init(payload);
+    debugger;
+}
+
 export function markWorkInProgressReceivedUpdate(){
   didReceiveUpdate = true;
 }
@@ -154,6 +170,14 @@ export function beginWork(current, workInProgress, renderLanes){
   // prevent lanes from passing to fiber.lanes of HostComponent's child fibers, and further to childLanes in bubbleProperties().
   workInProgress.lanes = NoLanes;
   switch (workInProgress.tag){
+    case LazyComponent:{//16
+      return mountLazyComponent(
+        current, 
+        workInProgress,
+        updateLanes,
+        renderLanes
+      );
+    }
     case FunctionComponent://0
       return updateFunctionComponent(current,workInProgress,renderLanes);
     case HostRoot://3

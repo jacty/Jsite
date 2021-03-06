@@ -2,7 +2,7 @@ import {J, createRoot,useState, lazy} from '@Jeact';
 
 import ErrorBoundary from '@com/Errors/ErrorBoundary.jsx';
 import '@assets/styles/main.sass';
-const AboutMe = lazy(()=>import('@assets/js/aboutme'));
+const AboutMe = lazy(()=>import('@assets/js/aboutme.jsx'));
 
 import {Footer} from '@com/shared.jsx';
 

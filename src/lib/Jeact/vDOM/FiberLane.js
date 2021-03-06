@@ -130,7 +130,7 @@ export function requestUpdateLane(lanePriority=1, wipLanes=0){
   }
 }
 
-function getHighestPriorityLane(lanes){
+export function getHighestPriorityLane(lanes){
   return lanes & -lanes; // Why this way can get the highest priority?
 }
 

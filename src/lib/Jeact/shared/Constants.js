@@ -13,6 +13,7 @@ export const FunctionComponent = 0;
 export const HostRoot = 3; // Root of a host tree.
 export const HostComponent = 5;
 export const HostText = 6;
+export const SuspenseComponent = 13;
 export const LazyComponent = 16;
 
 /* JeactFiberWorkLoop */
@@ -45,7 +46,7 @@ export const InputDiscreteLanePriority = 2;
 
 /* JeactUpdateQueue.js */
 export const UpdateState = 0;
-
+export const CaptureUpdate = 3;
 /* JeactFiberFlags.js */
 export const NoFlags = /*                      */ 0b00000000000000000000;
 export const PerformedWork = /*                */ 0b00000000000000000001;
@@ -59,8 +60,8 @@ export const Ref = /*                          */ 0b00000000000100000000;
 export const Snapshot = /*                     */ 0b00000000001000000000;
 export const Passive = /*                      */ 0b00000000010000000000;
 // These are not really side effects, but we still reuse this field.
-export const Incomplete = /*                   */ 0b0000001000000000000;
-
+export const Incomplete = /*                   */ 0b00000010000000000000;
+export const ShouldCapture = /*                */ 0b00000100000000000000;
 export const BeforeMutationMask = Update | Snapshot | ChildDeletion;
 export const MutationMask = 
     Placement | 

@@ -40,6 +40,7 @@ import {
   commitLayoutEffects,
 } from '@Jeact/vDOM/FiberCommitWork';
 import {CurrentDispatcher} from '@Jeact/shared/internals';
+import {throwException} from '@Jeact/vDOM/FiberThrow';
 
 const RootIncomplete = 0;
 const RootFatalErrored = 1;
@@ -231,6 +232,35 @@ function prepareFreshStack(root, updateLanes){
   wipRootUpdatedLanes = NoLanes;
 }
 
+function handleError(root, thrownValue){
+  do {
+    let erroredWork = wip;
+    try {
+      if(erroredWork === null || erroredWork.return === null){
+        debugger;
+      }
+      throwException(
+        root,
+        erroredWork.return,
+        erroredWork,
+        thrownValue,
+        wipRootRenderLanes
+      );
+      completeUnitOfWork(erroredWork);
+    } catch (yetAnotherThrownValue){
+      debugger;
+      thrownValue = yetAnotherThrownValue;
+      if (wip === erroredWork && erroredWork !== null){
+        debugger;
+      } else {
+        erroredWork = wip;
+      }
+      continue;
+    }
+    return;
+  } while(true);
+}
+
 export function markSkippedUpdateLanes(lane){
   wipRootSkippedLanes = mergeLanes(
     lane, 
@@ -254,9 +284,7 @@ function renderRootConcurrent(root, updateLanes){
     try {
       workLoopConcurrent();
     } catch(thrownValue){
-      console.error('Err:',thrownValue);
-      wip = null;
-      wipRootExitStatus = RootErrored;
+      handleError(root, thrownValue);
     }
 
   executionContext = prevExecutionContext;
@@ -305,7 +333,8 @@ function completeUnitOfWork(unitOfWork){
         return;
       }
     } else {
-      console.error('completeUnitOfWork2')
+      // Error threw.
+      debugger;
     }
 
     const siblingFiber = completedWork.sibling;

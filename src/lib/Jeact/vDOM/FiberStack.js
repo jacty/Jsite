@@ -35,7 +35,7 @@ export function pop(cursor, fiber){
   index --;
 }
 
-export function push(cursor, value, fiber){
+export function push(cursor, value){
   index ++;
   valueStack[index] = cursor.current;
   cursor.current = value;

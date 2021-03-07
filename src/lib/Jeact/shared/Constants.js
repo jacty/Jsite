@@ -16,6 +16,7 @@ export const HostComponent = 5;
 export const HostText = 6;
 export const SuspenseComponent = 13;
 export const LazyComponent = 16;
+export const OffscreenComponent = 22;
 
 /* JeactFiberWorkLoop */
 export const NoContext = /*             */ 0b0000000;

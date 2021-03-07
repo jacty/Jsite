@@ -5,9 +5,12 @@ import {
   FunctionComponent,
   SuspenseComponent,
   LazyComponent,
+  OffscreenComponent,
   NoLanes,
   PerformedWork,
   Ref,
+  DidCapture,
+  NoFlags,
 } from '@Jeact/shared/Constants';
 import {includesSomeLane} from '@Jeact/vDOM/FiberLane';
 import {
@@ -28,7 +31,14 @@ import {
   pushRootCachePool,
   pushCacheProvider
 } from '@Jeact/vDOM/FiberCacheComponent';
-
+import {
+  suspenseStackCursor,
+  ForceSuspenseFallback,
+  InvisibleParentSuspenseContext,
+  SubtreeSuspenseContextMask,
+} from '@Jeact/vDOM/FiberSuspenseContext';
+import {push} from '@Jeact/vDOM/FiberStack';
+import {createFiber} from '@Jeact/vDOM/Fiber';
 let didReceiveUpdate = false;
 
 function updateFunctionComponent(current,workInProgress,renderLanes){
@@ -126,8 +136,100 @@ function mountLazyComponent(
     debugger;
 }
 
-export function markWorkInProgressReceivedUpdate(){
-  didReceiveUpdate = true;
+function shouldRemainOnFallback(suspenseContext, current, workInProgress){
+  // If we're already showing a fallback, there are cases where we need to 
+  // remain on that fallback regardless of whether the content has resolved.
+  if (current !== null){
+    debugger;
+  }
+
+  // Not currently showing content. 
+  // hasSuspenseContext()
+  return suspenseContext & ForceSuspenseFallback !== 0
+
+}
+
+function updateSuspenseComponent(current, workInProgress, renderLanes){ 
+  const nextProps = workInProgress.pendingProps;
+
+  let suspenseContext = suspenseStackCursor.current;
+
+  let showFallback = false;
+  const didSuspend = (workInProgress.flags & DidCapture) !== NoFlags;
+  
+  if(
+    didSuspend ||
+    shouldRemainOnFallback(
+      suspenseContext,
+      current,
+      workInProgress,
+      renderLanes,
+    )
+  ){
+    debugger;
+  } else {
+    // Attempting the main content
+    if(
+      current === null ||
+      (current.memoizedState !== null)
+    ){
+      // This is a new mount or this boundary is already showing a fallback 
+     // state.
+     // Mark this subtree context as having at least one invisible parent that 
+     // could handle the fallback state.
+     // Boundaries without fallbacks or should be avoided are not considered
+     // since they cannot handle preferred fallback states.
+     if(
+      nextProps.fallback !== undefined
+      ){
+      // addSubtreeSuspenseContext()
+      suspenseContext = suspenseContext | InvisibleParentSuspenseContext
+     }
+    }
+  }
+  // setDefaultShallowSuspenseContext
+  suspenseContext &= SubtreeSuspenseContextMask;
+
+  // pushSuspenseContext()
+  push(suspenseStackCursor, suspenseContext);
+
+  if (current === null){
+    // Initial mount
+    const nextPrimaryChildren = nextProps.children;
+    const nextFallbackChildren = nextProps.fallback;
+    if (showFallback){
+      debugger
+    } else {
+      return mountSuspensePrimaryChildren(
+        workInProgress,
+        nextPrimaryChildren,
+        renderLanes,
+      )
+    }
+  } else {
+    // Update.
+    debugger;
+  }
+}
+
+function mountSuspensePrimaryChildren(
+  workInProgress,
+  primaryChildren,
+  renderLanes
+){
+  const primaryChildProps = {
+    mode: 'visible',
+    children: primaryChildren,
+  };
+  // createFiberFromOffscreen()
+  const primaryChildFragment = createFiber(
+    OffscreenComponent,
+    primaryChildProps
+  );
+  primaryChildFragment.lanes = renderLanes;
+  primaryChildFragment.return = workInProgress;
+  workInProgress.child = primaryChildFragment;
+  return primaryChildFragment;
 }
 
 function bailoutOnAlreadyFinishedWork(current, workInProgress, renderLanes){
@@ -181,18 +283,21 @@ export function beginWork(current, workInProgress, renderLanes){
         renderLanes
       );
     }
-    case FunctionComponent://0
+    case FunctionComponent:
       return updateFunctionComponent(current,workInProgress,renderLanes);
-    case HostRoot://3
+    case HostRoot:
       return updateHostRoot(current, workInProgress, renderLanes);
-    case HostComponent://5
+    case HostComponent:
       return updateHostComponent(current, workInProgress, renderLanes);
-    case HostText://6
+    case HostText:
       return null;
     case SuspenseComponent:
-      debugger;
+      return updateSuspenseComponent(current, workInProgress, renderLanes);
     default:
       console.error('beginWork4', workInProgress);
   }
 }
 
+export function markWorkInProgressReceivedUpdate(){
+  didReceiveUpdate = true;
+}

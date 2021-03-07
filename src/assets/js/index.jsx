@@ -10,7 +10,7 @@ function App(){
     const [nav,setNav] = useState(0)    
     return( 
             <ErrorBoundary>
-                <Suspense>
+                <Suspense fallback={<div>11</div>}>
                     <AboutMe />
                 </Suspense>
                 <Footer handlers={()=>{setNav(1)}}/>

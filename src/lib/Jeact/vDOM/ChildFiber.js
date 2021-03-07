@@ -74,7 +74,7 @@ export function reconcileChildFibers(
   if (!shouldTrackEffects){
     return null;
   } else {
-    console.error('deleteRemainingChildren');
+    debugger;
   }
 }
 

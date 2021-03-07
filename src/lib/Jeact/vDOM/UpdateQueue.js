@@ -2,6 +2,7 @@ import {
   __ENV__,
   UpdateState,
   NoLanes,
+  ShouldCapture,
 } from '@Jeact/shared/Constants';
 import {
   isSubsetOfLanes,
@@ -78,69 +79,14 @@ export function entangleTransitions(rootFiber, currentFiber, lane){
   }
 }
 
-export function enqueueCapturedUpdate(workInProgress, capturedUpdate){
-  let queue = workInProgress.updateQueue;
-  const current = workInProgress.alternate;
-  if (current !== null){
-    const currentQueue = current.updateQueue;
-    if (queue === currentQueue){
-      let newFirst = null;
-      let newLast = null;
-      const firstBaseUpdate = queue.firstBaseUpdate;
-      if (firstBaseUpdate !== null){
-        let update = firstBaseUpdate;
-        do {
-          const clone = {
-            eventTime: update.eventTime,
-            lane: update.lane,
-
-            tag: update.tag,
-            payload: update.payload,
-            callback: update.callback,
-
-            next: null,
-          };
-          if(newLast === null){
-            newFirst = newLast = clone;
-          } else {
-            newLast.next = clone;
-            newLast = clone;
-          }
-          update = update.next;
-        } while (update !== null);
-
-        if (newLast === null){
-          newFirst = newLast = capturedUpdate;
-        } else {
-          newLast.next = capturedUpdate;
-          newLast = capturedUpdate;
-        }
-      } else {
-        newFirst = newLast = capturedUpdate;
-      }
-      queue = {
-        baseState: currentQueue.baseState,
-        firstBaseUpdate: newFirst,
-        lastBaseUpdate: newLast,
-        shared: currentQueue.shared,
-        effects: currentQueue.effects,
-      };
-      workInProgress.updateQueue = queue;
-      return;
-    }
-  }
-
-  const lastBaseUpdate = queue.lastBaseUpdate;
-  if(lastBaseUpdate === null){
-    queue.firstBaseUpdate = capturedUpdate;
-  } else {
-    lastBaseUpdate.next = capturedUpdate;
-  }
-  queue.lastBaseUpdate = capturedUpdate;
-}
-
-function getStateFromUpdate(update, prevState){
+function getStateFromUpdate(
+  workInProgress,
+  queue,
+  update, 
+  prevState
+){
   switch (update.tag){
+    // Intentional fallthrough
     case UpdateState: {
       if(typeof update.payload === 'function') debugger;
       let partialState = update.payload;     
@@ -218,6 +164,8 @@ export function processUpdateQueue(workInProgress,renderLanes){
 
           // Process this update.
           newState = getStateFromUpdate(
+            workInProgress,
+            queue,
             update,
             newState
           );

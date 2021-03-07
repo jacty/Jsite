@@ -176,8 +176,6 @@ export function markRootFinished(root, remainingLanes){
 
   root.suspendedLanes = 0;
 
-  if(remainingLanes !== 0) debugger;
-
   const pooledCacheLanes = root.pooledCacheLanes &= remainingLanes;
   if(pooledCacheLanes === NoLanes){
     root.pooledCache = null;

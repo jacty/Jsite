@@ -3,32 +3,14 @@ import {
     FunctionComponent,
     SuspenseComponent,
     HostRoot,
-    ShouldCapture,
     NoTimestamp,
-    CaptureUpdate,
 } from '@Jeact/shared/Constants';
 import {
     suspenseStackCursor, 
     InvisibleParentSuspenseContext
 } from '@Jeact/vDOM/FiberSuspenseContext';
-import {
-    getHighestPriorityLane,
-    mergeLanes,
-} from '@Jeact/vDOM/FiberLane';
-import {
-    createUpdate,
-    enqueueCapturedUpdate,
-} from '@Jeact/vDOM/UpdateQueue';
-
-function createRootErrorUpdate(fiber, errorInfo, lane){
-    const update = createUpdate(NoTimestamp, lane);
-    update.tag = CaptureUpdate;
-    update.payload = {element: null};
-    update.callback = ()=>{
-        debugger;
-    }
-    return update;
-}
+import {createUpdate} from '@Jeact/vDOM/UpdateQueue';
+import {renderDidError} from '@Jeact/vDOM/FiberWorkLoop';
 
 export function throwException(
     root, 
@@ -36,7 +18,7 @@ export function throwException(
     sourceFiber,
     value,
     rootRenderLanes
-    ){
+){
     sourceFiber.flags |= Incomplete;
     
     if(
@@ -65,28 +47,7 @@ export function throwException(
 
             wip = wip.return;
         } while (wip !== null);
-
-        value = new Error('Component suspended while rendering but no fallback UI was specified.');
+        console.error('Component suspended while rendering but no fallback UI was specified.');
     }
-    //createCapturedValue()
-    value = {
-        value,
-        sourceFiber
-    }
-    let wip = returnFiber;
-    do{
-        switch (wip.tag){
-            case HostRoot:{
-                const errorInfo = value;
-                wip.flags |= ShouldCapture;
-                const lane = getHighestPriorityLane(rootRenderLanes);
-                wip.lanes = mergeLanes(wip.lanes , lane);
-                const update = createRootErrorUpdate(wip, errorInfo, lane);
-                enqueueCapturedUpdate(wip, update);
-            }
-            default:
-                break;
-        }
-        wip = wip.return;
-    } while (wip !== null);
+    renderDidError();//update exit status
 }

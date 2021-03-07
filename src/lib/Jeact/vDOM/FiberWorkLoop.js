@@ -13,7 +13,7 @@ import {
   PassiveMask,
   BeforeMutationMask,
   MutationMask,
-  LayoutMask
+  LayoutMask,
 } from '@Jeact/shared/Constants';
 import {
   shouldYieldToHost,
@@ -184,7 +184,6 @@ function performConcurrentWorkOnRoot(root){
   let exitStatus = renderRootConcurrent(root, lanes);  
   if(exitStatus !== RootIncomplete){
     if(exitStatus === RootErrored || exitStatus===RootFatalErrored){
-      console.error('Error')
       executionContext |= RetryAfterError;
       return null;
     }
@@ -233,7 +232,6 @@ function prepareFreshStack(root, updateLanes){
 }
 
 function handleError(root, thrownValue){
-  do {
     let erroredWork = wip;
     try {
       if(erroredWork === null || erroredWork.return === null){
@@ -246,19 +244,9 @@ function handleError(root, thrownValue){
         thrownValue,
         wipRootRenderLanes
       );
-      completeUnitOfWork(erroredWork);
     } catch (yetAnotherThrownValue){
       debugger;
-      thrownValue = yetAnotherThrownValue;
-      if (wip === erroredWork && erroredWork !== null){
-        debugger;
-      } else {
-        erroredWork = wip;
-      }
-      continue;
     }
-    return;
-  } while(true);
 }
 
 export function markSkippedUpdateLanes(lane){
@@ -266,6 +254,12 @@ export function markSkippedUpdateLanes(lane){
     lane, 
     wipRootSkippedLanes,
   )
+}
+
+export function renderDidError(){
+  if (wipRootExitStatus !== RootCompleted){
+    wipRootExitStatus = RootErrored;
+  }
 }
 
 function renderRootConcurrent(root, updateLanes){
@@ -288,16 +282,8 @@ function renderRootConcurrent(root, updateLanes){
     }
 
   executionContext = prevExecutionContext;
-  // Check if the tree has completed.
-  if ( wip !== null){
-    return RootIncomplete;
-  }  else {
-    // Set this to null to indicate there's no in-progress render.
-    wipRoot = null;
-    wipRootRenderLanes = NoLanes;
 
-    return wipRootExitStatus;
-  }
+  return wipRootExitStatus;
 }
 
 function workLoopConcurrent(){
@@ -333,7 +319,6 @@ function completeUnitOfWork(unitOfWork){
         return;
       }
     } else {
-      // Error threw.
       debugger;
     }
 
@@ -401,7 +386,8 @@ function commitRootImpl(root, renderPriority){
     commitLayoutEffects(finishedWork, root, lanes);
     executionContext = prevExecutionContext;
   } else {
-    debugger;
+    // No effects.
+    root.current = finishedWork;
   }
 
   const rootDidHavePassiveEffects = rootDoesHavePassiveEffects;

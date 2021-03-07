@@ -1,4 +1,4 @@
-import {J, createRoot,useState, lazy} from '@Jeact';
+import {J, createRoot,useState, lazy, Suspense} from '@Jeact';
 
 import ErrorBoundary from '@com/Errors/ErrorBoundary.jsx';
 import '@assets/styles/main.sass';
@@ -10,11 +10,9 @@ function App(){
     const [nav,setNav] = useState(0)    
     return( 
             <ErrorBoundary>
-                {nav ===0?
-                    <AboutMe />:
-                    <div>222</div>
-                }
-
+                <Suspense>
+                    <AboutMe />
+                </Suspense>
                 <Footer handlers={()=>{setNav(1)}}/>
             </ErrorBoundary>
         )

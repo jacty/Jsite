@@ -5,6 +5,7 @@ export const NoTimestamp = -1;
 */
 export let JEACT_ELEMENT_TYPE = Symbol.for('Jeact.element');
 export let JEACT_CONTEXT_TYPE = Symbol.for('Jeact.context');
+export let JEACT_SUSPENSE_TYPE = Symbol.for('Jeact.suspense');
 export let JEACT_LAZY_TYPE = Symbol.for('Jeact.lazy');
 /*
 *JeactWorkTags

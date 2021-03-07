@@ -12,6 +12,10 @@ const Aboutme = React.lazy(()=>import('@com/aboutme.jsx'));
 ReactDOM.createRoot = ReactDOM.unstable_createRoot;
 
 ReactDOM.createRoot(document.getElementById('root')).render(
-    <Aboutme />
+    <div>
+        <Suspense fallback={<div>111</div>}>
+            <Aboutme />
+        </Suspense>
+    </div>
 )
 

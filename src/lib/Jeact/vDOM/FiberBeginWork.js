@@ -3,6 +3,7 @@ import {
   HostText,
   HostComponent,
   FunctionComponent,
+  SuspenseComponent,
   LazyComponent,
   NoLanes,
   PerformedWork,
@@ -161,6 +162,8 @@ export function beginWork(current, workInProgress, renderLanes){
           pushCacheProvider(workInProgress, cache);
           pushRootCachePool(root);
           break;
+        case SuspenseComponent:
+          debugger;
       }
       return bailoutOnAlreadyFinishedWork(current, workInProgress, renderLanes)
     }
@@ -186,6 +189,8 @@ export function beginWork(current, workInProgress, renderLanes){
       return updateHostComponent(current, workInProgress, renderLanes);
     case HostText://6
       return null;
+    case SuspenseComponent:
+      debugger;
     default:
       console.error('beginWork4', workInProgress);
   }

@@ -50,15 +50,6 @@ export function reconcileChildFibers(
     };
   }
 
-  if (Array.isArray(newChild)){
-    return reconcileChildrenArray(
-      returnFiber,
-      currentFirstChild,
-      newChild,
-      lanes,
-    );
-  }
-
   if (typeof newChild === 'string' || typeof newChild === 'number'){
     return placeSingleChild(
       reconcileSingleTextNode(
@@ -69,6 +60,19 @@ export function reconcileChildFibers(
       ),
       shouldTrackEffects
     )
+  }
+
+  if (Array.isArray(newChild)){
+    return reconcileChildrenArray(
+      returnFiber,
+      currentFirstChild,
+      newChild,
+      lanes,
+    );
+  }
+
+  if(newChild==='function'&&newChild[Symbol.iterator]){
+    debugger;
   }
 
   if (!shouldTrackEffects){

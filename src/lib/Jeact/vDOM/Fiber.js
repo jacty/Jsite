@@ -7,7 +7,9 @@ import {
   HostComponent,
   FunctionComponent,
   LazyComponent,
-  JEACT_LAZY_TYPE
+  SuspenseComponent,
+  JEACT_LAZY_TYPE,
+  JEACT_SUSPENSE_TYPE
 } from '@Jeact/shared/Constants';
 
 let debugCounter = 1;
@@ -97,7 +99,7 @@ export function createWorkInProgress(current, pendingProps){
   return workInProgress;
 }
 
-export function createFiberFromTypeAndProps(element,lanes, owner){
+export function createFiberFromTypeAndProps(element, lanes, owner){
   const type = element.type;
   const pendingProps = element.props;
   const key = element.key;
@@ -109,6 +111,10 @@ export function createFiberFromTypeAndProps(element,lanes, owner){
     fiberTag = HostComponent;
   } else {
     switch(type){
+      case JEACT_SUSPENSE_TYPE:
+        const fiber = createFiber(SuspenseComponent, pendingProps, key);
+        fiber.lanes = lanes;
+        return fiber;
       default:{
         if (typeof type ==='object' && type !== null){
           switch (type.$$typeof){

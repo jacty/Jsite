@@ -38,7 +38,9 @@ import {
   SubtreeSuspenseContextMask,
 } from '@Jeact/vDOM/FiberSuspenseContext';
 import {push} from '@Jeact/vDOM/FiberStack';
-import {createFiber} from '@Jeact/vDOM/Fiber';
+import {
+  createFiber,
+} from '@Jeact/vDOM/Fiber';
 import {pushRenderLanes} from '@Jeact/vDOM/FiberWorkLoop';
 
 let didReceiveUpdate = false;
@@ -172,7 +174,19 @@ function mountLazyComponent(
   const payload = lazyComponent._payload;
   const init = lazyComponent._init;
   let Component = init(payload);
-    debugger;
+
+  workInProgress.type = Component;
+  const resolvedTag = workInProgress.tag = FunctionComponent;
+  switch(resolvedTag){
+    case FunctionComponent:{
+      return updateFunctionComponent(
+        null,
+        workInProgress,
+        renderLanes
+      )
+    }
+  }
+  debugger;
 }
 
 function shouldRemainOnFallback(suspenseContext, current, workInProgress){

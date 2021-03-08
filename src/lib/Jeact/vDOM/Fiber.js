@@ -51,6 +51,7 @@ export const createFiber = function(tag, pendingProps, key){
   return new FiberNode(tag, pendingProps, key);
 };
 
+
 // This is used to create an alternate fiber to do work on.
 // Why it is not a completed copy of current?
 export function createWorkInProgress(current, pendingProps){

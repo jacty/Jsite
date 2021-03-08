@@ -8,6 +8,7 @@ import {initializeUpdateQueue} from '@Jeact/vDOM/UpdateQueue';
 function FiberRootNode(containerInfo){
   this.containerInfo = containerInfo; 
   this.current=null; 
+  this.pingCache = null;//Suspense related
   this.finishedWork = null; 
 
   this.callbackNode = null;
@@ -16,6 +17,7 @@ function FiberRootNode(containerInfo){
 
   this.pendingLanes = NoLanes;
   this.suspendedLanes = NoLanes;
+  this.pingedLanes = NoLanes;// Suspense related
   this.finishedLanes = NoLanes;
 
   this.pooledCache = null;

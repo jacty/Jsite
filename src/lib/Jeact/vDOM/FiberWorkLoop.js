@@ -25,7 +25,9 @@ import {
   markStarvedLanesAsExpired,
   markRootUpdated,
   markRootFinished,
+  markRootPinged,
   getNextLanes,
+  isSubsetOfLanes,
 } from '@Jeact/vDOM/FiberLane';
 import {
   createWorkInProgress
@@ -49,6 +51,8 @@ import {
 const RootIncomplete = 0;
 const RootFatalErrored = 1;
 const RootErrored = 2;
+const RootSuspended = 3;
+const RootSuspendedWithDelay = 4;
 const RootCompleted = 5;
 
 let executionContext = NoContext;
@@ -65,6 +69,7 @@ let wipRootFatalError = null;
 let wipRootIncludedLanes = NoLanes;
 let wipRootSkippedLanes = NoLanes;
 let wipRootUpdatedLanes = NoLanes;
+let wipRootPingedLanes = NoLanes;
 
 let rootDoesHavePassiveEffects = false;
 let rootsWithPendingDiscreteUpdates = null;
@@ -243,6 +248,7 @@ function prepareFreshStack(root, updateLanes){
   wipRootFatalError = null;
   wipRootSkippedLanes = NoLanes;
   wipRootUpdatedLanes = NoLanes;
+  wipRootPingedLanes = NoLanes;
 }
 
 function handleError(root, thrownValue){
@@ -413,7 +419,33 @@ function commitRootImpl(root, renderPriority){
 
   return null;
 }
+export function pingSuspendedRoot(root, wakeable, pingedLanes){
+  const pingCache = root.pingCache;
+  if (pingCache !== null){
+    pingCache.delete(wakeable);
+  }
+  const eventTime = requestEventTime();
+  markRootPinged(root, pingedLanes, eventTime);
 
+  if (
+    wipRoot === root &&
+    isSubsetOfLanes(wipRootRenderLanes, pingedLanes)
+    ){
+    
+    if(
+      wipRootExitStatus === RootSuspendedWithDelay ||
+      wipRootExitStatus === RootSuspended){
+      debugger;
+    } else {
+      wipRootPingedLanes = mergeLanes(
+        wipRootPingedLanes,
+        pingedLanes,
+      )
+    }
+  }
+
+  ensureRootIsScheduled(root, eventTime);
+}
 export function updateEventWipLanes(){
   if (currentEventWipLanes === NoLanes){
     currentEventWipLanes = wipRootIncludedLanes;

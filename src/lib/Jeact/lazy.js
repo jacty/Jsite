@@ -32,7 +32,6 @@ function lazyInitializer(payload){
         );
     }
     if (payload._status === Resolved){
-        debugger;
         return payload._result;
     } else {
         throw payload._result;

@@ -17,3 +17,30 @@ export const InvisibleParentSuspenseContext = 0b01;
 
 export const ForceSuspenseFallback = 0b10;
 export const suspenseStackCursor = createCursor(DefaultSuspenseContext);
+
+export function shouldCaptureSuspense(
+    workInProgress,
+    hasInvisibleParent
+){
+    const nextState = workInProgress.memoizedState;
+    if (nextState !== null){
+        debugger;
+        return false;
+    }
+    const props = workInProgress.memoizedProps;
+    if(props.fallback === undefined){
+        return false;
+    }
+
+    if (props.avoid !== true){
+        return true;
+    }
+
+    // If it's a boundary we should avoid, then we prefer to bubble up to the 
+    // parent boundary if it is currently invisible.
+    if (hasInvisibleParent){
+        return false;
+    }
+    // If the parent is not able to handle it, we must handle it.
+    return true;
+}

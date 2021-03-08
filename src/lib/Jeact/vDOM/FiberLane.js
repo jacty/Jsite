@@ -169,6 +169,10 @@ export function markRootUpdated(root, updateLane, eventTime){
   eventTimes[index] = eventTime;
 }
 
+export function markRootPinged(root, pingedLanes, eventTime){
+  root.pingedLanes |= root.suspendedLanes & pingedLanes;
+}
+
 export function markRootFinished(root, remainingLanes){
   const noLongerPendingLanes = root.pendingLanes & ~remainingLanes;
 

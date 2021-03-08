@@ -39,7 +39,46 @@ import {
 } from '@Jeact/vDOM/FiberSuspenseContext';
 import {push} from '@Jeact/vDOM/FiberStack';
 import {createFiber} from '@Jeact/vDOM/Fiber';
+import {pushRenderLanes} from '@Jeact/vDOM/FiberWorkLoop';
+
 let didReceiveUpdate = false;
+
+function updateOffscreenComponent(
+  current,
+  workInProgress,
+  renderLanes
+){
+
+  const nextProps = workInProgress.pendingProps;
+  const nextChildren = nextProps.children;
+
+  const prevState = current !== null ? current.memoizedState : null;
+
+  let spawnedCachePool = null;
+
+  if (nextProps.mode === 'hidden'){
+    debugger;
+  } else {
+    // Rendering a visible tree.
+    let subtreeRenderLanes;
+    if (prevState !== null){
+      debugger;
+    } else{
+      subtreeRenderLanes = renderLanes;
+    }
+    pushRenderLanes(workInProgress, subtreeRenderLanes);
+  }
+  workInProgress.updateQueue = spawnedCachePool;
+  // reconcileChildren()
+  workInProgress.child = reconcileChildFibers(
+      workInProgress,
+      current,
+      nextChildren,
+      renderLanes
+    );
+
+  return workInProgress.child;
+}
 
 function updateFunctionComponent(current,workInProgress,renderLanes){
 
@@ -293,6 +332,8 @@ export function beginWork(current, workInProgress, renderLanes){
       return null;
     case SuspenseComponent:
       return updateSuspenseComponent(current, workInProgress, renderLanes);
+    case OffscreenComponent:
+      return updateOffscreenComponent(current, workInProgress, renderLanes);
     default:
       console.error('beginWork4', workInProgress);
   }

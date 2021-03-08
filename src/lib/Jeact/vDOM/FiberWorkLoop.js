@@ -41,6 +41,10 @@ import {
 } from '@Jeact/vDOM/FiberCommitWork';
 import {CurrentDispatcher} from '@Jeact/shared/internals';
 import {throwException} from '@Jeact/vDOM/FiberThrow';
+import {
+  createCursor,
+  push,
+} from '@Jeact/vDOM/FiberStack';
 
 const RootIncomplete = 0;
 const RootFatalErrored = 1;
@@ -53,6 +57,7 @@ let wip = null;
 let wipRootRenderLanes = NoLanes;
 
 export let subtreeRenderLanes = NoLanes;
+const subtreeRenderLanesCursor = createCursor(NoLanes);
 
 let wipRootExitStatus = RootIncomplete;
 let wipRootFatalError = null;
@@ -212,6 +217,15 @@ function finishConcurrentRender(root, exitStatus){
       console.error('finishConcurrentRender', exitStatus)
     }
   }
+}
+
+export function pushRenderLanes(fiber, lanes){
+  push(subtreeRenderLanesCursor, subtreeRenderLanes);
+  subtreeRenderLanes = mergeLanes(subtreeRenderLanes, lanes);
+  wipRootIncludedLanes = mergeLanes(
+    wipRootIncludedLanes,
+    lanes,
+  );
 }
 
 function prepareFreshStack(root, updateLanes){

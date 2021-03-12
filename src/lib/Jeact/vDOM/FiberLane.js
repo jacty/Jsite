@@ -4,10 +4,8 @@ import {
   NoLanePriority,
   NormalPriority,
   DefaultLanePriority,
-  InputDiscreteLanePriority,
   DefaultLane,
   TransitionLanes,
-  InputDiscreteLane,
   NonIdleLanes,
   NoTimestamp,
   RetryLanes,
@@ -19,13 +17,11 @@ let highestLanePriority = DefaultLanePriority;
 
 function getHighestPriorityLanes(lanes){
   switch(getHighestPriorityLane(lanes)){
-    case InputDiscreteLane:
-      highestLanePriority = InputDiscreteLanePriority;
-      return InputDiscreteLane
     case DefaultLane:
       highestLanePriority = DefaultLanePriority;
       return DefaultLane
     default:
+      debugger;
       console.error('error', lanes);
   }
 }
@@ -121,14 +117,13 @@ export function getNextLanesPriority(){
 
 export function requestUpdateLane(lanePriority=1, wipLanes=0){
   updateEventWipLanes()
+  // code below is from findUpdateLane() in React.
   switch (lanePriority) {
-    case DefaultLanePriority: {//1
-      return DefaultLane;
-    }
-    case InputDiscreteLanePriority:{
-      return InputDiscreteLane;
+    case DefaultLanePriority: {//Jeact:1; React:8
+      return DefaultLane; // 128
     }
     default:
+      debugger;
       // The remaining priorities are not valid for updates
       console.log('findUpdateLane.default', lanePriority)
       break;

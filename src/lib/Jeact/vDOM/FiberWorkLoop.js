@@ -87,13 +87,14 @@ let currentEventTime = NoTimestamp;
 let currentEventWipLanes = NoLanes;
 
 export function requestEventTime(){
-  // This is the first update.
-  if (executionContext&(RenderContext|CommitContext)!==NoContext){
-    // We're inside Jeact, so it's fine to read the actual time.
-    console.error('Error in requestEventTime')
+  if ((executionContext & (RenderContext | CommitContext)) !== NoContext){
+    // We're inside Jeact
+    debugger;
   }
   // We're not inside Jeact, so we may be in the middle of a browser event like click.
+  // TODO: explain why `currentEventTime` has been changed.
   if (currentEventTime !== NoTimestamp){
+    debugger
     // Use the same start time for all updates until we enter Jeact again.
     return currentEventTime;
   }

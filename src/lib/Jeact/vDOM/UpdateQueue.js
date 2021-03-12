@@ -46,7 +46,7 @@ export function createUpdate(eventTime, lane){
     eventTime,
     lane,
 
-    tag: UpdateState,
+    tag: UpdateState,//0
     payload: null,
     callback: null,
     
@@ -65,7 +65,7 @@ export function enqueueUpdate(fiber, update){
     // First update.
     update.next = update;
   } else {
-    // TD: Add more explanation
+    debugger;
     update.next = pending.next;
     pending.next = update;
   }

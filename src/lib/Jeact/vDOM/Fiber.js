@@ -9,7 +9,8 @@ import {
   LazyComponent,
   SuspenseComponent,
   JEACT_LAZY_TYPE,
-  JEACT_SUSPENSE_TYPE
+  JEACT_SUSPENSE_TYPE,
+  StaticMask,
 } from '@Jeact/shared/Constants';
 
 let debugCounter = 1;
@@ -48,6 +49,7 @@ function FiberNode(tag=HostRoot, pendingProps=null, key=null){
 }
 
 export const createFiber = function(tag, pendingProps, key){
+  // TODO: add argument lane
   return new FiberNode(tag, pendingProps, key);
 };
 
@@ -81,9 +83,8 @@ export function createWorkInProgress(current, pendingProps){
     workInProgress.alternate = current;
     current.alternate = workInProgress;
   }else{}
-  if (current.flags !== 0){
-    debugger;
-  }
+
+  workInProgress.flags = current.flags & StaticMask;
   cloneKeys = [
     'childLanes',
     'lanes',

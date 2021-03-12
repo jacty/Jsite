@@ -10,6 +10,7 @@ import {
   InputDiscreteLane,
   NonIdleLanes,
   NoTimestamp,
+  RetryLanes,
 } from '@Jeact/shared/Constants';
 import {updateEventWipLanes} from '@Jeact/vDOM/FiberWorkLoop';
 
@@ -106,6 +107,10 @@ export function markStarvedLanesAsExpired(root, currentTime){
   }
 }
 
+export function includesOnlyRetries(lanes){
+  return (lanes & RetryLanes) === lanes;
+}
+
 export function isTransitionLane(lane){
   return (lane & TransitionLanes) !== 0;
 }
@@ -167,6 +172,17 @@ export function markRootUpdated(root, updateLane, eventTime){
   const index = laneToIndex(updateLane);
 
   eventTimes[index] = eventTime;
+}
+
+export function markRootSuspended(root, suspendedLanes){
+  root.suspendedLanes |= suspendedLanes;
+  root.pingedLanes &= ~suspendedLanes;
+
+  const expirationTimes = root.expirationTimes;
+  let lanes = suspendedLanes;
+  if (lanes > 0){
+    debugger;
+  }
 }
 
 export function markRootPinged(root, pingedLanes, eventTime){

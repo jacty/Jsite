@@ -14,6 +14,7 @@ import {
   BeforeMutationMask,
   MutationMask,
   LayoutMask,
+  HostEffectMask,
 } from '@Jeact/shared/Constants';
 import {
   shouldYieldToHost,
@@ -28,6 +29,9 @@ import {
   markRootPinged,
   getNextLanes,
   isSubsetOfLanes,
+  removeLanes,
+  markRootSuspended,
+  includesOnlyRetries,
 } from '@Jeact/vDOM/FiberLane';
 import {
   createWorkInProgress
@@ -46,7 +50,9 @@ import {throwException} from '@Jeact/vDOM/FiberThrow';
 import {
   createCursor,
   push,
+  pop
 } from '@Jeact/vDOM/FiberStack';
+import {unwindWork} from '@Jeact/vDOM/FiberUnwindWork';
 
 const RootIncomplete = 0;
 const RootFatalErrored = 1;
@@ -70,6 +76,9 @@ let wipRootIncludedLanes = NoLanes;
 let wipRootSkippedLanes = NoLanes;
 let wipRootUpdatedLanes = NoLanes;
 let wipRootPingedLanes = NoLanes;
+
+let globalMostRecentFallbackTime = 0;
+const FALLBACK_THROTTLE_MS = 500;
 
 let rootDoesHavePassiveEffects = false;
 let rootsWithPendingDiscreteUpdates = null;
@@ -197,11 +206,12 @@ function performConcurrentWorkOnRoot(root){
       executionContext |= RetryAfterError;
       return null;
     }
+
     // now we have a consistent tree.
     const finishedWork = root.current.alternate
     root.finishedWork = finishedWork;
     root.finishedLanes = lanes;
-    finishConcurrentRender(root, exitStatus);
+    finishConcurrentRender(root, exitStatus, lanes);
   }
   //schedule to finish Incomplete work.
   ensureRootIsScheduled(root, performance.now());
@@ -212,25 +222,49 @@ function performConcurrentWorkOnRoot(root){
   return null;
 }
 
-function finishConcurrentRender(root, exitStatus){
+function finishConcurrentRender(root, exitStatus, lanes){
   switch (exitStatus){
     case RootCompleted:{
       commitRoot(root);
       break;
     }
+    case RootSuspended:{  
+      lanes = removeLanes(lanes, wipRootPingedLanes);
+      lanes = removeLanes(lanes, wipRootUpdatedLanes);
+      markRootSuspended(root, lanes);
+
+      // figure out if we should immediately commit it or wait a bit.
+      if(
+        includesOnlyRetries(lanes)
+      ){
+        const msUntilTimeout = globalMostRecentFallbackTime + FALLBACK_THROTTLE_MS - performance.now();
+        if(msUntilTimeout > 10){
+          debugger;
+        }
+
+      }
+      commitRoot(root);
+      break;
+    }
     default:{
+      debugger
       console.error('finishConcurrentRender', exitStatus)
     }
   }
 }
 
 export function pushRenderLanes(fiber, lanes){
-  push(subtreeRenderLanesCursor, subtreeRenderLanes);
+  push(subtreeRenderLanesCursor, subtreeRenderLanes, fiber);
   subtreeRenderLanes = mergeLanes(subtreeRenderLanes, lanes);
   wipRootIncludedLanes = mergeLanes(
     wipRootIncludedLanes,
     lanes,
   );
+}
+
+export function popRenderLanes(fiber){
+  subtreeRenderLanes = subtreeRenderLanesCursor.current;
+  pop(subtreeRenderLanesCursor, fiber);
 }
 
 function prepareFreshStack(root, updateLanes){
@@ -274,6 +308,12 @@ export function markSkippedUpdateLanes(lane){
     lane, 
     wipRootSkippedLanes,
   )
+}
+
+export function renderDidSuspend(){
+  if(wipRootExitStatus === RootIncomplete){
+    wipRootExitStatus = RootSuspended;
+  }
 }
 
 export function renderDidError(){
@@ -339,7 +379,22 @@ function completeUnitOfWork(unitOfWork){
         return;
       }
     } else {
-      debugger;
+      // Error threw
+      const next = unwindWork(completedWork, subtreeRenderLanes);
+
+      if (next !== null){
+        // Error fixed and return to normal render phase.
+        next.flags &= HostEffectMask;
+        wip = next;
+        return;
+      }
+
+      if (returnFiber!==null){
+        returnFiber.flags |= Incomplete;
+        returnFiber.subtreeFlags = NoFlags;
+        returnFiber.deletions = null;
+      }
+
     }
 
     const siblingFiber = completedWork.sibling;
@@ -381,7 +436,11 @@ function commitRootImpl(root, renderPriority){
   if(rootsWithPendingDiscreteUpdates !== null){
     debugger;
   }
-  if (root === wipRoot) debugger;
+  if (root === wipRoot){
+    wipRoot = null;
+    wip = null;
+    wipRootRenderLanes = NoLanes;
+  }
 
   if((finishedWork.subtreeFlags & PassiveMask)!== NoFlags ||
       (finishedWork.flags & PassiveMask) !== NoFlags

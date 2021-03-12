@@ -1,11 +1,14 @@
 import {
   FunctionComponent,
+  SuspenseComponent,
   HostText,
   HostComponent,
+  Fragment,
   HostRoot,
   NoLanes,
   NoFlags,
   Snapshot,
+  DidCapture,
 } from '@Jeact/shared/Constants';
 import {
   getRootHostContainer,
@@ -27,6 +30,12 @@ import {
   popRootCachePool,
   popCacheProvider,
 } from '@Jeact/vDOM/FiberCacheComponent';
+import {
+  suspenseStackCursor,
+  InvisibleParentSuspenseContext,
+} from '@Jeact/vDOM/FiberSuspenseContext';
+import {pop} from '@Jeact/vDOM/FiberStack';
+import {renderDidSuspend} from '@Jeact/vDOM/FiberWorkLoop';
 
 function appendAllChildren(parent, workInProgress){
   let node = workInProgress.child;
@@ -93,6 +102,7 @@ export function completeWork(current, workInProgress,renderLanes){
   const newProps = workInProgress.pendingProps;
   
   switch(workInProgress.tag){
+    case Fragment:
     case FunctionComponent://0
       bubbleProperties(workInProgress);
       return null;
@@ -140,6 +150,33 @@ export function completeWork(current, workInProgress,renderLanes){
       );
       workInProgress.stateNode = instance;
       precacheFiberNode(workInProgress, instance)
+      bubbleProperties(workInProgress);
+      return null;
+    }
+    case SuspenseComponent:{
+      pop(suspenseStackCursor, workInProgress);
+      const nextState = workInProgress.memoizedState;
+      if((workInProgress.flags & DidCapture) !== NoFlags){
+        debugger;
+      }
+      const nextDidTimeout = nextState !== null;
+      let prevDidTimeout = false;
+      if(current !== null){
+        debugger;
+        const prevState = current.memoizedState;
+        prevDidTimeout = prevState !== null;
+      } 
+
+      if(nextDidTimeout && !prevDidTimeout){
+          if(
+            (current === null) ||
+            ((suspenseStackCursor.current & InvisibleParentSuspenseContext)!==0)
+            ){
+            renderDidSuspend()
+          } else {
+            debugger;
+          }
+      }
       bubbleProperties(workInProgress);
       return null;
     }

@@ -25,9 +25,22 @@ export function pushRootCachePool(root){
     pooledCache = root.pooledCache;
 }
 
+let _suspendedPooledCache = null;
+
 export function popRootCachePool(root, renderLanes){
     root.pooledCache = pooledCache;
     if(pooledCache !== null){
         root.pooledCacheLanes |= renderLanes;
+    }
+}
+
+export function getSuspendedCachePool(){
+    let pool = pooledCache;
+    if(pool === null){
+        debugger;
+    }
+    return {
+        parent: CacheContext._currentValue,
+        pool,
     }
 }

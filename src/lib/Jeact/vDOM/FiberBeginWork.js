@@ -11,6 +11,7 @@ import {
   Ref,
   DidCapture,
   NoFlags,
+  Fragment,
 } from '@Jeact/shared/Constants';
 import {includesSomeLane} from '@Jeact/vDOM/FiberLane';
 import {
@@ -29,7 +30,8 @@ import {pushHostContainer} from '@Jeact/vDOM/FiberHostContext';
 import {shouldSetTextContent} from '@Jeact/vDOM/DOMComponent';
 import {
   pushRootCachePool,
-  pushCacheProvider
+  pushCacheProvider,
+  getSuspendedCachePool
 } from '@Jeact/vDOM/FiberCacheComponent';
 import {
   suspenseStackCursor,
@@ -79,6 +81,18 @@ function updateOffscreenComponent(
       renderLanes
     );
 
+  return workInProgress.child;
+}
+
+function updateFragment(current, workInProgress, renderLanes){
+  const nextChildren = workInProgress.pendingProps;
+  
+  workInProgress.child = reconcileChildFibers(
+      workInProgress,
+      current,
+      nextChildren,
+      renderLanes
+    );
   return workInProgress.child;
 }
 
@@ -189,6 +203,17 @@ function mountLazyComponent(
   debugger;
 }
 
+const SUSPENDED_MARKER = {
+  retryLane: NoLanes,
+}
+
+function mountSuspenseOffscreenState(renderLanes){
+  return {
+    baseLanes: renderLanes,
+    cachePool: getSuspendedCachePool(),
+  }
+}
+
 function shouldRemainOnFallback(suspenseContext, current, workInProgress){
   // If we're already showing a fallback, there are cases where we need to 
   // remain on that fallback regardless of whether the content has resolved.
@@ -199,7 +224,6 @@ function shouldRemainOnFallback(suspenseContext, current, workInProgress){
   // Not currently showing content. 
   // hasSuspenseContext()
   return suspenseContext & ForceSuspenseFallback !== 0
-
 }
 
 function updateSuspenseComponent(current, workInProgress, renderLanes){ 
@@ -219,7 +243,9 @@ function updateSuspenseComponent(current, workInProgress, renderLanes){
       renderLanes,
     )
   ){
-    debugger;
+    // rendering the fallback children.
+    showFallback = true;
+    workInProgress.flags &= ~DidCapture;
   } else {
     // Attempting the main content
     if(
@@ -244,14 +270,25 @@ function updateSuspenseComponent(current, workInProgress, renderLanes){
   suspenseContext &= SubtreeSuspenseContextMask;
 
   // pushSuspenseContext()
-  push(suspenseStackCursor, suspenseContext);
+  push(suspenseStackCursor, suspenseContext, workInProgress);
 
   if (current === null){
     // Initial mount
     const nextPrimaryChildren = nextProps.children;
     const nextFallbackChildren = nextProps.fallback;
     if (showFallback){
-      debugger
+      const fallbackFragment = mountSuspenseFallbackChildren(
+        workInProgress,
+        nextPrimaryChildren,
+        nextFallbackChildren,
+        renderLanes,
+      );
+      const primaryChildFragment = workInProgress.child;
+      primaryChildFragment.memoizedState = mountSuspenseOffscreenState(
+        renderLanes,
+      );
+      workInProgress.memoizedState = SUSPENDED_MARKER;
+      return fallbackFragment;
     } else {
       return mountSuspensePrimaryChildren(
         workInProgress,
@@ -283,6 +320,43 @@ function mountSuspensePrimaryChildren(
   primaryChildFragment.return = workInProgress;
   workInProgress.child = primaryChildFragment;
   return primaryChildFragment;
+}
+
+function mountSuspenseFallbackChildren(
+  workInProgress,
+  primaryChildren,
+  fallbackChildren,
+  renderLanes,
+){
+  const progressedPrimaryFragment = workInProgress.child;
+
+  const primaryChildProps = {
+    mode: 'hidden',
+    children: primaryChildren,
+  };
+
+  let primaryChildFragment;
+  let fallbackChildFragment;
+
+  primaryChildFragment = createFiber(
+    OffscreenComponent,
+    primaryChildProps,
+    null,
+  );
+  primaryChildFragment.lanes = renderLanes;
+
+  fallbackChildFragment = createFiber(
+    Fragment,
+    fallbackChildren,
+    null
+  );
+  fallbackChildFragment.lanes = renderLanes;
+
+  primaryChildFragment.return = workInProgress;
+  fallbackChildFragment.return = workInProgress;
+  primaryChildFragment.sibling = fallbackChildFragment;
+  workInProgress.child = primaryChildFragment;
+  return fallbackChildFragment;
 }
 
 function bailoutOnAlreadyFinishedWork(current, workInProgress, renderLanes){
@@ -346,6 +420,8 @@ export function beginWork(current, workInProgress, renderLanes){
       return null;
     case SuspenseComponent:
       return updateSuspenseComponent(current, workInProgress, renderLanes);
+    case Fragment:
+      return updateFragment(current, workInProgress, renderLanes);
     case OffscreenComponent:
       return updateOffscreenComponent(current, workInProgress, renderLanes);
     default:

@@ -14,6 +14,7 @@ export const FunctionComponent = 0;
 export const HostRoot = 3; // Root of a host tree.
 export const HostComponent = 5;
 export const HostText = 6;
+export const Fragment = 7;
 export const SuspenseComponent = 13;
 export const LazyComponent = 16;
 export const OffscreenComponent = 22;
@@ -30,6 +31,7 @@ export const NoLane =/*                          */ 0b00000000000000000000000000
 export const InputDiscreteLane = /*             */ 0b0000000000000000000000000001000;
 export const DefaultLane = /*                    */ 0b0000000000000000000000010000000;
 export const TransitionLanes = /*                */ 0b0000000001111111110000000000000;
+export const RetryLanes = /*                     */ 0b0000111100000000000000000000000;
 export const NonIdleLanes = /*                   */ 0b0001111111111111111111111111111;
 
 /* core Priorities */
@@ -49,23 +51,24 @@ export const InputDiscreteLanePriority = 2;
 /* JeactUpdateQueue.js */
 export const UpdateState = 0;
 /* JeactFiberFlags.js */
-export const NoFlags = /*                      */ 0b0000000000000000000000;
-export const PerformedWork = /*                */ 0b0000000000000000000001;
-export const Placement = /*                    */ 0b0000000000000000000010;
-export const Update = /*                       */ 0b0000000000000000000100;
+export const NoFlags = /*                      */ 0b000000000000000000000;
+export const PerformedWork = /*                */ 0b000000000000000000001;
+export const Placement = /*                    */ 0b000000000000000000010;
+export const Update = /*                       */ 0b000000000000000000100;
 export const PlacementAndUpdate = /*           */ Placement | Update;
-export const Deletion = /*                     */ 0b0000000000000000001000;
-export const ChildDeletion = /*                */ 0b0000000000000000010000;
-export const ContentReset = /*                 */ 0b0000000000000000100000; 
-export const DidCapture = /*                   */ 0b0000000000000010000000;
-export const Ref = /*                          */ 0b0000000000000100000000;
-export const Snapshot = /*                     */ 0b0000000000001000000000;
-export const Passive = /*                      */ 0b0000000000010000000000;
+export const Deletion = /*                     */ 0b000000000000000001000;
+export const ChildDeletion = /*                */ 0b000000000000000010000;
+export const ContentReset = /*                 */ 0b000000000000000100000; 
+export const DidCapture = /*                   */ 0b000000000000010000000;
+export const Ref = /*                          */ 0b000000000000100000000;
+export const Snapshot = /*                     */ 0b000000000001000000000;
+export const Passive = /*                      */ 0b000000000010000000000;
 
+export const HostEffectMask = /*               */ 0b000000001111111111111;
 
 // These are not really side effects, but we still reuse this field.
-export const Incomplete = /*                   */ 0b0000000010000000000000;
-export const ShouldCapture = /*                */ 0b0000000100000000000000;
+export const Incomplete = /*                   */ 0b000000010000000000000;
+export const ShouldCapture = /*                */ 0b000000100000000000000;
 export const BeforeMutationMask = Update | Snapshot | ChildDeletion;
 export const MutationMask = 
     Placement | 
@@ -80,6 +83,8 @@ export const noTimeout = -1;
 // Eventually times out
 export const USER_BLOCKING_PRIORITY_TIMEOUT = 250;
 export const NORMAL_PRIORITY_TIMEOUT = 5000;
+export const PassiveStatic = /*                */ 0b001000000000000000000;
+export const StaticMask = PassiveStatic;
 
 
 

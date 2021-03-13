@@ -41,13 +41,13 @@ export function cloneUpdateQueue(current, workInProgress){
   }
 }
 
-export function createUpdate(eventTime, lane){
+export function createUpdate(eventTime, lane, element=null){
   const update = {
     eventTime,
     lane,
 
     tag: UpdateState,//0
-    payload: null,
+    payload: element,
     callback: null,
     
     next: null,

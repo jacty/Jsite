@@ -24,9 +24,9 @@ function FiberRootNode(containerInfo){
 }
 
 export function createFiberRoot(container){
+  // prepare fiberRoot and fiber and connect them.
   const root = new FiberRootNode(container);
   const fiber = createFiber();//uninitializedFiber
-
   root.current = fiber;
   fiber.stateNode = root;
 

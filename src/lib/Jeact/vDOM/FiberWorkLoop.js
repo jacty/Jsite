@@ -111,20 +111,9 @@ export function scheduleUpdateOnFiber(fiber, lane, eventTime){
   // update fiber.lanes based on renderLanes;
   fiber.lanes = mergeLanes(fiber.lanes, lane);
   const root = fiber.stateNode;
-  debugger;
+
   // update root.pendingLanes, eventTimes etc.
   markRootUpdated(root, lane, eventTime);
-  if(root === wipRoot){
-    debugger;
-  }
-
-  if((executionContext & DiscreteEventContext)!==NoContext){
-    if(rootsWithPendingDiscreteUpdates === null){
-      rootsWithPendingDiscreteUpdates = new Set([root]);
-    } else {
-      rootsWithPendingDiscreteUpdates.add(root);
-    }
-  }
 
   ensureRootIsScheduled(root, eventTime);
 

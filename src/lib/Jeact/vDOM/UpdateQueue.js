@@ -15,11 +15,7 @@ export function initializeUpdateQueue(fiber){
     baseState: fiber.memoizedState,
     firstBaseUpdate: null,
     lastBaseUpdate: null,
-    shared: {
-      pending: null,
-      interleaved: null,
-      lanes: NoLanes,
-    },
+    pending:null,
     effects: null
   };
   fiber.updateQueue = queue;
@@ -57,9 +53,7 @@ export function createUpdate(eventTime, lane, element=null){
 
 export function enqueueUpdate(fiber, update){
   const updateQueue = fiber.updateQueue;
-
-  const sharedQueue = updateQueue.shared;
-  const pending = sharedQueue.pending;
+  const pending = updateQueue.pending;
 
   if (pending === null) {
     // First update.
@@ -69,7 +63,7 @@ export function enqueueUpdate(fiber, update){
     update.next = pending.next;
     pending.next = update;
   }
-  sharedQueue.pending = update;
+  updateQueue.pending = update;
 }
 
 export function entangleTransitions(rootFiber, currentFiber, lane){

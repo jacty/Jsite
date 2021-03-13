@@ -104,12 +104,14 @@ export function requestEventTime(){
 }
 
 export function scheduleUpdateOnFiber(fiber, lane, eventTime){
-  const root = markUpdateLaneFromFiberToRoot(fiber, lane);
-
-  if(root === null){
-    debugger;
-    return null;
-  } 
+  // The code below is from markUpdateLaneFromFiberToRoot(), which is supposed 
+  // to update all `fiber.lane`s. However, in current version, fiber can only 
+  // be the unprepared one without any children and parents.  
+  // 
+  // update fiber.lanes based on renderLanes;
+  fiber.lanes = mergeLanes(fiber.lanes, lane);
+  const root = fiber.stateNode;
+  debugger;
   // update root.pendingLanes, eventTimes etc.
   markRootUpdated(root, lane, eventTime);
   if(root === wipRoot){
@@ -129,33 +131,6 @@ export function scheduleUpdateOnFiber(fiber, lane, eventTime){
   return root;
 }
 
-function markUpdateLaneFromFiberToRoot(fiber, lane){
-  fiber.lanes = mergeLanes(fiber.lanes, lane);
-  let alternate = fiber.alternate;
-  if(alternate!==null){
-    debugger;
-  }
-
-  let node = fiber;
-  let parent = fiber.return;
-  while(parent!==null){
-    debugger;
-    parent.childLanes = mergeLanes(parent.childLanes, lane);
-    alternate = parent.alternate;
-    if (alternate !== null){
-      alternate.childLanes = mergeLanes(alternate.childLanes, lane);
-    }
-
-    node = parent;
-    parent = parent.return;
-  }
-
-
-  if(node.tag === HostRoot){
-    return node.stateNode;
-  }
-  return null;
-}
 
 function ensureRootIsScheduled(root, currentTime){
   const existingCallbackNode = root.callbackNode;

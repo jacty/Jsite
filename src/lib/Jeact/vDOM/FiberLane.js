@@ -162,9 +162,7 @@ export function removeLanes(set, subset){
 }
 
 export function markRootUpdated(root, updateLane, eventTime){
-  // TODO: temporarily set pendingLanes instead of adding up it to confirm if 
-  // there are cases that multiple lanes pending together.
-  root.pendingLanes = updateLane;
+  root.pendingLanes |= updateLane;
   
   const eventTimes = root.eventTimes;
   const index = laneToIndex(updateLane);

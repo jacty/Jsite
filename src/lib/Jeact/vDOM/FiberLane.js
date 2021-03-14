@@ -75,6 +75,7 @@ export function getNextLanes(root, wipLanes){
 function computeExpirationTime(lane, currentTime){
   // TODO: Expiration heuristic is constant per lane, so could use a map.
   getHighestPriorityLanes(lane);//update global variable highestLanePriority
+  if(highestLanePriority!==1){debugger};
   return currentTime + 5000;
 }
 

@@ -79,8 +79,8 @@ function computeExpirationTime(lane, currentTime){
 }
 
 export function markStarvedLanesAsExpired(root, currentTime){
-
   const suspendedLanes = root.suspendedLanes;
+  If(root.pingedLanes){debugger};
   const expirationTimes = root.expirationTimes;
 
   // Iterate through the pending lanes and check if we've reached their expiration time. If so, we'll assume the update is being starved and mark it as expired to force it to finish.

@@ -80,6 +80,7 @@ function computeExpirationTime(lane, currentTime){
 
 export function markStarvedLanesAsExpired(root, currentTime){
   const suspendedLanes = root.suspendedLanes;
+  
   if(root.pingedLanes){debugger}
   const expirationTimes = root.expirationTimes;
 

@@ -120,7 +120,6 @@ export function scheduleUpdateOnFiber(fiber, lane, eventTime){
   return root;
 }
 
-
 function ensureRootIsScheduled(root, currentTime){
   const existingCallbackNode = root.callbackNode;
 
@@ -133,14 +132,16 @@ function ensureRootIsScheduled(root, currentTime){
   );
   
   if (nextLanes === NoLanes){
+    debugger;
      if (existingCallbackNode !== null){
        debugger;
      }
      return;
-   }
+  }
 
   // Reuse existing task if there is.
   if (existingCallbackNode !== null){
+    debugger;
     return;
   }
 

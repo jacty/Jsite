@@ -29,12 +29,9 @@ let deadline = 0;
 let isMessageLoopRunning = false;
 let scheduledHostCallback = null;
 
-function flushWork(){
+function flushWork(initialTime){
+  // For next time work scheduled.
   isHostCallbackScheduled = false;
-  if(isHostCallbackScheduled){
-    debugger;
-  }
-
   isPerformingWork = true;
 
   try{
@@ -45,10 +42,8 @@ function flushWork(){
     isPerformingWork = false;
   }
 }
-// the return value of this function decides if there will be another re-runs of this function through performWorkUntilDeadline();
+// the return value of this function decides will be set to hasMoreWork.
 function workLoop(){
-  const currentTime = performance.now();
-  deadline = currentTime + yieldInterval;
   currentTask = peek(taskQueue);
   while(currentTask !== null){
     if(currentTask.expirationTime > currentTime &&
@@ -93,9 +88,6 @@ export function scheduleCallback(priority, callback){
   let startTime = performance.now();
   let timeout;
   switch (priority){
-    case InputDiscreteLanePriority:
-      timeout = USER_BLOCKING_PRIORITY_TIMEOUT;
-      break;
     case DefaultLanePriority:
     default:
       timeout = NORMAL_PRIORITY_TIMEOUT;
@@ -119,7 +111,6 @@ export function scheduleCallback(priority, callback){
     isHostCallbackScheduled = true;
     requestHostCallback(flushWork)
   }
- 
   return newTask;
 }
 
@@ -127,12 +118,16 @@ export function shouldYieldToHost(){
   return performance.now() >= deadline;
 }
 
-function performWorkUntilDeadline(){
-  if (scheduledHostCallback !== null){
-    let hasMoreWork = true;
+function performWorkUntilDeadline(){  
+  const currentTime = performance.now();
+  deadline = currentTime + yieldInterval;
+  let hasMoreWork = true;
     try{
       // scheduledHostCallback = flushWork;
-      hasMoreWork = scheduledHostCallback();
+      hasMoreWork = scheduledHostCallback(currentTime);
+    } catch (error){
+      console.error('Err:',error);
+      hasMoreWork = false;
     } finally {
       if (hasMoreWork){
         // If there's more work, schedule the next message event at the end
@@ -142,11 +137,7 @@ function performWorkUntilDeadline(){
         isMessageLoopRunning = false;
         scheduledHostCallback = null;
       }
-    }
-  } else {
-    debugger;
-    isMessageLoopRunning = false;
-  }
+    }  
 };
 
 const channel = new MessageChannel();

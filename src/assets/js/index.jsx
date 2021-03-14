@@ -12,7 +12,7 @@ const AboutMe = lazy(()=>import('@assets/js/aboutme.jsx'));
 // import {Footer} from '@com/shared.jsx';
 
 function App(){
-    const [nav,setNav] = useState(0)    
+    {/*const [nav,setNav] = useState(0)*/}
     return( 
             <div> 111
                 {/*

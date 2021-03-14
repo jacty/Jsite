@@ -1,6 +1,7 @@
 export function push(heap, node){
   const index = heap.length;
   heap.push(node);
+  if (index > 0) debugger;
   siftUp(heap, node, index);
 }
 

@@ -46,28 +46,11 @@ export function getNextLanes(root, wipLanes){
   let nextLanePriority = NoLanePriority;
 
   const suspendedLanes = root.suspendedLanes;
+  
+  if(pendingLanes!==128) debugger;
 
-  if(root.expiredLanes || root.entangledLanes){
-    debugger;
-  }
-
-
-  // Do not work on any idle work until all the non-idle work has finished,
-  // even it the work is suspended.
-  const nonIdlePendingLanes = pendingLanes & NonIdleLanes;
-  if (nonIdlePendingLanes !== NoLanes){
-    const nonIdleUnblockedLanes = nonIdlePendingLanes & ~suspendedLanes;
-    if (nonIdleUnblockedLanes !== NoLanes){
-      nextLanes = getHighestPriorityLanes(nonIdleUnblockedLanes);
-      nextLanePriority = highestLanePriority;
-    } else {
-      debugger;
-    }
-  } else {
-    // The only remaining work is Idle.
-    debugger;
-  }
-  if(wipLanes !== 0 && wipLanes !== nextLanes){debugger}
+  nextLanes = getHighestPriorityLanes(pendingLanes);
+  nextLanePriority = highestLanePriority;
 
   return [nextLanes, highestLanePriority];
 }

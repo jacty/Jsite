@@ -8,8 +8,7 @@ import {
 } from '@Jeact/vDOM/UpdateQueue';
 import { requestUpdateLane } from '@Jeact/vDOM/FiberLane';
 
-export function updateContainer(element, root){
-  
+export function updateContainer(element, root){ 
   // prepare and enqueue `update` 
   const current = root.current;//uninitialized fiber.
   const eventTime =requestEventTime();
@@ -17,8 +16,7 @@ export function updateContainer(element, root){
   const update = createUpdate(eventTime, lane, element);
   enqueueUpdate(current, update); //update fiber.updateQueue.pending.
   
-  const rootFiber = scheduleUpdateOnFiber(current, lane, eventTime);
-  
+  const rootFiber = scheduleUpdateOnFiber(current, lane, eventTime);  
 }
 
 

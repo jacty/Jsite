@@ -55,7 +55,6 @@ export const createFiber = function(tag, pendingProps, key){
 
 
 // This is used to create an alternate fiber to do work on.
-// Why it is not a completed copy of current?
 export function createWorkInProgress(current, pendingProps){
   let workInProgress = current.alternate;
   let cloneKeys = [];
@@ -77,15 +76,14 @@ export function createWorkInProgress(current, pendingProps){
         '_debugOwner',
         '_debugHookTypes'
       ])
-    }
-    clone(current,workInProgress,cloneKeys)   
+    }   
 
     workInProgress.alternate = current;
     current.alternate = workInProgress;
   }else{}
-
+  // TODO: why?
   workInProgress.flags = current.flags & StaticMask;
-  cloneKeys = [
+  cloneKeys = cloneKeys.concat([
     'childLanes',
     'lanes',
     'child',
@@ -95,7 +93,7 @@ export function createWorkInProgress(current, pendingProps){
     'sibling',
     'index',
     'ref',
-  ];
+  ]);
   clone(current,workInProgress,cloneKeys);
 
   return workInProgress;

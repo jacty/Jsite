@@ -156,6 +156,7 @@ function ensureRootIsScheduled(root, currentTime){
 // Entry point for every concurrent task, i.e. anything that
 // goes through Scheduler.
 function performConcurrentWorkOnRoot(root){
+  // TODO: explain why reset it is necessary like when it will be misused.
   currentEventTime = NoTimestamp;
   currentEventWipLanes = NoLanes;
 
@@ -179,7 +180,7 @@ function performConcurrentWorkOnRoot(root){
     root.finishedLanes = lanes;
     finishConcurrentRender(root, exitStatus, lanes);
   }
-  //schedule to finish Incomplete work.
+  //schedule to finish extra work scheduled in Render Phase
   ensureRootIsScheduled(root, performance.now());
   if (exitStatus!==RootCompleted){
     // Continue expired tasks.
@@ -292,7 +293,6 @@ function renderRootConcurrent(root, updateLanes){
   const prevExecutionContext = executionContext;
   executionContext |= RenderContext;
   const prevDispatcher = CurrentDispatcher.current;
-  
   // If the root or lanes have changed, throw out the existing stack
   // and prepare a fresh one. Otherwise we'll continue where we left off.
   if (wipRoot !== root || wipRootRenderLanes !== updateLanes){

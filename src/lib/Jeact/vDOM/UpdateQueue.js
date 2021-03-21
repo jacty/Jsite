@@ -43,7 +43,7 @@ export function createUpdate(eventTime, lane, element=null){
     lane,
 
     tag: UpdateState,//0
-    payload: element,
+    payload: {element},
     callback: null,
     
     next: null,

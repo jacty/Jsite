@@ -29,13 +29,13 @@ let deadline = 0;
 let isMessageLoopRunning = false;
 let scheduledHostCallback = null;
 
-function flushWork(initialTime){
+function flushWork(currentTime){
   // For next time work scheduled.
   isHostCallbackScheduled = false;
   isPerformingWork = true;
 
   try{
-     return workLoop();
+     return workLoop(currentTime);
   } finally {
     // flags may be set in workLoop should be reset finally.
     currentTask = null;
@@ -43,7 +43,7 @@ function flushWork(initialTime){
   }
 }
 // the return value of this function decides will be set to hasMoreWork.
-function workLoop(){
+function workLoop(currentTime){
   currentTask = peek(taskQueue);
   while(currentTask !== null){
     if(currentTask.expirationTime > currentTime &&

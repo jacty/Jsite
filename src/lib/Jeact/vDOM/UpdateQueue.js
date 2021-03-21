@@ -30,7 +30,7 @@ export function cloneUpdateQueue(current, workInProgress){
       baseState: currentQueue.baseState,
       firstBaseUpdate: currentQueue.firstBaseUpdate,
       lastBaseUpdate: currentQueue.lastBaseUpdate,
-      shared: currentQueue.shared,
+      pending: currentQueue.pending,
       effects: currentQueue.effects,
     };
     workInProgress.updateQueue = clone;
@@ -103,9 +103,9 @@ export function processUpdateQueue(workInProgress,renderLanes){
   let lastBaseUpdate = queue.lastBaseUpdate;
 
   // Check if there are pending updates. If so, transfer them to the base queue.
-  let pendingQueue = queue.shared.pending;
+  let pendingQueue = queue.pending;
   if (pendingQueue !== null){
-    queue.shared.pending = null;
+    queue.pending = null;
 
     const lastPendingUpdate = pendingQueue;
     const firstPendingUpdate = lastPendingUpdate.next;
@@ -171,7 +171,7 @@ export function processUpdateQueue(workInProgress,renderLanes){
         }
         update = update.next;
         if (update=== null){
-          pendingQueue = queue.shared.pending;
+          pendingQueue = queue.pending;
           if (pendingQueue === null){
             break;
           } else {
@@ -188,8 +188,8 @@ export function processUpdateQueue(workInProgress,renderLanes){
       queue.firstBaseUpdate = newFirstBaseUpdate;
       queue.lastBaseUpdate = newLastBaseUpdate;
 
-      const lastInterleaved = queue.shared.interleaved;
-      if (lastInterleaved !== null){
+      const lastInterleaved = queue.interleaved;
+      if (lastInterleaved !== undefined){
         debugger;
       } else if (firstBaseUpdate === null){
         debugger;

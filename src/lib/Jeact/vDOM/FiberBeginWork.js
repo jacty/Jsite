@@ -139,7 +139,12 @@ function updateHostRoot(current, workInProgress, renderLanes){
 
   const nextChildren = nextState.element;
   if(nextChildren === prevChildren){
+    /* 
+    * First run of UpdateHostRoot() will not have a child, since 
+    * first Fiber(RootFiber) which has no any relevant DOM/VDOM node yet.
+    */
     debugger;
+    return bailoutOnAlreadyFinishedWork(current, workInProgress, renderLanes);
   }
 
   workInProgress.child = reconcileChildFibers(
@@ -360,11 +365,13 @@ function mountSuspenseFallbackChildren(
 }
 
 function bailoutOnAlreadyFinishedWork(current, workInProgress, renderLanes){
+  if (workInProgress.lanes !== 0) debugger;
   // Check if the children have any pending work.
   if (!includesSomeLane(renderLanes, workInProgress.childLanes)){
     // The children don't have any work either.
     return null;
   } else {
+    debugger;
     // This fiber doesn't have work, but its subtree does. Clone the child fibers and continue.
     cloneChildFibers(workInProgress);
     return workInProgress.child;
@@ -379,6 +386,7 @@ export function beginWork(current, workInProgress, renderLanes){
     const newProps = workInProgress.pendingProps;
     if(oldProps !== newProps){
       debugger;
+      didReceiveUpdate = true;
     } else if(!includesSomeLane(renderLanes, updateLanes)){
       didReceiveUpdate = false;
       // This fiber does not have any pending work. Bailout without entering 

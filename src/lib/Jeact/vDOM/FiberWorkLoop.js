@@ -184,6 +184,7 @@ function performConcurrentWorkOnRoot(root){
   ensureRootIsScheduled(root, performance.now());
   if (exitStatus!==RootCompleted){
     // Continue expired tasks.
+    debugger;
     return performConcurrentWorkOnRoot.bind(null, root, lanes);
   }
   return null;
@@ -293,20 +294,22 @@ function renderRootConcurrent(root, updateLanes){
   const prevExecutionContext = executionContext;
   executionContext |= RenderContext;
   const prevDispatcher = CurrentDispatcher.current;
+  if(prevDispatcher!==null){
+    debugger;
+  }
   // If the root or lanes have changed, throw out the existing stack
   // and prepare a fresh one. Otherwise we'll continue where we left off.
   if (wipRoot !== root || wipRootRenderLanes !== updateLanes){
     //create a new FiberNode by cloning root.current and set it to wip.
     prepareFreshStack(root, updateLanes);
   }
-
   //Keep trying until all caught error handled.
-    try {
-      workLoopConcurrent();
-    } catch(thrownValue){
-      handleError(root, thrownValue);
-    }
-
+  try {
+    workLoopConcurrent();
+  } catch(thrownValue){
+    console.error(thrownValue);
+    handleError(root, thrownValue);
+  }
   executionContext = prevExecutionContext;
 
   return wipRootExitStatus;
@@ -320,6 +323,7 @@ function workLoopConcurrent(){
 }
 
 function performUnitOfWork(unitOfWork){
+  debugger;
   const current = unitOfWork.alternate;
   let next = beginWork(current, unitOfWork, subtreeRenderLanes);
 

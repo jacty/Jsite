@@ -88,7 +88,6 @@ function bubbleProperties(completedWork){
       subtreeFlags |= child.subtreeFlags;
       subtreeFlags |= child.flags;
 
-      child.return = completedWork
       child = child.sibling;
     }
     completedWork.subtreeFlags |= subtreeFlags;

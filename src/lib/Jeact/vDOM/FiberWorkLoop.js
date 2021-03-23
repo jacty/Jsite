@@ -323,7 +323,6 @@ function workLoopConcurrent(){
 }
 
 function performUnitOfWork(unitOfWork){
-  debugger;
   const current = unitOfWork.alternate;
   let next = beginWork(current, unitOfWork, subtreeRenderLanes);
 

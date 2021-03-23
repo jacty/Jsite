@@ -52,9 +52,9 @@ export function renderWithHooks(current,workInProgress,nextRenderLanes){
 
   // Check if there was a render phase update
   if (didScheduleRenderPhaseUpdateDuringThisPass){
-    console.error('renderWithHooks1')
+    debugger;
   }
-  
+
   return children
 }
 

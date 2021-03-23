@@ -46,7 +46,7 @@ export function setInitialDOMProperties(domElement, workInProgress){
     }
 }
 
-export function shouldSetTextContent(type, props){
+export function shouldSetTextContent(props){
   return typeof props.children === 'string';
 }
 

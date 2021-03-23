@@ -97,7 +97,6 @@ function updateFragment(current, workInProgress, renderLanes){
 }
 
 function updateFunctionComponent(current,workInProgress,renderLanes){
-
   let nextChildren = renderWithHooks(
     current,
     workInProgress,
@@ -105,6 +104,7 @@ function updateFunctionComponent(current,workInProgress,renderLanes){
   );
 
   if(current!==null && !didReceiveUpdate){
+    debugger;
     bailoutHooks(current, workInProgress, renderLanes);
     return bailoutOnAlreadyFinishedWork(current, workInProgress, renderLanes);
   }
@@ -162,7 +162,7 @@ function updateHostComponent(current, workInProgress,renderLanes){
   const prevProps = current !== null ? current.memoizedProps : null;
 
   let nextChildren = nextProps.children;
-  const isDirectTextChild = shouldSetTextContent(type, nextProps);
+  const isDirectTextChild = shouldSetTextContent(nextProps);
 
   if (isDirectTextChild){
     // Handle direct text node in host environment to avoid another traversing.

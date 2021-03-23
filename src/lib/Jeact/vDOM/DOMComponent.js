@@ -58,7 +58,11 @@ function setTextContent(node, text){
             firstChild &&
             firstChild === node.lastChild &&
             firstChild.nodeType === TEXT_NODE
-        ){            
+        ){  
+        // For text updates, it's faster to set the `nodeValue` of the Text 
+        // node directly instead of using `.textContent` which will remove the 
+        // existing node and create a new one.
+        debugger;          
         firstChild.nodeValue = text;
         return;
         }

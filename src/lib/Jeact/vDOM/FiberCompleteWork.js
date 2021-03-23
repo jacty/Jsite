@@ -40,6 +40,7 @@ import {renderDidSuspend} from '@Jeact/vDOM/FiberWorkLoop';
 function appendAllChildren(parent, workInProgress){
   let node = workInProgress.child;
   while (node!==null){
+    debugger;
     if (node.tag === HostComponent || node.tag === HostText){
       let domInstance = node.stateNode;
       parent.appendChild(domInstance);

@@ -244,6 +244,7 @@ function commitPlacement(finishedWork){
     if(isContainer){
         insertOrAppendPlacementNodeIntoContainer(finishedWork, before, parent);
     } else {
+        debugger;
         insertOrAppendPlacementNode(finishedWork, before, parent);
     }
 }

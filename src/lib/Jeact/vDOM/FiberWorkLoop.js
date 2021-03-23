@@ -132,7 +132,6 @@ function ensureRootIsScheduled(root, currentTime){
   );
   
   if (nextLanes === NoLanes){
-    debugger;
      if (existingCallbackNode !== null){
        debugger;
      }
@@ -141,7 +140,6 @@ function ensureRootIsScheduled(root, currentTime){
 
   // Reuse existing task if there is.
   if (existingCallbackNode !== null){
-    debugger;
     return;
   }
 
@@ -407,7 +405,6 @@ function commitRootImpl(root, renderPriority){
   }
   if (root === wipRoot){
     wipRoot = null;
-    wip = null;
     wipRootRenderLanes = NoLanes;
   }
 

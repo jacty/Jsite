@@ -7,7 +7,7 @@ import {
 } from '@Jeact';
 
 import '@assets/styles/main.sass';
-const AboutMe = lazy(()=>import('@assets/js/aboutme.jsx'));
+// const AboutMe = lazy(()=>import('@assets/js/aboutme.jsx'));
 
 // import {Footer} from '@com/shared.jsx';
 

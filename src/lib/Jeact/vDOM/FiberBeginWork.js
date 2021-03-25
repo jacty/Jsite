@@ -51,7 +51,6 @@ function updateOffscreenComponent(
   workInProgress,
   renderLanes
 ){
-
   const nextProps = workInProgress.pendingProps;
   const nextChildren = nextProps.children;
 

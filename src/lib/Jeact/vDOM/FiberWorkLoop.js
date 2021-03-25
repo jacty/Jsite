@@ -182,7 +182,6 @@ function performConcurrentWorkOnRoot(root){
   ensureRootIsScheduled(root, performance.now());
   if (exitStatus!==RootCompleted){
     // Continue expired tasks.
-    debugger;
     return performConcurrentWorkOnRoot.bind(null, root, lanes);
   }
   return null;
@@ -292,9 +291,7 @@ function renderRootConcurrent(root, updateLanes){
   const prevExecutionContext = executionContext;
   executionContext |= RenderContext;
   const prevDispatcher = CurrentDispatcher.current;
-  if(prevDispatcher!==null){
-    debugger;
-  }
+
   // If the root or lanes have changed, throw out the existing stack
   // and prepare a fresh one. Otherwise we'll continue where we left off.
   if (wipRoot !== root || wipRootRenderLanes !== updateLanes){
@@ -341,7 +338,6 @@ function completeUnitOfWork(unitOfWork){
     if ((completedWork.flags & Incomplete) === NoFlags){      
       let next = completeWork(current, completedWork, subtreeRenderLanes);
       if (next !== null) {
-        console.error('x');
         wip = next;
         return;
       }

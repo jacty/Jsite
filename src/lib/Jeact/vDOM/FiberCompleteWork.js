@@ -8,13 +8,16 @@ import {
   NoLanes,
   NoFlags,
   DidCapture,
+  OffscreenComponent,
+  OffscreenLane,
 } from '@Jeact/shared/Constants';
 import {
   getRootHostContainer,
   popHostContainer
 } from '@Jeact/vDOM/FiberHostContext';
 import {
-  mergeLanes
+  mergeLanes,
+  includesSomeLane,
 } from '@Jeact/vDOM/FiberLane';
 import { 
   createTextNode, 
@@ -34,12 +37,14 @@ import {
   InvisibleParentSuspenseContext,
 } from '@Jeact/vDOM/FiberSuspenseContext';
 import {pop} from '@Jeact/vDOM/FiberStack';
-import {renderDidSuspend} from '@Jeact/vDOM/FiberWorkLoop';
+import {
+  renderDidSuspend,
+  popRenderLanes
+} from '@Jeact/vDOM/FiberWorkLoop';
 
 function appendAllChildren(parent, workInProgress){
   let node = workInProgress.child;
   while (node!==null){
-    debugger;
     if (node.tag === HostComponent || node.tag === HostText){
       let domInstance = node.stateNode;
       parent.appendChild(domInstance);
@@ -50,7 +55,6 @@ function appendAllChildren(parent, workInProgress){
        *       </Function Component>
        *  </DOM>
        */
-      node.child.return = node;
       node = node.child;
       continue;
     }
@@ -176,6 +180,30 @@ export function completeWork(current, workInProgress,renderLanes){
           }
       }
       bubbleProperties(workInProgress);
+      return null;
+    }
+    case OffscreenComponent:{
+      popRenderLanes(workInProgress);
+      const nextState = workInProgress.memoizedState;
+      const nextIsHidden = nextState !== null;
+
+      if(current !== null){
+        debugger;
+      }
+
+      // Don't bubble properties for hidden children.
+      if (
+        !nextIsHidden ||
+        includesSomeLane(subtreeRenderLanes, OffscreenLane)
+        ){
+        bubbleProperties(workInProgress);
+      }
+
+      const spawnedCachePool = workInProgress.updateQueue;
+      if(spawnedCachePool !== null){
+        debugger;
+        // popCachePool(workInProgress);
+      }
       return null;
     }
     default:

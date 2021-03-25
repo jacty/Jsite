@@ -33,6 +33,7 @@ export const DefaultLane = /*                    */ 0b00000000000000000000000100
 export const TransitionLanes = /*                */ 0b0000000001111111110000000000000;
 export const RetryLanes = /*                     */ 0b0000111100000000000000000000000;
 export const NonIdleLanes = /*                   */ 0b0001111111111111111111111111111;
+export const OffscreenLane = /*                 */ 0b1000000000000000000000000000000;
 
 /* core Priorities */
 export const ImmediatePriority = 99;

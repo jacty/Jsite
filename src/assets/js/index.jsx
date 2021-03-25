@@ -14,13 +14,11 @@ import '@assets/styles/main.sass';
 function App(){
     {/*const [nav,setNav] = useState(0)*/}
     return( 
-            <div> 111
-                {/*
-
+            <div>
                 <Suspense fallback={<div>11</div>}>
-                    <AboutMe />
+                    {/*<AboutMe />*/}
                 </Suspense>
-                
+                {/*
                 
                     <Footer handlers={()=>{setNav(1)}}/>
                 */}

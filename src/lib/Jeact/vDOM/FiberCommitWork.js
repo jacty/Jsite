@@ -5,7 +5,6 @@ import{
  BeforeMutationMask,
  MutationMask,
  NoFlags,
- Snapshot,
  ContentReset,
  Ref,
  Placement,
@@ -63,14 +62,13 @@ function commitBeforeMutationEffects_complete(){
 function commitBeforeMutationEffectsOnFiber(finishedWork){
     const current = finishedWork.alternate;
     const flags = finishedWork.flags;
-    if((flags & Snapshot) !== NoFlags){
-        switch(finishedWork.tag){
-            case HostRoot:{
-                // clear container;
-                finishedWork.stateNode.containerInfo.textContent = '';
-            }
+    switch(finishedWork.tag){
+        case HostRoot:{
+            // clear container;
+            finishedWork.stateNode.containerInfo.textContent = '';
         }
     }
+    
 }
 
 export function commitMutationEffects(root, renderPriority, firstChild){

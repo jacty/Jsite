@@ -7,7 +7,6 @@ import {
   HostRoot,
   NoLanes,
   NoFlags,
-  Snapshot,
   DidCapture,
 } from '@Jeact/shared/Constants';
 import {
@@ -113,7 +112,6 @@ export function completeWork(current, workInProgress,renderLanes){
       popCacheProvider(workInProgress, cache);
       popHostContainer(workInProgress);
       bubbleProperties(workInProgress);
-      workInProgress.flags |= Snapshot;
       return null;
     }
     case HostComponent:{//5

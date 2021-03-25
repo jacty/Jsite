@@ -52,16 +52,14 @@ export const InputDiscreteLanePriority = 2;
 export const UpdateState = 0;
 /* JeactFiberFlags.js */
 export const NoFlags = /*                      */ 0b000000000000000000000;
-export const PerformedWork = /*                */ 0b000000000000000000001;
-export const Placement = /*                    */ 0b000000000000000000010;
-export const Update = /*                       */ 0b000000000000000000100;
+export const Placement = /*                    */ 0b000000000000000000001;
+export const Update = /*                       */ 0b000000000000000000010;
 export const PlacementAndUpdate = /*           */ Placement | Update;
-export const Deletion = /*                     */ 0b000000000000000001000;
-export const ChildDeletion = /*                */ 0b000000000000000010000;
-export const ContentReset = /*                 */ 0b000000000000000100000; 
+export const Deletion = /*                     */ 0b000000000000000000100;
+export const ChildDeletion = /*                */ 0b000000000000000001000;
+export const ContentReset = /*                 */ 0b000000000000000010000; 
 export const DidCapture = /*                   */ 0b000000000000010000000;
 export const Ref = /*                          */ 0b000000000000100000000;
-export const Snapshot = /*                     */ 0b000000000001000000000;
 export const Passive = /*                      */ 0b000000000010000000000;
 
 export const HostEffectMask = /*               */ 0b000000001111111111111;
@@ -69,7 +67,7 @@ export const HostEffectMask = /*               */ 0b000000001111111111111;
 // These are not really side effects, but we still reuse this field.
 export const Incomplete = /*                   */ 0b000000010000000000000;
 export const ShouldCapture = /*                */ 0b000000100000000000000;
-export const BeforeMutationMask = Update | Snapshot | ChildDeletion;
+export const BeforeMutationMask = Update | ChildDeletion;
 export const MutationMask = 
     Placement | 
     Update | 

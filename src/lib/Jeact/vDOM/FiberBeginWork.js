@@ -7,7 +7,6 @@ import {
   LazyComponent,
   OffscreenComponent,
   NoLanes,
-  PerformedWork,
   Ref,
   DidCapture,
   NoFlags,
@@ -109,7 +108,6 @@ function updateFunctionComponent(current,workInProgress,renderLanes){
     return bailoutOnAlreadyFinishedWork(current, workInProgress, renderLanes);
   }
 
-  workInProgress.flags |= PerformedWork;
   workInProgress.child = reconcileChildFibers(
       workInProgress,
       current,

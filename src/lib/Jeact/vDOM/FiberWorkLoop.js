@@ -85,6 +85,7 @@ let rootsWithPendingDiscreteUpdates = null;
 
 let currentEventTime = NoTimestamp;
 let currentEventWipLanes = NoLanes;
+let currentEventTransitionLane = NoLanes;
 
 export function requestEventTime(){
   if ((executionContext & (RenderContext | CommitContext)) !== NoContext){
@@ -105,16 +106,16 @@ export function requestEventTime(){
 
 export function scheduleUpdateOnFiber(fiber, lane, eventTime){
   // The code below is from markUpdateLaneFromFiberToRoot(), which is supposed 
-  // to update all `fiber.lane`s. However, in current version, fiber can only 
-  // be the unprepared one without any children and parents.  
+  // to update all `fiber.lane`s. However, in current phrase of this version, 
+  // fiber can only be the unprepared one without any children and parents.  
   // 
   // update fiber.lanes based on renderLanes;
+
   fiber.lanes = mergeLanes(fiber.lanes, lane);
   const root = fiber.stateNode;
 
   // update root.pendingLanes, eventTimes etc.
   markRootUpdated(root, lane, eventTime);
-
   ensureRootIsScheduled(root, eventTime);
 
   return root;
@@ -138,16 +139,20 @@ function ensureRootIsScheduled(root, currentTime){
      return;
   }
 
-  // Reuse existing task if there is.
-  if (existingCallbackNode !== null){
+  // Reuse existing task with the same priority.
+  const existingCallbackPriority = root.callbackPriority;
+  if (existingCallbackPriority === nextLanesPriority){
     return;
   }
+
+  if (nextLanesPriority !==1) debugger;
 
   let newCallbackNode = scheduleCallback(
     nextLanesPriority,
     performConcurrentWorkOnRoot.bind(null, root),
   )
 
+  root.callbackPriority = nextLanesPriority;
   root.callbackNode = newCallbackNode;
 }
 
@@ -157,6 +162,8 @@ function performConcurrentWorkOnRoot(root){
   // TODO: explain why reset it is necessary like when it will be misused.
   currentEventTime = NoTimestamp;
   currentEventWipLanes = NoLanes;
+  currentEventTransitionLane = NoLanes;
+
 
   const originalCallbackNode = root.callbackNode;
 
@@ -180,9 +187,9 @@ function performConcurrentWorkOnRoot(root){
   }
   //schedule to finish extra work scheduled in Render Phase
   ensureRootIsScheduled(root, performance.now());
-  if (exitStatus!==RootCompleted){
+  if (root.callbackNode === originalCallbackNode){
     // Continue expired tasks.
-    return performConcurrentWorkOnRoot.bind(null, root, lanes);
+    return performConcurrentWorkOnRoot.bind(null, root);
   }
   return null;
 }
@@ -232,7 +239,7 @@ export function popRenderLanes(fiber){
   pop(subtreeRenderLanesCursor, fiber);
 }
 
-function prepareFreshStack(root, updateLanes){
+function prepareFreshStack(root, lanes){
   // to keep next stack fresh.
   root.finishedWork = null;
   root.finishedLanes = NoLanes;
@@ -242,7 +249,7 @@ function prepareFreshStack(root, updateLanes){
   wipRoot = root;
   wip = createWorkInProgress(root.current);
   wipRootRenderLanes = subtreeRenderLanes =
-    wipRootIncludedLanes = updateLanes;
+    wipRootIncludedLanes = lanes;
   wipRootExitStatus = RootIncomplete;
   wipRootFatalError = null;
   wipRootSkippedLanes = NoLanes;
@@ -287,16 +294,16 @@ export function renderDidError(){
   }
 }
 
-function renderRootConcurrent(root, updateLanes){
+function renderRootConcurrent(root, lanes){
   const prevExecutionContext = executionContext;
   executionContext |= RenderContext;
   const prevDispatcher = CurrentDispatcher.current;
 
   // If the root or lanes have changed, throw out the existing stack
   // and prepare a fresh one. Otherwise we'll continue where we left off.
-  if (wipRoot !== root || wipRootRenderLanes !== updateLanes){
+  if (wipRoot !== root || wipRootRenderLanes !== lanes){
     //create a new FiberNode by cloning root.current and set it to wip.
-    prepareFreshStack(root, updateLanes);
+    prepareFreshStack(root, lanes);
   }
   //Keep trying until all caught error handled.
   try {

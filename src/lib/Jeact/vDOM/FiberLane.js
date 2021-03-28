@@ -10,7 +10,8 @@ import {
   NoTimestamp,
   RetryLanes,
   SyncLane,
-  SyncLanePriority
+  SyncLanePriority,
+  IdleLane,
 } from '@Jeact/shared/Constants';
 import {updateEventWipLanes} from '@Jeact/vDOM/FiberWorkLoop';
 import {getCurrentUpdatePriority} from '@Jeact/vDOM/UpdatePriorities';
@@ -231,6 +232,10 @@ export function removeLanes(set, subset){
 
 export function markRootUpdated(root, updateLane, eventTime){
   root.pendingLanes |= updateLane;
+    
+  if(updateLane !== IdleLane){
+    if (root.suspendedLanes !== 0 || root.pingedLanes !== 0) debugger;
+  }
   
   const eventTimes = root.eventTimes;
   const index = laneToIndex(updateLane);

@@ -89,6 +89,7 @@ export function scheduleCallback(priority, callback){
   switch (priority){
     case DefaultLanePriority:
     default:
+      if (priority !== 1) debugger;
       timeout = NORMAL_PRIORITY_TIMEOUT;
       break;
   }

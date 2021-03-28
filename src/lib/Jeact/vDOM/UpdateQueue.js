@@ -53,6 +53,11 @@ export function createUpdate(eventTime, lane, element=null){
 
 export function enqueueUpdate(fiber, update){
   const updateQueue = fiber.updateQueue;
+  if (updateQueue === null){// fiber has been unmounted.
+    debugger;
+    return;
+  }
+
   const pending = updateQueue.pending;
 
   if (pending === null) {
@@ -66,10 +71,14 @@ export function enqueueUpdate(fiber, update){
   updateQueue.pending = update;
 }
 
-export function entangleTransitions(rootFiber, currentFiber, lane){
-  const updateQueue = currentFiber.updateQueue;
+export function entangleTransitions(root, fiber, lane){
+  const updateQueue = fiber.updateQueue;
+  if (updateQueue === null){
+    // fiber unmounted.
+    return;
+  }
   if (isTransitionLane(lane)){
-    console.error('entangleTransitions');
+    debugger;
   }
 }
 

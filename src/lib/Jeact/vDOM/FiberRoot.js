@@ -1,6 +1,7 @@
 import {
   NoTimestamp,
   NoLanes,
+  NoLanePriority
 } from '@Jeact/shared/Constants';
 import { createFiber } from '@Jeact/vDOM/Fiber';
 import {initializeUpdateQueue} from '@Jeact/vDOM/UpdateQueue';
@@ -13,6 +14,7 @@ function FiberRootNode(containerInfo){
   this.finishedWork = null; 
 
   this.callbackNode = null;
+  this.callbackPriority = NoLanePriority;
   this.eventTimes = Array(31).fill(0);
   this.expirationTimes = Array(31).fill(NoTimestamp);;
 

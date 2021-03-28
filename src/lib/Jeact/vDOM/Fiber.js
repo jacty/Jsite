@@ -80,7 +80,14 @@ export function createWorkInProgress(current, pendingProps){
 
     workInProgress.alternate = current;
     current.alternate = workInProgress;
-  }else{}
+  }else{
+    debugger;
+    // already have an alternate.
+    // Reset 
+    workInProgress.flags = NoFlags;
+    workInProgress.subtreeFlags = NoFlags;
+    workInProgress.deletions = null;
+  }
   // TODO: why?
   workInProgress.flags = current.flags & StaticMask;
   cloneKeys = cloneKeys.concat([

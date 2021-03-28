@@ -246,11 +246,16 @@ export function markRootUpdated(root, updateLane, eventTime){
 export function markRootSuspended(root, suspendedLanes){
   root.suspendedLanes |= suspendedLanes;
   root.pingedLanes &= ~suspendedLanes;
-
+  // The suspended lanes are no longer CPU-bound. Clear the expiration times.
   const expirationTimes = root.expirationTimes;
   let lanes = suspendedLanes;
-  if (lanes > 0){
-    debugger;
+  while (lanes > 0){
+    const index = laneToIndex(lanes);
+    const lane = 1 << index;
+
+    expirationTimes[index] = NoTimestamp;
+
+    lanes &= ~lane;
   }
 }
 

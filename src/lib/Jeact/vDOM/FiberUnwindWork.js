@@ -33,6 +33,7 @@ export function unwindWork(wip, renderLanes){
                 // popCachePool(wip);
                 debugger;
             }
+            return null;
         default:
             return null;
     }

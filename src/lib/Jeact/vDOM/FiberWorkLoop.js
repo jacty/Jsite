@@ -260,9 +260,6 @@ function prepareFreshStack(root, lanes){
 function handleError(root, thrownValue){
     let erroredWork = wip;
     try {
-      if(erroredWork === null || erroredWork.return === null){
-        debugger;
-      }
       throwException(
         root,
         erroredWork.return,
@@ -270,7 +267,9 @@ function handleError(root, thrownValue){
         thrownValue,
         wipRootRenderLanes
       );
+      completeUnitOfWork(erroredWork);
     } catch (yetAnotherThrownValue){
+      console.error('x', yetAnotherThrownValue);
       debugger;
     }
 }
@@ -447,31 +446,33 @@ function commitRootImpl(root, renderPriority){
   return null;
 }
 export function pingSuspendedRoot(root, wakeable, pingedLanes){
-  const pingCache = root.pingCache;
-  if (pingCache !== null){
-    pingCache.delete(wakeable);
-  }
-  const eventTime = requestEventTime();
-  markRootPinged(root, pingedLanes, eventTime);
+  // const pingCache = root.pingCache;
+  // if (pingCache !== null){
+  //   pingCache.delete(wakeable);
+  // }
+  // const eventTime = requestEventTime();
+  // markRootPinged(root, pingedLanes, eventTime);
 
-  if (
-    wipRoot === root &&
-    isSubsetOfLanes(wipRootRenderLanes, pingedLanes)
-    ){
+  // if (
+  //   wipRoot === root &&
+  //   isSubsetOfLanes(wipRootRenderLanes, pingedLanes)
+  //   ){
     
-    if(
-      wipRootExitStatus === RootSuspendedWithDelay ||
-      wipRootExitStatus === RootSuspended){
-      debugger;
-    } else {
-      wipRootPingedLanes = mergeLanes(
-        wipRootPingedLanes,
-        pingedLanes,
-      )
-    }
-  }
+  //   if(
+  //     wipRootExitStatus === RootSuspendedWithDelay ||
+  //     wipRootExitStatus === RootSuspended
+  //   )
+  //   {// More conditions above.
+  //     debugger;
+  //   } else {
+  //     wipRootPingedLanes = mergeLanes(
+  //       wipRootPingedLanes,
+  //       pingedLanes,
+  //     )
+  //   }
+  // }
 
-  ensureRootIsScheduled(root, eventTime);
+  // ensureRootIsScheduled(root, eventTime);
 }
 export function updateEventWipLanes(){
   if (currentEventWipLanes === NoLanes){

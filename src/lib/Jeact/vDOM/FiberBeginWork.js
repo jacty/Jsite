@@ -390,6 +390,7 @@ export function beginWork(current, workInProgress, renderLanes){
       // the begin phase.
       switch (workInProgress.tag){
         case HostRoot:
+          debugger;
           pushHostContainer(workInProgress);
           const root = workInProgress.stateNode;
           const cache = current.memoizedState.cache;

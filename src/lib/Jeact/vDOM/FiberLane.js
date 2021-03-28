@@ -9,6 +9,8 @@ import {
   NonIdleLanes,
   NoTimestamp,
   RetryLanes,
+  SyncLane,
+  SyncLanePriority
 } from '@Jeact/shared/Constants';
 import {updateEventWipLanes} from '@Jeact/vDOM/FiberWorkLoop';
 
@@ -17,6 +19,9 @@ let highestLanePriority = DefaultLanePriority;
 
 function getHighestPriorityLanes(lanes){
   switch(getHighestPriorityLane(lanes)){
+    case SyncLane:
+      highestLanePriority = SyncLanePriority;
+      return SyncLane;
     case DefaultLane:
       highestLanePriority = DefaultLanePriority;
       return DefaultLane
@@ -46,11 +51,79 @@ export function getNextLanes(root, wipLanes){
   let nextLanePriority = NoLanePriority;
 
   const suspendedLanes = root.suspendedLanes;
+  const pingedLanes = root.pingedLanes;
   
-  if(pendingLanes!==128) debugger;
+  const nonIdlePendingLanes = pendingLanes & NonIdleLanes; // useless?
+  // to check usage of expression above
+  if(nonIdlePendingLanes !== pendingLanes) debugger;
+  if(nonIdlePendingLanes !== NoLanes){
+    const nonIdleUnblockedLanes = nonIdlePendingLanes & ~suspendedLanes;
+    if (nonIdleUnblockedLanes !== NoLanes){
+      nextLanes = getHighestPriorityLanes(nonIdleUnblockedLanes);
+      nextLanePriority = highestLanePriority;
+    } else {
+      debugger;
+      const nonIdlePingedLanes = nonIdlePendingLanes & pingedLanes;
+      if (nonIdlePingedLanes !== NoLanes){
+        nextLanes = getHighestPriorityLanes(nonIdlePingedLanes);
+        nextLanePriority = highestLanePriority;
+      }
+    }
+  } else {
+    // remaining work
+    const unblockedLanes = pendingLanes & ~suspendedLanes;
+    if (unblockedLanes !== NoLanes){
+      debugger;
+      nextLanes = getHighestPriorityLanes(unblockedLanes);
+      nextLanePriority = highestLanePriority;
+    } else {
+      debugger;
+      if (pingedLanes !== NoLanes){
+        nextLanes = getHighestPriorityLanes(pingedLanes);
+        nextLanePriority = highestLanePriority;
+      }
+    }
+  }
 
-  nextLanes = getHighestPriorityLanes(pendingLanes);
-  nextLanePriority = highestLanePriority;
+  if (nextLanes === NoLanes){
+    // suspended case
+    debugger;
+    return NoLanes;
+  }
+
+  // If we're already in the middle of a render, switching lanes will lost 
+  // progress. Only do this if the new lanes are higher priority.
+  if (
+    wipLanes !== NoLanes &&
+    wipLanes !== nextLanes &&
+    // If we already suspended with a delay, then interrupting is fine.
+    (wipLanes & suspendedLanes) == NoLanes
+    ){
+    debugger;
+    const nextLane = getHighestPriorityLanes(nextLanes);
+    const wipLane = getHighestPriorityLanes(wipLanes);
+    if (
+      nextLane >= wipLane ||
+      (nextLane === DefaultLane && (wipLane & TransitionLanes) !== NoLanes) 
+    ){
+        return wipLanes;
+    } else {
+      highestLanePriority = nextLanePriority;
+    }
+  }
+  const entangledLanes = root.entangledLanes;
+  if (entangledLanes !== NoLanes){
+    const entanglements = root.entanglements;
+    let lanes = nextLanes & entangledLanes;
+    while (lanes > 0){
+      const index = laneToIndex(lanes);
+      const lane = 1 << index;
+
+      nextLanes |= entanglements[index];
+
+      lanes &= ~lane;
+    }
+  }
 
   return [nextLanes, highestLanePriority];
 }
@@ -63,28 +136,36 @@ function computeExpirationTime(lane, currentTime){
 }
 
 export function markStarvedLanesAsExpired(root, currentTime){
-  const suspendedLanes = root.suspendedLanes;
   
-  if(root.pingedLanes){debugger}
+  const suspendedLanes = root.suspendedLanes;
+  const pingedLanes = root.pingedLanes;
   const expirationTimes = root.expirationTimes;
 
   // Iterate through the pending lanes and check if we've reached their expiration time. If so, we'll assume the update is being starved and mark it as expired to force it to finish.
   let lanes = root.pendingLanes;
+  let expiredLanes = 0;
   while (lanes>0) {
     const index = laneToIndex(lanes);
     const lane = 1 << index; // move 1 towards left for {index} bits.
+    
     const expirationTime = expirationTimes[index];
     if (expirationTime === NoTimestamp){
       if (
-        (lane & suspendedLanes) === NoLanes){
+        (lane & suspendedLanes) === NoLanes ||
+        (lane & pingedLanes) !== NoLanes
+        ){
         // Assumes timestamps are monotonically increasing.
         expirationTimes[index] = computeExpirationTime(lane, currentTime);
       }
     } else if(expirationTime <= currentTime){
       // This lane expired
-      root.expiredLanes |= lane;
+      expiredLanes |= lane;
     }
     lanes &= ~lane;
+  }
+
+  if (expiredLanes !== 0){
+    markRootExpired(root, expiredLanes);
   }
 }
 
@@ -167,6 +248,15 @@ export function markRootSuspended(root, suspendedLanes){
 
 export function markRootPinged(root, pingedLanes, eventTime){
   root.pingedLanes |= root.suspendedLanes & pingedLanes;
+}
+
+export function markRootExpired(root, expiredLanes){
+  const entanglements = root.entanglements;
+  const SyncLaneIndex = 0;
+  entanglements[SyncLaneIndex] |= expiredLanes;
+  root.entangledLanes |= SyncLane;
+  root.pendingLanes |= SyncLane;
+
 }
 
 export function markRootFinished(root, remainingLanes){

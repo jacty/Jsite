@@ -302,7 +302,6 @@ function renderRootConcurrent(root, updateLanes){
   try {
     workLoopConcurrent();
   } catch(thrownValue){
-    console.error(thrownValue);
     handleError(root, thrownValue);
   }
   executionContext = prevExecutionContext;

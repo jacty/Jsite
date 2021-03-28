@@ -28,12 +28,12 @@ export const RetryAfterError = /*       */ 0b1000000;
 /* JeactFiberLane */
 export const NoLanes=/*                          */ 0b0000000000000000000000000000000;
 export const NoLane =/*                          */ 0b0000000000000000000000000000000;
-export const InputDiscreteLane = /*             */ 0b0000000000000000000000000001000;
-export const DefaultLane = /*                    */ 0b0000000000000000000000010000000;
-export const TransitionLanes = /*                */ 0b0000000001111111110000000000000;
+export const SyncLane =/*                        */ 0b0000000000000000000000000000001;
+export const DefaultLane = /*                    */ 0b0000000000000000000000000010000;
+export const TransitionLanes = /*                */ 0b0000000001111111111111111000000;
 export const RetryLanes = /*                     */ 0b0000111100000000000000000000000;
 export const NonIdleLanes = /*                   */ 0b0001111111111111111111111111111;
-export const OffscreenLane = /*                 */ 0b1000000000000000000000000000000;
+export const OffscreenLane = /*                  */ 0b1000000000000000000000000000000;
 
 /* core Priorities */
 export const ImmediatePriority = 99;
@@ -47,7 +47,7 @@ export const NormalSchedulePriority = 3;
 /* LanePriorities */
 export const NoLanePriority = 0;
 export const DefaultLanePriority = 1;
-export const InputDiscreteLanePriority = 2;
+export const SyncLanePriority = 2
 
 /* JeactUpdateQueue.js */
 export const UpdateState = 0;

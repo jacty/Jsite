@@ -1,6 +1,5 @@
 import {
   DefaultLanePriority,
-  InputDiscreteLanePriority,
   NORMAL_PRIORITY_TIMEOUT,
   USER_BLOCKING_PRIORITY_TIMEOUT
 } from '@Jeact/shared/Constants';

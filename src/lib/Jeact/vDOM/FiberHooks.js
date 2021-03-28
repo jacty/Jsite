@@ -1,5 +1,4 @@
 import {
-  InputDiscreteLanePriority,
   NoLanes,
   Passive,
   Update
@@ -245,8 +244,8 @@ function updateState(initialState){
 }
 
 function dispatchAction(fiber, queue, action){
-  const eventTime = requestEventTime();
-  const lane = requestUpdateLane(InputDiscreteLanePriority,fiber.lanes);
+  const eventTime = requestEventTime();debugger;
+  // const lane = requestUpdateLane(InputDiscreteLanePriority,fiber.lanes);
 
   const update = {
     lane,

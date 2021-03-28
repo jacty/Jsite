@@ -13,7 +13,8 @@ import {
   SyncLanePriority
 } from '@Jeact/shared/Constants';
 import {updateEventWipLanes} from '@Jeact/vDOM/FiberWorkLoop';
-
+import {getCurrentUpdatePriority} from '@Jeact/vDOM/UpdatePriorities';
+import {getCurrentEventPriority} from '@Jeact/vDOM/events/EventPriorities';
 // Used by getHighestPriorityLanes and getNextLanes:
 let highestLanePriority = DefaultLanePriority;
 
@@ -181,19 +182,21 @@ export function getNextLanesPriority(){
   return highestLanePriority;
 }
 
-export function requestUpdateLane(lanePriority=1, wipLanes=0){
+export function requestUpdateLane(){
   updateEventWipLanes()
-  // code below is from findUpdateLane() in React.
-  switch (lanePriority) {
-    case DefaultLanePriority: {//Jeact:1; React:8
-      return DefaultLane; // 128
-    }
-    default:
-      debugger;
-      // The remaining priorities are not valid for updates
-      console.log('findUpdateLane.default', lanePriority)
-      break;
+
+  // Updates originating inside Jeact.
+  // Adapted from ReactEventPriorities.new.js
+  const updateLane = getCurrentUpdatePriority();
+  if (updateLane !== NoLane){
+    debugger;
+    return updateLane;
   }
+
+  // Updates originated outside Jeact.
+  // Adapted from ReactDOMHostConfig.js
+  const eventLane = getCurrentEventPriority();
+  return eventLane;
 }
 
 export function getHighestPriorityLane(lanes){

@@ -468,6 +468,7 @@ export function pingSuspendedRoot(root, wakeable, pingedLanes){
 }
 export function updateEventWipLanes(){
   if (currentEventWipLanes === NoLanes){
+    if (wipRootIncludedLanes !== NoLanes) debugger;
     currentEventWipLanes = wipRootIncludedLanes;
   }
 }

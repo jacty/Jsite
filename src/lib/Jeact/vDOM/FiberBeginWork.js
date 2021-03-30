@@ -11,6 +11,7 @@ import {
   DidCapture,
   NoFlags,
   Fragment,
+  JEACT_OFFSCREEN_TYPE
 } from '@Jeact/shared/Constants';
 import {includesSomeLane} from '@Jeact/vDOM/FiberLane';
 import {
@@ -184,9 +185,10 @@ function mountLazyComponent(
   updateLanes, 
   renderLanes
 ){
+
   if (_current !== null) debugger;
   const props = workInProgress.pendingProps;
-  const lazyComponent = workInProgress.type;
+  const lazyComponent = workInProgress.elementType;
   const payload = lazyComponent._payload;
   const init = lazyComponent._init;
   let Component = init(payload);
@@ -318,6 +320,7 @@ function mountSuspensePrimaryChildren(
     OffscreenComponent,
     primaryChildProps
   );
+  primaryChildFragment.elementType = JEACT_OFFSCREEN_TYPE;
   primaryChildFragment.lanes = renderLanes;
   primaryChildFragment.return = workInProgress;
   workInProgress.child = primaryChildFragment;
@@ -343,6 +346,7 @@ function mountSuspenseFallbackChildren(
     primaryChildProps,
     null,
   );
+  primaryChildFragment.elementType = JEACT_OFFSCREEN_TYPE;
   primaryChildFragment.lanes = renderLanes;
 
   fallbackChildFragment = createFiber(

@@ -1,6 +1,7 @@
 import {
   __ENV__,
   JEACT_ELEMENT_TYPE,
+  JEACT_FRAGMENT_TYPE,
   Placement
 } from '@Jeact/shared/Constants';
 import {
@@ -111,6 +112,7 @@ function reconcileSingleElement(
     deleteChild(returnFiber, child);
     child = child.sibling;
   }
+  if (element.type === JEACT_FRAGMENT_TYPE) debugger;
   const created = createFiberFromElement(element, lanes);
   created.return = returnFiber;
   return created;

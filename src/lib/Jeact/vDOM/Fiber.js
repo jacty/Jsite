@@ -18,6 +18,7 @@ let debugCounter = 1;
 function FiberNode(tag=HostRoot, pendingProps=null, key=null){
   this.tag = tag; 
   this.key = key;
+  this.elementType = null;
   this.type = null;
   this.stateNode = null; 
 
@@ -120,6 +121,7 @@ export function createFiberFromTypeAndProps(element, lanes, owner){
     switch(type){
       case JEACT_SUSPENSE_TYPE:
         const fiber = createFiber(SuspenseComponent, pendingProps, key);
+        fiber.elementType = JEACT_SUSPENSE_TYPE;
         fiber.lanes = lanes;
         return fiber;
       default:{
@@ -139,6 +141,7 @@ export function createFiberFromTypeAndProps(element, lanes, owner){
 
   const fiber = createFiber(fiberTag, pendingProps, key);
   fiber.type = type;
+  fiber.elementType = type;
   fiber.lanes = lanes;
 
   return fiber;

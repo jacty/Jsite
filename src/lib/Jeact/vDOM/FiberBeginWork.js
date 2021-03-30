@@ -330,8 +330,6 @@ function mountSuspenseFallbackChildren(
   fallbackChildren,
   renderLanes,
 ){
-  const progressedPrimaryFragment = workInProgress.child;
-
   const primaryChildProps = {
     mode: 'hidden',
     children: primaryChildren,

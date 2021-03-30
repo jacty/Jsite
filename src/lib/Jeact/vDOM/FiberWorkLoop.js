@@ -201,8 +201,6 @@ function finishConcurrentRender(root, exitStatus, lanes){
       break;
     }
     case RootSuspended:{  
-      lanes = removeLanes(lanes, wipRootPingedLanes);
-      lanes = removeLanes(lanes, wipRootUpdatedLanes);
       markRootSuspended(root, lanes);
 
       // figure out if we should immediately commit it or wait a bit.
@@ -305,13 +303,17 @@ function renderRootConcurrent(root, lanes){
     prepareFreshStack(root, lanes);
   }
   //Keep trying until all caught error handled.
-  try {
-    workLoopConcurrent();
-  } catch(thrownValue){
-    handleError(root, thrownValue);
-  }
+  do{
+    try {
+      workLoopConcurrent();
+      break;
+    } catch(thrownValue){
+      handleError(root, thrownValue);
+    }
+  } while (true);
+  
   executionContext = prevExecutionContext;
-
+  
   return wipRootExitStatus;
 }
 
@@ -382,10 +384,7 @@ function completeUnitOfWork(unitOfWork){
 }
 
 function commitRoot(root){
-  runWithPriority(
-    commitRootImpl.bind(null, root, ImmediatePriority)
-  );
-  return null;
+    commitRootImpl(root, ImmediatePriority)
 }
 
 function commitRootImpl(root, renderPriority){
@@ -401,9 +400,7 @@ function commitRootImpl(root, renderPriority){
   let remainingLanes = mergeLanes(finishedWork.lanes, finishedWork.childLanes);
   //update lanes and eventTimes
   markRootFinished(root, remainingLanes);  
-  if(rootsWithPendingDiscreteUpdates !== null){
-    debugger;
-  }
+
   if (root === wipRoot){
     wipRoot = null;
     wipRootRenderLanes = NoLanes;

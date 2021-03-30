@@ -1,5 +1,6 @@
 import {
   NoFlags,
+  NoLane,
   NoLanes,
   NoTimestamp,
   ImmediatePriority,
@@ -396,9 +397,9 @@ function commitRootImpl(root, renderPriority){
   root.finishedWork = null;
   root.finishedLanes = NoLanes;
   root.callbackNode = null;
+  root.callbackPriority = NoLane;
 
   let remainingLanes = mergeLanes(finishedWork.lanes, finishedWork.childLanes);
-  //update lanes and eventTimes
   markRootFinished(root, remainingLanes);  
 
   if (root === wipRoot){
@@ -424,7 +425,7 @@ function commitRootImpl(root, renderPriority){
     const prevExecutionContext= executionContext;
     executionContext |= CommitContext;
     commitBeforeMutationEffects(finishedWork);
-    commitMutationEffects(root, renderPriority, finishedWork);
+    commitMutationEffects(root, finishedWork);
     root.current = finishedWork;
     commitLayoutEffects(finishedWork, root, lanes);
     executionContext = prevExecutionContext;

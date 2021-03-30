@@ -10,6 +10,7 @@ import {
   DidCapture,
   OffscreenComponent,
   OffscreenLane,
+  Update,
 } from '@Jeact/shared/Constants';
 import {
   getRootHostContainer,
@@ -178,6 +179,9 @@ export function completeWork(current, workInProgress,renderLanes){
           } else {
             debugger;
           }
+      }
+      if (nextDidTimeout){
+        workInProgress.flags |= Update;
       }
       bubbleProperties(workInProgress);
       return null;

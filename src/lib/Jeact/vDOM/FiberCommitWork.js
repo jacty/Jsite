@@ -71,12 +71,12 @@ function commitBeforeMutationEffectsOnFiber(finishedWork){
     
 }
 
-export function commitMutationEffects(root, renderPriority, firstChild){
+export function commitMutationEffects(root,firstChild){
     nextEffect = firstChild;
-    commitMutationEffects_begin(root, renderPriority);
+    commitMutationEffects_begin(root);
 }
 
-function commitMutationEffects_begin(root, renderPriority){
+function commitMutationEffects_begin(root){
     while(nextEffect !== null){
         const fiber = nextEffect;
 
@@ -87,16 +87,16 @@ function commitMutationEffects_begin(root, renderPriority){
         if((fiber.subtreeFlags & MutationMask) !== NoFlags && child !== null){
             nextEffect = child;
         } else {
-            commitMutationEffects_complete(root, renderPriority);
+            commitMutationEffects_complete(root);
         }
     }
 }
 
-function commitMutationEffects_complete(root, renderPriority){
+function commitMutationEffects_complete(root){
     while(nextEffect !== null){
         const fiber = nextEffect;
         try {
-            commitMutationEffectsOnFiber(fiber, root, renderPriority);
+            commitMutationEffectsOnFiber(fiber, root);
         } catch(error){
             console.error('x', error);
         }

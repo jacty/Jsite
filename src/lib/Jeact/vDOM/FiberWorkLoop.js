@@ -3,7 +3,6 @@ import {
   NoLane,
   NoLanes,
   NoTimestamp,
-  ImmediatePriority,
   Incomplete,
   NoContext,
   RenderContext,
@@ -16,11 +15,12 @@ import {
   MutationMask,
   LayoutMask,
   HostEffectMask,
+  SyncLane,
+  NormalSchedulePriority,
 } from '@Jeact/shared/Constants';
 import {
   shouldYieldToHost,
-  scheduleCallback,
-  runWithPriority,
+  scheduleCallback
 } from '@Jeact/scheduler';
 import {
   mergeLanes,
@@ -30,10 +30,10 @@ import {
   markRootPinged,
   getNextLanes,
   isSubsetOfLanes,
-  removeLanes,
   markRootSuspended,
   includesOnlyRetries,
   claimNextRetryLane,
+  getHighestPriorityLane,
 } from '@Jeact/vDOM/FiberLane';
 import {
   createWorkInProgress
@@ -55,6 +55,13 @@ import {
   pop
 } from '@Jeact/vDOM/FiberStack';
 import {unwindWork} from '@Jeact/vDOM/FiberUnwindWork';
+import {
+  DiscreteEventPriority,
+  ContinuousEventPriority,
+  DefaultEventPriority,
+  IdleEventPriority,
+  lanesToEventPriority,
+} from '@Jeact/vDOM/events/EventPriorities';
 
 const RootIncomplete = 0;
 const RootFatalErrored = 1;
@@ -105,17 +112,20 @@ export function requestEventTime(){
 }
 
 export function scheduleUpdateOnFiber(fiber, lane, eventTime){
-  // The code below is from markUpdateLaneFromFiberToRoot(), which is supposed 
-  // to update all `fiber.lane`s. However, in current phrase of this version, 
-  // fiber can only be the unprepared one without any children and parents.  
-  // 
-  // update fiber.lanes based on renderLanes;
-
-  fiber.lanes = mergeLanes(fiber.lanes, lane);
-  const root = fiber.stateNode;
-
+  const root = markUpdateLaneFromFiberToRoot(fiber, lane);
+  if(root === null){
+    return null;
+  } 
   // update root.pendingLanes, eventTimes etc.
   markRootUpdated(root, lane, eventTime);
+
+  if (root === wipRoot){
+    debugger;
+  }
+  if (lane === SyncLane){
+    debugger;
+  }
+
   ensureRootIsScheduled(root, eventTime);
 
   return root;
@@ -146,36 +156,64 @@ function markUpdateLaneFromFiberToRoot(sourceFiber, lane){
 
 function ensureRootIsScheduled(root, currentTime){
   const existingCallbackNode = root.callbackNode;
-
   // update root.expirationTime. 
   markStarvedLanesAsExpired(root, currentTime);
 
-  const [nextLanes, nextLanesPriority] = getNextLanes(
+  const nextLanes = getNextLanes(
     root, 
     root===wipRoot ? wipRootRenderLanes : NoLanes,
   );
-  
+
   if (nextLanes === NoLanes){
      if (existingCallbackNode !== null){
        debugger;
      }
+     root.callbackNode = null;
+     root.callbackPriority = NoLane;
      return;
   }
 
+  const newCallbackPriority = getHighestPriorityLane(nextLanes);
   // Reuse existing task with the same priority.
   const existingCallbackPriority = root.callbackPriority;
-  if (existingCallbackPriority === nextLanesPriority){
+  if (existingCallbackPriority === newCallbackPriority){
     return;
   }
 
-  if (nextLanesPriority !==1) debugger;
+  if (existingCallbackNode !== null) debugger;
 
-  let newCallbackNode = scheduleCallback(
-    nextLanesPriority,
-    performConcurrentWorkOnRoot.bind(null, root),
-  )
+  let newCallbackNode;
+  if (newCallbackPriority === SyncLane){
+    debugger;
+  } else {
+    let schedulerPriorityLevel;
+    switch(lanesToEventPriority(nextLanes)){
+      case DiscreteEventContext:
+        debugger;
+        schedulerPriorityLevel = ImmediateSchedulePriority;
+        break;
+      case ContinuousEventPriority:
+        debugger;
+        schedulerPriorityLevel = UserBlockingSchedulePriority;
+        break;
+      case DefaultEventPriority:
+        schedulerPriorityLevel = NormalSchedulePriority;
+        break;
+      case IdleEventPriority:
+        debugger;
+        schedulerPriorityLevel = IdleSchedulePriority;
+        break;
+      default:
+        schedulerPriorityLevel = NormalSchedulePriority;
+        break;        
+    }
+    newCallbackNode = scheduleCallback(
+      schedulerPriorityLevel,
+      performConcurrentWorkOnRoot.bind(null, root),
+    )
+  }
 
-  root.callbackPriority = nextLanesPriority;
+  root.callbackPriority = newCallbackPriority;
   root.callbackNode = newCallbackNode;
 }
 
@@ -190,7 +228,7 @@ function performConcurrentWorkOnRoot(root){
 
   const originalCallbackNode = root.callbackNode;
 
-  let [lanes] = getNextLanes(
+  let lanes = getNextLanes(
     root,
     root === wipRoot ? wipRootRenderLanes : NoLanes,
   )
@@ -407,7 +445,7 @@ function completeUnitOfWork(unitOfWork){
 }
 
 function commitRoot(root){
-    commitRootImpl(root, ImmediatePriority)
+    commitRootImpl(root)
 }
 
 function commitRootImpl(root, renderPriority){

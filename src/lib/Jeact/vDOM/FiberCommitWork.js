@@ -342,7 +342,7 @@ function commitWork(current, finishedWork){
     switch(finishedWork.tag){
         case SuspenseComponent:{
             commitSuspenseComponent(finishedWork);
-            attachSuspenseRetryListeners(finishedWork);
+            // attachSuspenseRetryListeners(finishedWork);
             return;
         }
         default:

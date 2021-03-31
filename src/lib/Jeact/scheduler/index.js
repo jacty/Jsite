@@ -1,7 +1,12 @@
 import {
-  DefaultLanePriority,
   NORMAL_PRIORITY_TIMEOUT,
-  USER_BLOCKING_PRIORITY_TIMEOUT
+  USER_BLOCKING_PRIORITY_TIMEOUT,
+  NoSchedulePriority,
+  ImmediateSchedulePriority,
+  UserBlockingSchedulePriority,
+  NormalSchedulePriority,
+  LowSchedulePriority,
+  IdleSchedulePriority,
 } from '@Jeact/shared/Constants';
 import {push,pop,peek} from './SchedulerMinHeap';
 
@@ -76,20 +81,28 @@ function workLoop(currentTime){
   }
 }
 
-export function runWithPriority(fn){
-  try {
-    return fn()
-  } finally{
-  }
-}
-
-export function scheduleCallback(priority, callback){
+export function scheduleCallback(priorityLevel, callback){
   let startTime = performance.now();
   let timeout;
-  switch (priority){
-    case DefaultLanePriority:
+  switch (priorityLevel) {
+    case ImmediateSchedulePriority:
+      debugger;
+      timeout = IMMEDIATE_PRIORITY_TIMEOUT;
+      break;
+    case UserBlockingSchedulePriority:
+      debugger;
+      timeout = USER_BLOCKING_PRIORITY_TIMEOUT;
+      break;
+    case IdleSchedulePriority:
+      debugger;
+      timeout = IDLE_PRIORITY_TIMEOUT;
+      break;
+    case LowSchedulePriority:
+      debugger;
+      timeout = LOW_PRIORITY_TIMEOUT;
+      break;
+    case NormalSchedulePriority:
     default:
-      if (priority !== 1) debugger;
       timeout = NORMAL_PRIORITY_TIMEOUT;
       break;
   }
@@ -99,7 +112,7 @@ export function scheduleCallback(priority, callback){
   const newTask = {
     id: taskIdCount++,
     callback,
-    priority,
+    priorityLevel,
     startTime,
     expirationTime,
     sortIndex: expirationTime,

@@ -1,8 +1,6 @@
 import {
   NoLane,
   NoLanes,
-  NoLanePriority,
-  NormalPriority,
   DefaultLanePriority,
   DefaultLane,
   TransitionLanes,
@@ -51,11 +49,10 @@ export function getNextLanes(root, wipLanes){
 
   const pendingLanes = root.pendingLanes;
   if (pendingLanes === NoLanes){
-    return [NoLanes, NoLanePriority];
+    return NoLanes;
   }
   
   let nextLanes = NoLanes;
-  let nextLanePriority = NoLanePriority;
 
   const suspendedLanes = root.suspendedLanes;
   const pingedLanes = root.pingedLanes;
@@ -67,27 +64,24 @@ export function getNextLanes(root, wipLanes){
     const nonIdleUnblockedLanes = nonIdlePendingLanes & ~suspendedLanes;
     if (nonIdleUnblockedLanes !== NoLanes){
       nextLanes = getHighestPriorityLanes(nonIdleUnblockedLanes);
-      nextLanePriority = highestLanePriority;
     } else {
       debugger;
       const nonIdlePingedLanes = nonIdlePendingLanes & pingedLanes;
       if (nonIdlePingedLanes !== NoLanes){
         nextLanes = getHighestPriorityLanes(nonIdlePingedLanes);
-        nextLanePriority = highestLanePriority;
       }
     }
   } else {
+    debugger;
     // remaining work
     const unblockedLanes = pendingLanes & ~suspendedLanes;
     if (unblockedLanes !== NoLanes){
       debugger;
       nextLanes = getHighestPriorityLanes(unblockedLanes);
-      nextLanePriority = highestLanePriority;
     } else {
       debugger;
       if (pingedLanes !== NoLanes){
         nextLanes = getHighestPriorityLanes(pingedLanes);
-        nextLanePriority = highestLanePriority;
       }
     }
   }
@@ -105,7 +99,7 @@ export function getNextLanes(root, wipLanes){
     wipLanes !== nextLanes &&
     // If we already suspended with a delay, then interrupting is fine.
     (wipLanes & suspendedLanes) == NoLanes
-    ){
+  ){
     debugger;
     const nextLane = getHighestPriorityLanes(nextLanes);
     const wipLane = getHighestPriorityLanes(wipLanes);
@@ -114,8 +108,6 @@ export function getNextLanes(root, wipLanes){
       (nextLane === DefaultLane && (wipLane & TransitionLanes) !== NoLanes) 
     ){
         return wipLanes;
-    } else {
-      highestLanePriority = nextLanePriority;
     }
   }
   const entangledLanes = root.entangledLanes;
@@ -132,7 +124,7 @@ export function getNextLanes(root, wipLanes){
     }
   }
 
-  return [nextLanes, highestLanePriority];
+  return nextLanes;
 }
 
 function computeExpirationTime(lane, currentTime){
@@ -157,7 +149,7 @@ export function markStarvedLanesAsExpired(root, currentTime){
   // Iterate through the pending lanes and check if we've reached their expiration time. If so, we'll assume the update is being starved and mark it as expired to force it to finish.
   let lanes = root.pendingLanes;
   let expiredLanes = 0;
-  while (lanes>0) {
+  while (lanes > 0) {
     const index = laneToIndex(lanes);
     const lane = 1 << index; // move 1 towards left for {index} bits.
     
@@ -167,7 +159,6 @@ export function markStarvedLanesAsExpired(root, currentTime){
         (lane & suspendedLanes) === NoLanes ||
         (lane & pingedLanes) !== NoLanes
         ){
-        // Assumes timestamps are monotonically increasing.
         expirationTimes[index] = computeExpirationTime(lane, currentTime);
       }
     } else if(expirationTime <= currentTime){
@@ -180,6 +171,10 @@ export function markStarvedLanesAsExpired(root, currentTime){
   if (expiredLanes !== 0){
     markRootExpired(root, expiredLanes);
   }
+}
+
+export function includesNonIdleWork(lanes){
+  return (lanes & NonIdleLanes) !== NoLanes;
 }
 
 export function includesOnlyRetries(lanes){
@@ -221,7 +216,7 @@ export function claimNextRetryLane(){
 }
 
 export function getHighestPriorityLane(lanes){
-  return lanes & -lanes; // Why this way can get the highest priority?
+  return lanes & -lanes; 
 }
 
 function getLowestPriorityLane(lanes){

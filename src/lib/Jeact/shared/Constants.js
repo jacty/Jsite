@@ -31,6 +31,7 @@ export const RetryAfterError = /*       */ 0b1000000;
 export const NoLanes=/*                          */ 0b0000000000000000000000000000000;
 export const NoLane =/*                          */ 0b0000000000000000000000000000000;
 export const SyncLane =/*                        */ 0b0000000000000000000000000000001;
+export const InputContinuousLane = /*            */ 0b0000000000000000000000000000100;
 export const DefaultLane = /*                    */ 0b0000000000000000000000000010000;
 export const TransitionLanes = /*                */ 0b0000000001111111111111111000000;
 
@@ -41,14 +42,15 @@ export const NonIdleLanes = /*                   */ 0b00011111111111111111111111
 export const IdleLane = /*                       */ 0b0100000000000000000000000000000;
 export const OffscreenLane = /*                  */ 0b1000000000000000000000000000000;
 
-/* core Priorities */
-export const ImmediatePriority = 99;
-export const NormalPriority = 97;
-export const NoPriority = 90;
 
 /* SchedulerPriorities */
+export const NoSchedulePriority = 0;
 export const ImmediateSchedulePriority = 1;
+export const UserBlockingSchedulePriority = 2;
 export const NormalSchedulePriority = 3;
+export const LowSchedulePriority = 4;
+export const IdleSchedulePriority = 5;
+
 
 /* LanePriorities */
 export const NoLanePriority = 0;

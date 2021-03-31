@@ -29,6 +29,9 @@ function getHighestPriorityLanes(lanes){
     case DefaultLane:
       highestLanePriority = DefaultLanePriority;
       return DefaultLane
+    case RetryLane1:
+      debugger
+      return lanes & RetryLanes;
     default:
       debugger;
       console.error('error', lanes);
@@ -133,10 +136,16 @@ export function getNextLanes(root, wipLanes){
 }
 
 function computeExpirationTime(lane, currentTime){
-  // TODO: Expiration heuristic is constant per lane, so could use a map.
-  getHighestPriorityLanes(lane);//update global variable highestLanePriority
-  if(highestLanePriority!==1){debugger};
-  return currentTime + 5000;
+  switch (lane){
+    case SyncLane:
+      return currentTime + 250;
+    case DefaultLane:
+    case RetryLane1:
+      return currentTime + 5000;
+    default:
+      debugger;
+      return NoTimestamp;
+  }
 }
 
 export function markStarvedLanesAsExpired(root, currentTime){

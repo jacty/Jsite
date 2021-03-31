@@ -369,12 +369,10 @@ function bailoutOnAlreadyFinishedWork(current, workInProgress, renderLanes){
   if (!includesSomeLane(renderLanes, workInProgress.childLanes)){
     // The children don't have any work either.
     return null;
-  } else {
-    debugger;
-    // This fiber doesn't have work, but its subtree does. Clone the child fibers and continue.
-    cloneChildFibers(workInProgress);
-    return workInProgress.child;
   }
+    // This fiber doesn't have work, but its subtree does. Clone the child fibers and continue.
+    cloneChildFibers(current, workInProgress);
+    return workInProgress.child;
 }
 // Iterate from parent fibers to child fibers(including sibling fibers) to build the whole fiber chain.
 export function beginWork(current, workInProgress, renderLanes){
@@ -392,17 +390,53 @@ export function beginWork(current, workInProgress, renderLanes){
       // the begin phase.
       switch (workInProgress.tag){
         case HostRoot:
-          debugger;
           pushHostContainer(workInProgress);
           const root = workInProgress.stateNode;
           const cache = current.memoizedState.cache;
           pushCacheProvider(workInProgress, cache);
           pushRootCachePool(root);
           break;
-        case SuspenseComponent:
+        case HostComponent:
+          // pushHostContext()
+          break;
+        case SuspenseComponent:{
+          const state = workInProgress.memoizedState;
+          if (state !== null){
+            const primaryChildFragment = workInProgress.child;
+            const primaryChildLanes = primaryChildFragment.childLanes;
+            if(includesSomeLane(renderLanes, primaryChildLanes)){
+              debugger
+              return updateSuspenseComponent(
+                current,
+                workInProgress,
+                renderLanes,
+              );
+            } else {
+              push(suspenseStackCursor, 
+                   suspenseStackCursor.current & SubtreeSuspenseContextMask,
+                   workInProgress);   
+              const child = bailoutOnAlreadyFinishedWork(
+                current,
+                workInProgress,
+                renderLanes,
+              ) 
+              if(child !== null){
+                return child.sibling;
+              } else {
+                return null;
+              }
+            }
+          } else {
+            debugger;
+          }
+          break;
+        }
+        case OffscreenComponent:
           debugger;
       }
       return bailoutOnAlreadyFinishedWork(current, workInProgress, renderLanes)
+    } else {
+      didReceiveUpdate = false;
     }
   } else {
     didReceiveUpdate = false;

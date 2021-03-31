@@ -95,9 +95,7 @@ export function requestEventTime(){
     debugger;
   }
   // We're not inside Jeact, so we may be in the middle of a browser event like click.
-  // TODO: explain why `currentEventTime` has been changed.
   if (currentEventTime !== NoTimestamp){
-    debugger
     // Use the same start time for all updates until we enter Jeact again.
     return currentEventTime;
   }
@@ -480,7 +478,7 @@ export function pingSuspendedRoot(root, wakeable, pingedLanes){
     wipRoot === root &&
     isSubsetOfLanes(wipRootRenderLanes, pingedLanes)
   ){
-    
+    debugger;
     if(
       wipRootExitStatus === RootSuspendedWithDelay ||
       wipRootExitStatus === RootSuspended
@@ -509,6 +507,7 @@ function retryTimedOutBoundary(boundaryFiber, retryLane=NoLane){
   const root = markUpdateLaneFromFiberToRoot(boundaryFiber, retryLane);
   if (root !== null){
     markRootUpdated(root, retryLane, eventTime);
+    debugger;
     ensureRootIsScheduled(root, eventTime);
   }
 }

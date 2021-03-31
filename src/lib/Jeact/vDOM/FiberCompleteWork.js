@@ -11,6 +11,7 @@ import {
   OffscreenComponent,
   OffscreenLane,
   Update,
+  StaticMask,
 } from '@Jeact/shared/Constants';
 import {
   getRootHostContainer,
@@ -42,6 +43,29 @@ import {
   renderDidSuspend,
   popRenderLanes
 } from '@Jeact/vDOM/FiberWorkLoop';
+
+function updateHostComponent(
+  current, 
+  workInProgress,
+  type,
+  newProps,
+  rootContainerInstance,
+){
+  const oldProps = current.memoizedProps;
+  if (oldProps === newProps){
+    return;
+  }
+
+  const instance = workInProgress.stateNode;
+  const updatePayload = prepareUpdate(
+    instance,
+    type,
+    oldProps,
+    newProps,
+    rootContainerInstance,
+  )
+  workInProgress.updateQueue = updatePayload;
+}
 
 function appendAllChildren(parent, workInProgress){
   let node = workInProgress.child;
@@ -96,7 +120,19 @@ function bubbleProperties(completedWork){
     }
     completedWork.subtreeFlags |= subtreeFlags;
   } else {
-    console.error('x');
+    let child = completedWork.child;
+    while (child !== null){
+      newChildLanes = mergeLanes(
+        newChildLanes,
+        mergeLanes(child.lanes, child.childLanes),
+      );
+
+      subtreeFlags |= child.subtreeFlags & StaticMask;
+      subtreeFlags |= child.flags & StaticMask;
+      // child.return = completedWork;
+      child = child.sibling;
+    }
+    completedWork.subtreeFlags |= subtreeFlags;
   }
 
   completedWork.childLanes = newChildLanes;
@@ -123,21 +159,27 @@ export function completeWork(current, workInProgress,renderLanes){
       const rootContainerInstance = getRootHostContainer();
       const type = workInProgress.type;
       if(current !== null && workInProgress.stateNode !== null){
-        debugger;
+        updateHostComponent(
+          current,
+          workInProgress,
+          type,
+          newProps,
+          rootContainerInstance,
+        )
+      } else {
+        const instance = createElement(
+          type,
+          rootContainerInstance,
+        );
+        
+        precacheFiberNode(workInProgress, instance);
+        updateFiberProps(instance, newProps);
+
+        appendAllChildren(instance, workInProgress);
+        setInitialDOMProperties(instance, workInProgress) 
+        
+        workInProgress.stateNode = instance;
       }
-
-      const instance = createElement(
-        type,
-        rootContainerInstance,
-      );
-      
-      precacheFiberNode(workInProgress, instance);
-      updateFiberProps(instance, newProps);
-
-      appendAllChildren(instance, workInProgress);
-      setInitialDOMProperties(instance, workInProgress) 
-      
-      workInProgress.stateNode = instance;
       bubbleProperties(workInProgress);
       return null;
     }
@@ -165,7 +207,6 @@ export function completeWork(current, workInProgress,renderLanes){
       const nextDidTimeout = nextState !== null;
       let prevDidTimeout = false;
       if(current !== null){
-        debugger;
         const prevState = current.memoizedState;
         prevDidTimeout = prevState !== null;
       } 

@@ -67,6 +67,7 @@ export function createWorkInProgress(current, pendingProps=null){
     );
 
     cloneKeys = [
+      'elementType',
       'type',
       'stateNode',
     ];

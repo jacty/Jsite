@@ -193,13 +193,22 @@ function deleteChild(returnFiber, childToDelete){
   const deletions = returnFiber.deletions;    
 }
 
-export function cloneChildFibers(workInProgress){
+export function cloneChildFibers(current, workInProgress){
+  if(workInProgress.child === null){
+    return;
+  }
   let currentChild = workInProgress.child;
   let newChild = createWorkInProgress(currentChild, currentChild.pendingProps);
   workInProgress.child = newChild;
   newChild.return = workInProgress;
 
-  if (currentChild.sibling!==null){
-    console.error('cloneChildFibers');
+  while (currentChild.sibling!==null){
+    currentChild = currentChild.sibling;
+    newChild = newChild.sibling = createWorkInProgress(
+      currentChild,
+      currentChild.pendingProps,
+    );
+    newChild.return = workInProgress;
   }
+  newChild.sibling = null;
 }

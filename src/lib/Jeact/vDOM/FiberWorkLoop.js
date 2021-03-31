@@ -507,7 +507,6 @@ function retryTimedOutBoundary(boundaryFiber, retryLane=NoLane){
   const root = markUpdateLaneFromFiberToRoot(boundaryFiber, retryLane);
   if (root !== null){
     markRootUpdated(root, retryLane, eventTime);
-    debugger;
     ensureRootIsScheduled(root, eventTime);
   }
 }

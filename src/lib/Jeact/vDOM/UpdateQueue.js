@@ -44,7 +44,6 @@ export function createUpdate(eventTime, lane, element=null){
 
     tag: UpdateState,//0
     payload: {element},
-    callback: null,
     
     next: null,
   };
@@ -172,11 +171,7 @@ export function processUpdateQueue(workInProgress,renderLanes){
             update,
             newState
           );
-
-          const callback = update.callback;
-          if (callback !== null) {
-            debugger;
-          }        
+      
         }
         update = update.next;
         if (update=== null){

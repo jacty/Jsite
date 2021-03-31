@@ -18,8 +18,8 @@ export function updateContainer(element, root){
 
   enqueueUpdate(current, update); //update fiber.updateQueue.pending.
   const rootFiber = scheduleUpdateOnFiber(current, lane, eventTime); 
-  if (root !== null){
-    entangleTransitions(root, current, lane);
+  if (rootFiber !== null){
+    entangleTransitions(rootFiber, current, lane);
   } 
 }
 

@@ -1,7 +1,6 @@
 import {
   NORMAL_PRIORITY_TIMEOUT,
   USER_BLOCKING_PRIORITY_TIMEOUT,
-  NoSchedulePriority,
   ImmediateSchedulePriority,
   UserBlockingSchedulePriority,
   NormalSchedulePriority,
@@ -10,10 +9,7 @@ import {
 } from '@Jeact/shared/Constants';
 import {push,pop,peek} from './SchedulerMinHeap';
 
-// Tasks are stored on a min heap.
 let taskQueue = [];
-
-// Incrementing id counter. Used to maintain insertion order.
 let taskIdCount = 1;
 
 let currentTask = null;
@@ -23,6 +19,9 @@ let isPerformingWork = false;
 
 let isHostCallbackScheduled = false;
 
+let isMessageLoopRunning = false;
+let scheduledHostCallback = null;
+
 // Scheduler periodically yields in case there is other work on the main
 // thread, like user events. By default, it yields multiple times per frame.
 // It does not attempt to align with frame boundaries, since most tasks don't
@@ -30,10 +29,9 @@ let isHostCallbackScheduled = false;
 let yieldInterval = 5;
 let deadline = 0;
 
-let isMessageLoopRunning = false;
-let scheduledHostCallback = null;
-
 function flushWork(currentTime){
+  console.error('x');
+  debugger;
   // For next time work scheduled.
   isHostCallbackScheduled = false;
   isPerformingWork = true;

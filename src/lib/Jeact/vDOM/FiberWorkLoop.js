@@ -450,14 +450,12 @@ function commitRootImpl(root, renderPriority){
     executionContext |= CommitContext;
     commitBeforeMutationEffects(finishedWork);
     commitMutationEffects(root, finishedWork);
-    root.current = finishedWork;
     commitLayoutEffects(finishedWork, root, lanes);
     executionContext = prevExecutionContext;
-  } else {
-    // No effects.
-    root.current = finishedWork;
-  }
+  } 
 
+  root.current = finishedWork;
+  
   const rootDidHavePassiveEffects = rootDoesHavePassiveEffects;
   if (rootDoesHavePassiveEffects){
     debugger;

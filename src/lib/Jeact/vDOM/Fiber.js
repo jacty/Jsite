@@ -56,7 +56,7 @@ export const createFiber = function(tag, pendingProps, key){
 
 
 // This is used to create an alternate fiber to do work on.
-export function createWorkInProgress(current, pendingProps){
+export function createWorkInProgress(current, pendingProps=null){
   let workInProgress = current.alternate;
   let cloneKeys = [];
   if (workInProgress === null){
@@ -82,9 +82,15 @@ export function createWorkInProgress(current, pendingProps){
     workInProgress.alternate = current;
     current.alternate = workInProgress;
   }else{
-    debugger;
-    // already have an alternate.
-    // Reset 
+    workInProgress.pendingProps = pendingProps;
+    
+    cloneKeys = [
+      'type'
+    ];
+    if(workInProgress.flags !== NoFlags || 
+      workInProgress.subtreeFlags !== NoFlags){
+      debugger;
+    } 
     workInProgress.flags = NoFlags;
     workInProgress.subtreeFlags = NoFlags;
     workInProgress.deletions = null;

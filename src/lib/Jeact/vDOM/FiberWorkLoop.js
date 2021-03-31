@@ -444,6 +444,8 @@ function commitRootImpl(root, renderPriority){
   return null;
 }
 export function pingSuspendedRoot(root, wakeable, pingedLanes){
+  debugger;
+  // The earliest attach to catch the change from Promise.
   const pingCache = root.pingCache;
   if (pingCache !== null){
     pingCache.delete(wakeable);
@@ -472,6 +474,11 @@ export function pingSuspendedRoot(root, wakeable, pingedLanes){
 
   ensureRootIsScheduled(root, eventTime);
 }
+
+export function resolveRetryWakeable(boundaryFiber, wakeable){
+  debugger;
+}
+
 export function updateEventWipLanes(){
   if (currentEventWipLanes === NoLanes){
     if (wipRootIncludedLanes !== NoLanes) debugger;

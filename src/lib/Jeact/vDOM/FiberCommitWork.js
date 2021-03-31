@@ -11,7 +11,13 @@ import{
  Update,
  PlacementAndUpdate,
  LayoutMask,
+ SuspenseComponent,
+ OffscreenComponent,
 } from '@Jeact/shared/Constants';
+
+import {
+    resolveRetryWakeable
+} from '@Jeact/vDOM/FiberWorkLoop';
 
 let nextEffect = null;
 
@@ -71,6 +77,24 @@ function commitBeforeMutationEffectsOnFiber(finishedWork){
     
 }
 
+function attachSuspenseRetryListeners(finishedWork){
+    const wakeables = finishedWork.updateQueue;
+    if (wakeables !== null){
+        finishedWork.updateQueue = null;
+        let retryCache = finishedWork.stateNode;
+        if(retryCache === null){
+            retryCache = finishedWork.stateNode = new WeakSet()
+        }
+        wakeables.forEach(wakeable => {
+            let retry = resolveRetryWakeable.bind(null, finishedWork, wakeable);
+            if(!retryCache.has(wakeable)){
+               retryCache.add(wakeable);
+               wakeable.then(retry, retry); 
+            }
+        })
+    }
+}
+
 export function commitMutationEffects(root,firstChild){
     nextEffect = firstChild;
     commitMutationEffects_begin(root);
@@ -126,7 +150,9 @@ function commitMutationEffectsOnFiber(finishedWork, root){
             debugger;
         }
         case Update:{
-            debugger;
+            const current = finishedWork.alternate;
+            commitWork(current, finishedWork);
+            break;
         }
     }
 }
@@ -185,6 +211,33 @@ function commitLayoutEffectOnFiber(finishedRoot, current, finishedWork, committe
                 debugger;
             }
         }
+    }
+}
+
+function toggleAllChildren(finishedWork, isHidden){
+    let node = finishedWork;
+    while(true){
+        if (node.tag === HostComponent){
+            debugger;
+        } else if (node.tag === HostText){
+            debugger
+        } else if (
+            node.tag === OffscreenComponent && 
+            node.memoizedState !== null &&
+            node !== finishedWork
+            ){
+            // Found a nested Offscreen component that is hidden. Stop going 
+            // search deeper and remain this tree hidden.
+        } else if (node.child !== null){
+            node.child.return = node;
+            node = node.child;
+            continue;
+        }
+
+        if (node == finishedWork){
+            return;
+        }
+        debugger;
     }
 }
 
@@ -282,5 +335,26 @@ function insertOrAppendPlacementNode(node, before, parent){
         }
     } else {
         console.error('insertOrAppendPlacementNode1')
+    }
+}
+
+function commitWork(current, finishedWork){
+    switch(finishedWork.tag){
+        case SuspenseComponent:{
+            commitSuspenseComponent(finishedWork);
+            attachSuspenseRetryListeners(finishedWork);
+            return;
+        }
+        default:
+            debugger;
+    }
+}
+
+function commitSuspenseComponent(finishedWork){
+    const newState = finishedWork.memoizedState;
+    if (newState !== null){
+       const primaryChildParent = finishedWork.child;
+        //hideOrUnhideAllChildren()
+        toggleAllChildren(primaryChildParent, true); 
     }
 }

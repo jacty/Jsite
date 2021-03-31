@@ -33,6 +33,7 @@ import {
   removeLanes,
   markRootSuspended,
   includesOnlyRetries,
+  claimNextRetryLane,
 } from '@Jeact/vDOM/FiberLane';
 import {
   createWorkInProgress
@@ -120,6 +121,29 @@ export function scheduleUpdateOnFiber(fiber, lane, eventTime){
   ensureRootIsScheduled(root, eventTime);
 
   return root;
+}
+
+function markUpdateLaneFromFiberToRoot(sourceFiber, lane){
+  sourceFiber.lanes = mergeLanes(sourceFiber.lanes, lane);
+  let alternate = sourceFiber.alternate;
+  if (alternate !== null){
+    alternate.lanes = mergeLanes(alternate.lanes, lane);
+  }
+  let node = sourceFiber;
+  let parent = sourceFiber.return;
+  while(parent !== null){
+    parent.childLanes = mergeLanes(parent.childLanes, lane);
+    alternate = parent.alternate;
+    if(alternate !== null){
+      alternate.childLanes = mergeLanes(alternate.childLanes, lane);
+    }
+    node = parent;
+    parent = parent.return;
+  }
+  if (node.tag === HostRoot){
+    return node.stateNode
+  } 
+  return null;
 }
 
 function ensureRootIsScheduled(root, currentTime){
@@ -437,14 +461,15 @@ function commitRootImpl(root, renderPriority){
   const rootDidHavePassiveEffects = rootDoesHavePassiveEffects;
   if (rootDoesHavePassiveEffects){
     debugger;
-  }
+    }
+
+  // Read this again, since an effect might have updated it.
 
   ensureRootIsScheduled(root, performance.now())
 
   return null;
 }
 export function pingSuspendedRoot(root, wakeable, pingedLanes){
-  debugger;
   // The earliest attach to catch the change from Promise.
   const pingCache = root.pingCache;
   if (pingCache !== null){
@@ -475,8 +500,27 @@ export function pingSuspendedRoot(root, wakeable, pingedLanes){
   ensureRootIsScheduled(root, eventTime);
 }
 
+function retryTimedOutBoundary(boundaryFiber, retryLane=NoLane){
+  // The boundary fiber (Suspense) previously was rendered in its fallback 
+  // state. One of the promises that suspended is has resolved and try 
+  // rendering again at a new expiration time.
+  if (retryLane === NoLane) {
+    retryLane = claimNextRetryLane();
+  }
+  const eventTime = requestEventTime();
+  const root = markUpdateLaneFromFiberToRoot(boundaryFiber, retryLane);
+  if (root !== null){
+    markRootUpdated(root, retryLane, eventTime);
+    ensureRootIsScheduled(root, eventTime);
+  }
+}
+
 export function resolveRetryWakeable(boundaryFiber, wakeable){
-  debugger;
+  let retryCache = boundaryFiber.stateNode;
+  if(retryCache !== null){
+    retryCache.delete(wakeable);
+  }
+  retryTimedOutBoundary(boundaryFiber);
 }
 
 export function updateEventWipLanes(){

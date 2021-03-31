@@ -190,7 +190,7 @@ function commitLayoutMountEffects_complete(subtreeRoot, root, committedLanes){
             nextEffect = null;
             return;
         }
-        debugger;
+
         const sibling = fiber.sibling;
         if (sibling !== null){
             nextEffect = sibling;

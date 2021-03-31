@@ -12,12 +12,14 @@ import {
   SyncLane,
   SyncLanePriority,
   IdleLane,
+  RetryLane1
 } from '@Jeact/shared/Constants';
 import {updateEventWipLanes} from '@Jeact/vDOM/FiberWorkLoop';
 import {getCurrentUpdatePriority} from '@Jeact/vDOM/UpdatePriorities';
 import {getCurrentEventPriority} from '@Jeact/vDOM/events/EventPriorities';
 // Used by getHighestPriorityLanes and getNextLanes:
 let highestLanePriority = DefaultLanePriority;
+let nextRetryLane = RetryLane1;
 
 function getHighestPriorityLanes(lanes){
   switch(getHighestPriorityLane(lanes)){
@@ -198,6 +200,15 @@ export function requestUpdateLane(){
   // Adapted from ReactDOMHostConfig.js
   const eventLane = getCurrentEventPriority();
   return eventLane;
+}
+
+export function claimNextRetryLane(){
+  const lane = nextRetryLane;
+  nextRetryLane <<= 1;
+  if((nextRetryLane & RetryLanes) === 0){
+    nextRetryLane = RetryLane1;
+  }
+  return lane;
 }
 
 export function getHighestPriorityLane(lanes){

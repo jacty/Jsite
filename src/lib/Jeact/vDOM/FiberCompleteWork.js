@@ -43,7 +43,8 @@ import {
 import {pop} from '@Jeact/vDOM/FiberStack';
 import {
   renderDidSuspend,
-  popRenderLanes
+  popRenderLanes,
+  subtreeRenderLanes,
 } from '@Jeact/vDOM/FiberWorkLoop';
 
 function updateHostComponent(
@@ -151,7 +152,6 @@ export function completeWork(current, workInProgress,renderLanes){
       bubbleProperties(workInProgress);
       return null;
     case HostRoot:{//3
-      debugger;
       const fiberRoot = workInProgress.stateNode;
       popRootCachePool(fiberRoot, renderLanes);
       const cache = workInProgress.memoizedState.cache;
@@ -213,7 +213,6 @@ export function completeWork(current, workInProgress,renderLanes){
       return null;
     }
     case SuspenseComponent:{
-      debugger;
       pop(suspenseStackCursor, workInProgress);
       const nextState = workInProgress.memoizedState;
       if((workInProgress.flags & DidCapture) !== NoFlags){
@@ -222,6 +221,7 @@ export function completeWork(current, workInProgress,renderLanes){
       const nextDidTimeout = nextState !== null;
       let prevDidTimeout = false;
       if(current !== null){
+        debugger;
         const prevState = current.memoizedState;
         prevDidTimeout = prevState !== null;
       } 
@@ -236,14 +236,16 @@ export function completeWork(current, workInProgress,renderLanes){
             debugger;
           }
       }
-      if (nextDidTimeout){
+      if (nextDidTimeout || prevDidTimeout){
+        // If this boundary just timed out, schedule an effect to attach a 
+        // retry listener to the promise. We also use this flag to toggle 
+        // children.
         workInProgress.flags |= Update;
       }
       bubbleProperties(workInProgress);
       return null;
     }
     case OffscreenComponent:{
-      debugger;
       popRenderLanes(workInProgress);
       const nextState = workInProgress.memoizedState;
       const nextIsHidden = nextState !== null;
@@ -272,16 +274,5 @@ export function completeWork(current, workInProgress,renderLanes){
   }
 }
 
-function updateHostContainer(workInProgress){
-  const root = workInProgress.stateNode;
-  const childrenUnchanged = workInProgress.firstEffect === null;
-  if(childrenUnchanged){
-    console.error('updateHostContainer2')
-  } else {
-    const container = root.containerInfo;
-    const newChildSet = createContainerChildSet(container);
-    console.error('updateHostContainer1')  
-  }
-}
 
 

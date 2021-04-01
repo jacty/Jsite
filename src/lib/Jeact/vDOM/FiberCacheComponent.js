@@ -1,5 +1,8 @@
 import {JEACT_CONTEXT_TYPE} from '@Jeact/shared/Constants';
-import {pushProvider} from '@Jeact/vDOM/FiberNewContext';
+import {
+    pushProvider,
+    popProvider
+} from '@Jeact/vDOM/FiberNewContext';
 
 export const CacheContext = {
     $$typeof:JEACT_CONTEXT_TYPE,
@@ -15,7 +18,7 @@ export function pushCacheProvider(workInProgress, cache){
 }
 
 export function popCacheProvider(workInProgress, cache){
-    // popProvider(CacheContext, workInProgress);
+    popProvider(CacheContext, workInProgress);
 }
 
 export function pushRootCachePool(root){

@@ -449,6 +449,7 @@ function completeUnitOfWork(unitOfWork){
 }
 
 function commitRoot(root){
+    debugger;
     commitRootImpl(root)
 }
 

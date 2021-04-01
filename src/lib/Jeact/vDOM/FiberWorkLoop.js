@@ -47,7 +47,6 @@ import {
   commitMutationEffects,
   commitLayoutEffects,
 } from '@Jeact/vDOM/FiberCommitWork';
-import {CurrentDispatcher} from '@Jeact/shared/internals';
 import {throwException} from '@Jeact/vDOM/FiberThrow';
 import {
   createCursor,
@@ -93,7 +92,6 @@ let rootDoesHavePassiveEffects = false;
 let rootsWithPendingDiscreteUpdates = null;
 
 let currentEventTime = NoTimestamp;
-let currentEventWipLanes = NoLanes;
 let currentEventTransitionLane = NoLanes;
 
 export function requestEventTime(){
@@ -220,11 +218,8 @@ function ensureRootIsScheduled(root, currentTime){
 // Entry point for every concurrent task, i.e. anything that
 // goes through Scheduler.
 function performConcurrentWorkOnRoot(root){
-  // TODO: explain why reset it is necessary like when it will be misused.
   currentEventTime = NoTimestamp;
-  currentEventWipLanes = NoLanes;
   currentEventTransitionLane = NoLanes;
-
 
   const originalCallbackNode = root.callbackNode;
 
@@ -237,6 +232,7 @@ function performConcurrentWorkOnRoot(root){
   if(exitStatus !== RootIncomplete){
     if(exitStatus === RootErrored || exitStatus===RootFatalErrored){
       executionContext |= RetryAfterError;
+      debugger;
       return null;
     }
 
@@ -355,7 +351,6 @@ export function renderDidError(){
 function renderRootConcurrent(root, lanes){
   const prevExecutionContext = executionContext;
   executionContext |= RenderContext;
-  const prevDispatcher = CurrentDispatcher.current;
 
   // If the root or lanes have changed, throw out the existing stack
   // and prepare a fresh one. Otherwise we'll continue where we left off.
@@ -374,7 +369,14 @@ function renderRootConcurrent(root, lanes){
   } while (true);
   
   executionContext = prevExecutionContext;
-  
+
+  if(wip !== null){
+    return RootIncomplete;
+  }
+
+  wipRoot = null;
+  wipRootRenderLanes = NoLanes
+
   return wipRootExitStatus;
 }
 
@@ -555,13 +557,6 @@ export function resolveRetryWakeable(boundaryFiber, wakeable){
     retryCache.delete(wakeable);
   }
   retryTimedOutBoundary(boundaryFiber);
-}
-
-export function updateEventWipLanes(){
-  if (currentEventWipLanes === NoLanes){
-    if (wipRootIncludedLanes !== NoLanes) debugger;
-    currentEventWipLanes = wipRootIncludedLanes;
-  }
 }
 
 export function updateExecutionContext(){

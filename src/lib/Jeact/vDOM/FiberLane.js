@@ -12,7 +12,6 @@ import {
   IdleLane,
   RetryLane1
 } from '@Jeact/shared/Constants';
-import {updateEventWipLanes} from '@Jeact/vDOM/FiberWorkLoop';
 import {getCurrentUpdatePriority} from '@Jeact/vDOM/UpdatePriorities';
 import {getCurrentEventPriority} from '@Jeact/vDOM/events/EventPriorities';
 // Used by getHighestPriorityLanes and getNextLanes:
@@ -190,8 +189,6 @@ export function getNextLanesPriority(){
 }
 
 export function requestUpdateLane(){
-  updateEventWipLanes()
-
   // Updates originating inside Jeact.
   // Adapted from ReactEventPriorities.new.js
   const updateLane = getCurrentUpdatePriority();

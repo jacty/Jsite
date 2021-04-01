@@ -13,7 +13,7 @@ let taskQueue = [];
 let taskIdCount = 1;
 
 let currentTask = null;
-
+let currentPriorityLevel = NormalSchedulePriority;
 // This is set while performing work, to prevent re-entry.
 let isPerformingWork = false;
 
@@ -30,17 +30,16 @@ let yieldInterval = 5;
 let deadline = 0;
 
 function flushWork(currentTime){
-  console.error('x');
-  debugger;
   // For next time work scheduled.
   isHostCallbackScheduled = false;
   isPerformingWork = true;
-
+  const previousPriorityLevel = currentPriorityLevel;
   try{
-     return workLoop(currentTime);
+    return workLoop(currentTime);
   } finally {
     // flags may be set in workLoop should be reset finally.
     currentTask = null;
+    currentPriorityLevel = previousPriorityLevel;
     isPerformingWork = false;
   }
 }

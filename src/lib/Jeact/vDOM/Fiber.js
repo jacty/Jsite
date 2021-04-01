@@ -6,10 +6,10 @@ import {
   HostText,
   HostComponent,
   FunctionComponent,
-  LazyComponent,
   SuspenseComponent,
-  JEACT_LAZY_TYPE,
   JEACT_SUSPENSE_TYPE,
+  JEACT_FRAGMENT_TYPE,
+  JEACT_OFFSCREEN_TYPE,
   StaticMask,
 } from '@Jeact/shared/Constants';
 
@@ -115,6 +115,10 @@ export function createWorkInProgress(current, pendingProps=null){
 }
 
 export function createFiberFromTypeAndProps(element, lanes, owner){
+
+}
+
+export function createFiberFromElement(element, lanes){
   const type = element.type;
   const pendingProps = element.props;
   const key = element.key;
@@ -126,21 +130,17 @@ export function createFiberFromTypeAndProps(element, lanes, owner){
     fiberTag = HostComponent;
   } else {
     switch(type){
+      case JEACT_FRAGMENT_TYPE: debugger;
       case JEACT_SUSPENSE_TYPE:
         const fiber = createFiber(SuspenseComponent, pendingProps, key);
         fiber.elementType = JEACT_SUSPENSE_TYPE;
         fiber.lanes = lanes;
         return fiber;
+      case JEACT_OFFSCREEN_TYPE:
+        debugger;
       default:{
-        if (typeof type ==='object' && type !== null){
-          switch (type.$$typeof){
-            case JEACT_LAZY_TYPE:
-              fiberTag = LazyComponent;
-              break;
-            default:{
-              debugger;
-            }
-          }
+        if (typeof type === 'object' && type !== null){
+          debugger;
         }
       }
     }
@@ -151,11 +151,6 @@ export function createFiberFromTypeAndProps(element, lanes, owner){
   fiber.elementType = type;
   fiber.lanes = lanes;
 
-  return fiber;
-}
-
-export function createFiberFromElement(element, lanes){
-  const fiber = createFiberFromTypeAndProps(element, lanes);
   return fiber;
 }
 

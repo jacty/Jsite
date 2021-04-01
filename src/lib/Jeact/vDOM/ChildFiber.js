@@ -123,6 +123,7 @@ function reconcileSingleElement(
     child = child.sibling;
   }
   if (element.type === JEACT_FRAGMENT_TYPE) debugger;
+  // createFiberFromTypeAndProps() has been merged to createFiberFromElement
   const created = createFiberFromElement(element, lanes);
   created.return = returnFiber;
   return created;

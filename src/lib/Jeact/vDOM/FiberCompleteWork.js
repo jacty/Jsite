@@ -1,4 +1,5 @@
 import {
+  LazyComponent,
   FunctionComponent,
   SuspenseComponent,
   HostText,
@@ -15,7 +16,8 @@ import {
 } from '@Jeact/shared/Constants';
 import {
   getRootHostContainer,
-  popHostContainer
+  popHostContainer,
+  popHostContext,
 } from '@Jeact/vDOM/FiberHostContext';
 import {
   mergeLanes,
@@ -142,11 +144,14 @@ export function completeWork(current, workInProgress,renderLanes){
   const newProps = workInProgress.pendingProps;
   
   switch(workInProgress.tag){
+    case LazyComponent:
     case Fragment:
     case FunctionComponent://0
+      debugger;
       bubbleProperties(workInProgress);
       return null;
     case HostRoot:{//3
+      debugger;
       const fiberRoot = workInProgress.stateNode;
       popRootCachePool(fiberRoot, renderLanes);
       const cache = workInProgress.memoizedState.cache;
@@ -156,9 +161,11 @@ export function completeWork(current, workInProgress,renderLanes){
       return null;
     }
     case HostComponent:{//5
+      popHostContext(workInProgress);
       const rootContainerInstance = getRootHostContainer();
       const type = workInProgress.type;
       if(current !== null && workInProgress.stateNode !== null){
+        debugger;
         updateHostComponent(
           current,
           workInProgress,
@@ -167,6 +174,12 @@ export function completeWork(current, workInProgress,renderLanes){
           rootContainerInstance,
         )
       } else {
+        if(!newProps){
+          debugger;
+          bubbleProperties(workInProgress);
+          return null;
+        }
+
         const instance = createElement(
           type,
           rootContainerInstance,
@@ -184,6 +197,7 @@ export function completeWork(current, workInProgress,renderLanes){
       return null;
     }
     case HostText: {//6
+      debugger;
       const newText = newProps;
       if (workInProgress.alternate& workInProgress.stateNode!==null){
         console.error('x');
@@ -199,6 +213,7 @@ export function completeWork(current, workInProgress,renderLanes){
       return null;
     }
     case SuspenseComponent:{
+      debugger;
       pop(suspenseStackCursor, workInProgress);
       const nextState = workInProgress.memoizedState;
       if((workInProgress.flags & DidCapture) !== NoFlags){
@@ -228,6 +243,7 @@ export function completeWork(current, workInProgress,renderLanes){
       return null;
     }
     case OffscreenComponent:{
+      debugger;
       popRenderLanes(workInProgress);
       const nextState = workInProgress.memoizedState;
       const nextIsHidden = nextState !== null;

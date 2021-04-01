@@ -399,9 +399,10 @@ function performUnitOfWork(unitOfWork){
     wip = next;
   }
 }
-// set stateNode to domInstance and append all children, build effects list.
+
 function completeUnitOfWork(unitOfWork){
-  debugger;
+  // Attempt to complete the current unit of work, then move to the next
+  // sibling. If there are no more siblings, return to the parent fiber.
   let completedWork = unitOfWork;
   do {
     const current = completedWork.alternate;

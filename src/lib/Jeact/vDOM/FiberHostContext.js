@@ -31,6 +31,13 @@ export function pushHostContext(fiber){
     push(contextFiberStackCursor, fiber, fiber);
 }
 
+export function popHostContext(fiber){
+  if(contextFiberStackCursor.current !== fiber){
+    return;
+  }
+  pop(contextFiberStackCursor, fiber);
+}
+
 function getChildHostContext(
     parentHostContext,
     type,

@@ -3,9 +3,6 @@ import {pushProvider} from '@Jeact/vDOM/FiberNewContext';
 
 export const CacheContext = {
     $$typeof:JEACT_CONTEXT_TYPE,
-    Consumer: null,
-    Provider: null,
-    _calculatedChangedBits: null,
     _currentValue: null,
     _threadCount: 0,
 }

@@ -2,6 +2,7 @@ import {
   __ENV__,
   JEACT_ELEMENT_TYPE,
   JEACT_FRAGMENT_TYPE,
+  JEACT_LAZY_TYPE,
   Placement
 } from '@Jeact/shared/Constants';
 import {
@@ -30,8 +31,19 @@ export function reconcileChildFibers(
     currentFirstChild = current.child;
     shouldTrackEffects = true;
   }
+
   // Handle object types
   const isObject = typeof newChild === 'object' && newChild !== null;
+
+  const isUnkeyedTopLevelFragment = 
+    isObject &&
+    newChild.type === JEACT_FRAGMENT_TYPE &&
+    newChild.key === null;
+  if(isUnkeyedTopLevelFragment){
+    debugger;
+    newChild = newChild.props.children;
+  }
+
   if (isObject){
     switch(newChild.$$typeof){
       case JEACT_ELEMENT_TYPE:
@@ -44,13 +56,11 @@ export function reconcileChildFibers(
           ),
           shouldTrackEffects
         );
-      default:
-        if(!Array.isArray(newChild)){
-          console.error('reconcileChildFibers1', newChild.$$typeof)
-        }
+      case JEACT_LAZY_TYPE:
+        debugger;        
     };
   }
-
+  debugger;
   if (typeof newChild === 'string' || typeof newChild === 'number'){
     return placeSingleChild(
       reconcileSingleTextNode(

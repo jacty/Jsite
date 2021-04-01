@@ -1,4 +1,7 @@
-import {createCursor, push} from '@Jeact/vDOM/FiberStack';
+import {
+    createCursor,
+    push
+} from '@Jeact/vDOM/FiberStack';
 
 const valueCursor = createCursor(null);
 

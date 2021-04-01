@@ -88,9 +88,7 @@ function getStateFromUpdate(
   prevState
 ){
   switch (update.tag){
-    // Intentional fallthrough
     case UpdateState: {
-      if(typeof update.payload === 'function') debugger;
       let partialState = update.payload;     
       if (partialState === null || partialState === undefined){
         debugger;
@@ -99,7 +97,7 @@ function getStateFromUpdate(
       return Object.assign({}, prevState, partialState);
     }
     default:
-      console.error('getStateFromUpdate2', update.tag)
+      debugger;
   }
   return prevState;
 }
@@ -160,10 +158,9 @@ export function processUpdateQueue(workInProgress,renderLanes){
         if(!isSubsetOfLanes(renderLanes, updateLane)){
           debugger;
         } else {
-          if(newLastBaseUpdate!==null){
+          if(newLastBaseUpdate !== null){
             debugger;
           }
-
           // Process this update.
           newState = getStateFromUpdate(
             workInProgress,

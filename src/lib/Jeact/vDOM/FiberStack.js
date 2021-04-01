@@ -41,7 +41,7 @@ export function pop(cursor, fiber){
 
 export function push(cursor, value, fiber){
   index ++;
-
+  
   valueStack[index] = cursor.current;
 
   if(__ENV__){

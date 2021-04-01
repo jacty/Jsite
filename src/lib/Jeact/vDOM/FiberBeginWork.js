@@ -121,15 +121,16 @@ function updateFunctionComponent(current,workInProgress,renderLanes){
 function updateHostRoot(current, workInProgress, renderLanes){
   // push host container like div#root into stack, so we can get it to refer in any depth when we are reconcile fiber children.
   pushHostContainer(workInProgress);//pushHostRootContext()
+
   const prevState = workInProgress.memoizedState;
   const prevChildren = prevState.element;
   cloneUpdateQueue(current, workInProgress);
   processUpdateQueue(workInProgress, renderLanes);
 
   const nextState = workInProgress.memoizedState;
-
+  const root = workInProgress.stateNode;
   const nextCache = nextState.cache;
-  pushRootCachePool(workInProgress.stateNode);
+  pushRootCachePool(root);
   pushCacheProvider(workInProgress, nextCache);
   if(nextCache !== prevState.cache){
     debugger;
@@ -386,6 +387,7 @@ export function beginWork(current, workInProgress, renderLanes){
       didReceiveUpdate = true;
     } else if(!includesSomeLane(renderLanes, updateLanes)){
       didReceiveUpdate = false;
+      debugger;
       // This fiber does not have any pending work. Bailout without entering 
       // the begin phase.
       switch (workInProgress.tag){
@@ -444,7 +446,8 @@ export function beginWork(current, workInProgress, renderLanes){
   // prevent lanes from passing to fiber.lanes of HostComponent's child fibers, and further to childLanes in bubbleProperties().
   workInProgress.lanes = NoLanes;
   switch (workInProgress.tag){
-    case LazyComponent:{//16
+    case LazyComponent:{
+      debugger;
       return mountLazyComponent(
         current, 
         workInProgress,
@@ -453,18 +456,23 @@ export function beginWork(current, workInProgress, renderLanes){
       );
     }
     case FunctionComponent:
+      debugger;
       return updateFunctionComponent(current,workInProgress,renderLanes);
     case HostRoot:
       return updateHostRoot(current, workInProgress, renderLanes);
     case HostComponent:
+      debugger;
       return updateHostComponent(current, workInProgress, renderLanes);
     case HostText:
       return null;
     case SuspenseComponent:
+      debugger;
       return updateSuspenseComponent(current, workInProgress, renderLanes);
     case Fragment:
+      debugger;
       return updateFragment(current, workInProgress, renderLanes);
     case OffscreenComponent:
+      debugger;
       return updateOffscreenComponent(current, workInProgress, renderLanes);
     default:
       console.error('beginWork4', workInProgress);

@@ -74,9 +74,7 @@ export function createWorkInProgress(current, pendingProps=null){
 
     if (__ENV__){
       cloneKeys = cloneKeys.concat([
-        '_debugID',
-        '_debugOwner',
-        '_debugHookTypes'
+        '_debugID'
       ])
     }   
 
@@ -88,6 +86,7 @@ export function createWorkInProgress(current, pendingProps=null){
     cloneKeys = [
       'type'
     ];
+
     if(workInProgress.flags !== NoFlags || 
       workInProgress.subtreeFlags !== NoFlags){
       debugger;
@@ -96,7 +95,7 @@ export function createWorkInProgress(current, pendingProps=null){
     workInProgress.subtreeFlags = NoFlags;
     workInProgress.deletions = null;
   }
-  // TODO: why?
+  // Static effects are not specific to a render. 
   workInProgress.flags = current.flags & StaticMask;
   cloneKeys = cloneKeys.concat([
     'childLanes',
@@ -109,6 +108,7 @@ export function createWorkInProgress(current, pendingProps=null){
     'index',
     'ref',
   ]);
+  
   clone(current,workInProgress,cloneKeys);
 
   return workInProgress;

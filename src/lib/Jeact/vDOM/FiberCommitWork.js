@@ -38,7 +38,7 @@ function commitBeforeMutationEffects_begin(){
         if(
             (fiber.subtreeFlags & BeforeMutationMask) !== NoFlags &&
             child !== null
-            ){
+        ){
             nextEffect = child;
         } else {
             commitBeforeMutationEffects_complete();
@@ -52,7 +52,7 @@ function commitBeforeMutationEffects_complete(){
         try {
             commitBeforeMutationEffectsOnFiber(fiber);
         } catch (error){
-            console.error('x', error);
+            debugger;
         }
 
         const sibling = fiber.sibling;
@@ -122,7 +122,7 @@ function commitMutationEffects_complete(root){
         try {
             commitMutationEffectsOnFiber(fiber, root);
         } catch(error){
-            console.error('x', error);
+            debugger;
         }
 
         const sibling = fiber.sibling;
@@ -150,6 +150,7 @@ function commitMutationEffectsOnFiber(finishedWork, root){
             debugger;
         }
         case Update:{
+            debugger;
             const current = finishedWork.alternate;
             commitWork(current, finishedWork);
             break;
@@ -182,7 +183,7 @@ function commitLayoutMountEffects_complete(subtreeRoot, root, committedLanes){
             try{
                 commitLayoutEffectOnFiber(root, current, fiber, committedLanes);
             } catch(error){
-                console.error('x', error);
+                debugger;
             }
         }
 
@@ -260,7 +261,7 @@ function isHostParent(fiber){
 
 function getHostSibling(fiber){
     let node = fiber;
-    while (true){
+    siblings: while (true){
         while(node.sibling === null){
             if (node.return === null || isHostParent(node.return)){
                 return null;
@@ -316,7 +317,11 @@ function insertOrAppendPlacementNodeIntoContainer(node, before, parent){
             insertOrAppendPlacementNodeIntoContainer(child, before, parent);
             let sibling = child.sibling;
             while (sibling !== null ){
-                insertOrAppendPlacementNodeIntoContainer(sibling, before, parent);
+                insertOrAppendPlacementNodeIntoContainer(
+                    sibling, 
+                    before, 
+                parent);
+
                 sibling = sibling.sibling;
             }
         }

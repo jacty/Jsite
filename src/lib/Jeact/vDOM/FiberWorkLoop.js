@@ -61,6 +61,9 @@ import {
   IdleEventPriority,
   lanesToEventPriority,
 } from '@Jeact/vDOM/events/EventPriorities';
+import {
+  getCurrentUpdatePriority
+} from '@Jeact/vDOM/UpdatePriorities';
 
 const RootIncomplete = 0;
 const RootFatalErrored = 1;
@@ -449,15 +452,17 @@ function completeUnitOfWork(unitOfWork){
 }
 
 function commitRoot(root){
-    debugger;
-    commitRootImpl(root)
+    const updateLanePriority = getCurrentUpdatePriority();
+    commitRootImpl(root, updateLanePriority)
 }
 
 function commitRootImpl(root, renderPriority){
   const finishedWork = root.finishedWork;
   const lanes = root.finishedLanes;
+
   if (finishedWork === null){
     debugger;
+    return null;
   }
   root.finishedWork = null;
   root.finishedLanes = NoLanes;
@@ -482,15 +487,19 @@ function commitRootImpl(root, renderPriority){
     (finishedWork.subtreeFlags &
       (BeforeMutationMask | MutationMask | LayoutMask | PassiveMask)) !== 
     NoFlags;
-  const rootHasEffect = (finishedWork.flags &
-    (BeforeMutationMask | MutationMask | LayoutMask | PassiveMask)) !==
+  const rootHasEffect = 
+    (finishedWork.flags &
+      (BeforeMutationMask | MutationMask | LayoutMask | PassiveMask)) !==
     NoFlags;
 
   if (subtreeHasEffects || rootHasEffect){
     const prevExecutionContext= executionContext;
     executionContext |= CommitContext;
+
     commitBeforeMutationEffects(finishedWork);
+
     commitMutationEffects(root, finishedWork);
+
     commitLayoutEffects(finishedWork, root, lanes);
     executionContext = prevExecutionContext;
   } 
@@ -506,7 +515,6 @@ function commitRootImpl(root, renderPriority){
 
   ensureRootIsScheduled(root, performance.now())
 
-  return null;
 }
 export function pingSuspendedRoot(root, wakeable, pingedLanes){
   // The earliest attach to catch the change from Promise.

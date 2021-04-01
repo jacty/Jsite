@@ -401,6 +401,7 @@ function performUnitOfWork(unitOfWork){
 }
 // set stateNode to domInstance and append all children, build effects list.
 function completeUnitOfWork(unitOfWork){
+  debugger;
   let completedWork = unitOfWork;
   do {
     const current = completedWork.alternate;

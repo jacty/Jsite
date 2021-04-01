@@ -26,7 +26,10 @@ import {
   renderWithHooks,
   bailoutHooks
 } from '@Jeact/vDOM/FiberHooks';
-import {pushHostContainer} from '@Jeact/vDOM/FiberHostContext';
+import {
+  pushHostContainer,
+  pushHostContext,
+} from '@Jeact/vDOM/FiberHostContext';
 import {shouldSetTextContent} from '@Jeact/vDOM/DOMComponent';
 import {
   pushRootCachePool,
@@ -38,6 +41,9 @@ import {
   ForceSuspenseFallback,
   InvisibleParentSuspenseContext,
   SubtreeSuspenseContextMask,
+  hasSuspenseContext,
+  addSubtreeSuspenseContext,
+  setDefaultShallowSuspenseContext,
 } from '@Jeact/vDOM/FiberSuspenseContext';
 import {push} from '@Jeact/vDOM/FiberStack';
 import {
@@ -65,6 +71,7 @@ function updateOffscreenComponent(
     // Rendering a visible tree.
     let subtreeRenderLanes;
     if (prevState !== null){
+      // toggle hidden tree to visible.
       debugger;
     } else{
       subtreeRenderLanes = renderLanes;
@@ -156,6 +163,7 @@ function updateHostRoot(current, workInProgress, renderLanes){
 }
 
 function updateHostComponent(current, workInProgress,renderLanes){
+  pushHostContext(workInProgress)
   const type = workInProgress.type;
   const nextProps = workInProgress.pendingProps;
   const prevProps = current !== null ? current.memoizedProps : null;
@@ -226,16 +234,16 @@ function shouldRemainOnFallback(suspenseContext, current, workInProgress){
     debugger;
   }
 
-  // Not currently showing content. 
-  // hasSuspenseContext()
-  return suspenseContext & ForceSuspenseFallback !== 0
+  // Not currently showing content. Consult the Suspense context.
+  return hasSuspenseContext(
+    suspenseContext,
+    ForceSuspenseFallback
+    )
 }
 
 function updateSuspenseComponent(current, workInProgress, renderLanes){ 
   const nextProps = workInProgress.pendingProps;
-
   let suspenseContext = suspenseStackCursor.current;
-
   let showFallback = false;
   const didSuspend = (workInProgress.flags & DidCapture) !== NoFlags;
   
@@ -248,7 +256,7 @@ function updateSuspenseComponent(current, workInProgress, renderLanes){
       renderLanes,
     )
   ){
-    // rendering the fallback children.
+    // part of the subtree has suspended and render the fallback children.
     showFallback = true;
     workInProgress.flags &= ~DidCapture;
   } else {
@@ -260,19 +268,16 @@ function updateSuspenseComponent(current, workInProgress, renderLanes){
       // This is a new mount or this boundary is already showing a fallback 
      // state.
      // Mark this subtree context as having at least one invisible parent that 
-     // could handle the fallback state.
-     // Boundaries without fallbacks or should be avoided are not considered
-     // since they cannot handle preferred fallback states.
-     if(
-      nextProps.fallback !== undefined
-      ){
-      // addSubtreeSuspenseContext()
-      suspenseContext = suspenseContext | InvisibleParentSuspenseContext
-     }
+     // could handle the fallback state..
+
+      suspenseContext = addSubtreeSuspenseContext(
+        suspenseContext,
+        InvisibleParentSuspenseContext,
+      )     
     }
   }
-  // setDefaultShallowSuspenseContext
-  suspenseContext &= SubtreeSuspenseContextMask;
+  // why?
+  suspenseContext = setDefaultShallowSuspenseContext(suspenseContext);
 
   // pushSuspenseContext()
   push(suspenseStackCursor, suspenseContext, workInProgress);
@@ -282,6 +287,7 @@ function updateSuspenseComponent(current, workInProgress, renderLanes){
     const nextPrimaryChildren = nextProps.children;
     const nextFallbackChildren = nextProps.fallback;
     if (showFallback){
+      debugger;
       const fallbackFragment = mountSuspenseFallbackChildren(
         workInProgress,
         nextPrimaryChildren,
@@ -323,6 +329,7 @@ function mountSuspensePrimaryChildren(
   );
   primaryChildFragment.elementType = JEACT_OFFSCREEN_TYPE;
   primaryChildFragment.lanes = renderLanes;
+
   primaryChildFragment.return = workInProgress;
   workInProgress.child = primaryChildFragment;
   return primaryChildFragment;
@@ -461,18 +468,15 @@ export function beginWork(current, workInProgress, renderLanes){
     case HostRoot:
       return updateHostRoot(current, workInProgress, renderLanes);
     case HostComponent:
-      debugger;
       return updateHostComponent(current, workInProgress, renderLanes);
     case HostText:
       return null;
     case SuspenseComponent:
-      debugger;
       return updateSuspenseComponent(current, workInProgress, renderLanes);
     case Fragment:
       debugger;
       return updateFragment(current, workInProgress, renderLanes);
     case OffscreenComponent:
-      debugger;
       return updateOffscreenComponent(current, workInProgress, renderLanes);
     default:
       console.error('beginWork4', workInProgress);

@@ -18,6 +18,26 @@ export const InvisibleParentSuspenseContext = 0b01;
 export const ForceSuspenseFallback = 0b10;
 export const suspenseStackCursor = createCursor(DefaultSuspenseContext);
 
+export function hasSuspenseContext(
+    parentContext,
+    flag
+){
+    return (parentContext & flag) !== 0;
+}
+
+export function setDefaultShallowSuspenseContext(
+    parentContext
+){
+    return parentContext & SubtreeSuspenseContextMask;
+}
+
+export function addSubtreeSuspenseContext(
+    parentContext,
+    subtreeContext
+){
+    return parentContext | subtreeContext;
+}
+
 export function shouldCaptureSuspense(
     workInProgress,
     hasInvisibleParent

@@ -26,3 +26,16 @@ export function pushHostContainer(fiber){
 export function popHostContainer(fiber){
     pop(rootInstanceStackCursor, fiber);
 }
+
+export function pushHostContext(fiber){
+    push(contextFiberStackCursor, fiber, fiber);
+}
+
+function getChildHostContext(
+    parentHostContext,
+    type,
+    rootContainerInstance
+){
+    const parentNamespace = parentHostContext;
+    return getChildNamespace(parentNamespace);
+}

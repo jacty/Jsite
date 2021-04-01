@@ -47,7 +47,11 @@ export function setInitialDOMProperties(domElement, workInProgress){
 }
 
 export function shouldSetTextContent(props){
-  return typeof props.children === 'string';
+    if(props.dangerouslySetInnerHTML) debugger;
+  return (
+    typeof props.children === 'string' ||
+    typeof props.children === 'number'
+    )
 }
 
 function setTextContent(node, text){

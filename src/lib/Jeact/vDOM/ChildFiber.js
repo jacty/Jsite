@@ -31,7 +31,10 @@ export function reconcileChildFibers(
     currentFirstChild = current.child;
     shouldTrackEffects = true;
   }
-
+  if(newChild === null && !shouldTrackEffects){
+    // early bail out
+    return null;
+  }
   // Handle object types
   const isObject = typeof newChild === 'object' && newChild !== null;
 
@@ -86,11 +89,8 @@ export function reconcileChildFibers(
     debugger;
   }
 
-  if (!shouldTrackEffects){
-    return null;
-  } else {
-    debugger;
-  }
+
+  debugger;
 }
 
 function placeSingleChild(newFiber, shouldTrackEffects){

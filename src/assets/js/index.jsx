@@ -11,8 +11,9 @@ const AboutMe = lazy(()=>import('@assets/js/aboutme.jsx'));
 
 createRoot(document.getElementById('root')).render(
             
-        <Suspense fallback={<div>fallback</div>}>
-            <AboutMe />
+        <Suspense>
+            <h1>Demo</h1>
+            {/*<AboutMe />*/}
         </Suspense>
 
     );

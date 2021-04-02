@@ -7,9 +7,11 @@ import {
   HostComponent,
   FunctionComponent,
   SuspenseComponent,
+  LazyComponent,
   JEACT_SUSPENSE_TYPE,
   JEACT_FRAGMENT_TYPE,
   JEACT_OFFSCREEN_TYPE,
+  JEACT_LAZY_TYPE,
   StaticMask,
 } from '@Jeact/shared/Constants';
 
@@ -129,7 +131,7 @@ export function createFiberFromElement(element, lanes){
   } else if(typeof type === 'string'){
     fiberTag = HostComponent;
   } else {
-    switch(type){
+    getTag: switch(type){
       case JEACT_FRAGMENT_TYPE: debugger;
       case JEACT_SUSPENSE_TYPE:
         const fiber = createFiber(SuspenseComponent, pendingProps, key);
@@ -140,7 +142,11 @@ export function createFiberFromElement(element, lanes){
         debugger;
       default:{
         if (typeof type === 'object' && type !== null){
-          debugger;
+          switch(type.$$typeof){
+            case JEACT_LAZY_TYPE:
+              fiberTag = LazyComponent;
+              break getTag;
+          }
         }
       }
     }

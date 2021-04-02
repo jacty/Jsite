@@ -50,6 +50,7 @@ import {
   createFiber,
 } from '@Jeact/vDOM/Fiber';
 import {pushRenderLanes} from '@Jeact/vDOM/FiberWorkLoop';
+import {createElement} from '@Jeact/Element';
 
 let didReceiveUpdate = false;
 
@@ -287,7 +288,6 @@ function updateSuspenseComponent(current, workInProgress, renderLanes){
     const nextPrimaryChildren = nextProps.children;
     const nextFallbackChildren = nextProps.fallback;
     if (showFallback){
-      debugger;
       const fallbackFragment = mountSuspenseFallbackChildren(
         workInProgress,
         nextPrimaryChildren,
@@ -334,11 +334,12 @@ function mountSuspensePrimaryChildren(
   workInProgress.child = primaryChildFragment;
   return primaryChildFragment;
 }
+const defaultFallbackChildren=createElement('p',null,'Loading...');
 
 function mountSuspenseFallbackChildren(
   workInProgress,
   primaryChildren,
-  fallbackChildren,
+  fallbackChildren=defaultFallbackChildren,
   renderLanes,
 ){
   const primaryChildProps = {
@@ -454,7 +455,6 @@ export function beginWork(current, workInProgress, renderLanes){
   workInProgress.lanes = NoLanes;
   switch (workInProgress.tag){
     case LazyComponent:{
-      debugger;
       return mountLazyComponent(
         current, 
         workInProgress,
@@ -474,7 +474,6 @@ export function beginWork(current, workInProgress, renderLanes){
     case SuspenseComponent:
       return updateSuspenseComponent(current, workInProgress, renderLanes);
     case Fragment:
-      debugger;
       return updateFragment(current, workInProgress, renderLanes);
     case OffscreenComponent:
       return updateOffscreenComponent(current, workInProgress, renderLanes);

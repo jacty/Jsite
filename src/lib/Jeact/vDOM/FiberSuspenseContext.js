@@ -48,9 +48,6 @@ export function shouldCaptureSuspense(
         return false;
     }
     const props = workInProgress.memoizedProps;
-    if(props.fallback === undefined){
-        return false;
-    }
 
     if (props.avoid !== true){
         return true;

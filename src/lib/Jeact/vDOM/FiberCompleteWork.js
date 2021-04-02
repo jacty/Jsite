@@ -39,6 +39,7 @@ import {
 import {
   suspenseStackCursor,
   InvisibleParentSuspenseContext,
+  hasSuspenseContext
 } from '@Jeact/vDOM/FiberSuspenseContext';
 import {pop} from '@Jeact/vDOM/FiberStack';
 import {
@@ -148,7 +149,6 @@ export function completeWork(current, workInProgress,renderLanes){
     case LazyComponent:
     case Fragment:
     case FunctionComponent://0
-      debugger;
       bubbleProperties(workInProgress);
       return null;
     case HostRoot:{//3
@@ -227,9 +227,15 @@ export function completeWork(current, workInProgress,renderLanes){
       } 
 
       if(nextDidTimeout && !prevDidTimeout){
+          const hasInvisibleChildContext = 
+            current === null &&
+            workInProgress.memoizedProps.avoid !== true;
           if(
-            (current === null) ||
-            ((suspenseStackCursor.current & InvisibleParentSuspenseContext)!==0)
+              hasInvisibleChildContext ||
+              hasSuspenseContext(
+                suspenseStackCursor.current,
+                (InvisibleParentSuspenseContext)
+              )
             ){
             renderDidSuspend()
           } else {

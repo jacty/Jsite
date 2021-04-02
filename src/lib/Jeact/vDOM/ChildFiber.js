@@ -63,7 +63,7 @@ export function reconcileChildFibers(
         debugger;        
     };
   }
-  debugger;
+
   if (typeof newChild === 'string' || typeof newChild === 'number'){
     return placeSingleChild(
       reconcileSingleTextNode(

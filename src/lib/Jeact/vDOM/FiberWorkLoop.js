@@ -273,6 +273,7 @@ function finishConcurrentRender(root, exitStatus, lanes){
         }
 
       }
+      // work expired. Commit immediately.
       commitRoot(root);
       break;
     }
@@ -518,6 +519,7 @@ function commitRootImpl(root, renderPriority){
 }
 export function pingSuspendedRoot(root, wakeable, pingedLanes){
   // The earliest attach to catch the change from Promise.
+  debugger;
   const pingCache = root.pingCache;
   if (pingCache !== null){
     pingCache.delete(wakeable);

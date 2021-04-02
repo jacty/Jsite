@@ -2,6 +2,7 @@ import{
  HostRoot,
  HostText,
  HostComponent,
+ FunctionComponent,
  BeforeMutationMask,
  MutationMask,
  NoFlags,
@@ -147,7 +148,14 @@ function commitMutationEffectsOnFiber(finishedWork, root){
             break;
         }
         case PlacementAndUpdate:{
-            debugger;
+            // Placement
+            commitPlacement(finishedWork);
+            finishedWork.flags &= ~Placement;
+
+            //Update
+            const current = finishedWork.alternate;
+            commitWork(current, finishedWork);
+            break;
         }
         case Update:{
             debugger;
@@ -205,12 +213,19 @@ function commitLayoutMountEffects_complete(subtreeRoot, root, committedLanes){
 function commitLayoutEffectOnFiber(finishedRoot, current, finishedWork, committedLanes){
     if ((finishedWork.flags & Update) !== NoFlags){
         switch(finishedWork.tag){
+            case FunctionComponent:
             case HostRoot:{
                 debugger;
             }
             case HostComponent:{
                 debugger;
             }
+            case HostText:
+                break;
+            case SuspenseComponent:
+                break;
+            case OffscreenComponent:
+                break;
         }
     }
 }
@@ -345,6 +360,15 @@ function insertOrAppendPlacementNode(node, before, parent){
 
 function commitWork(current, finishedWork){
     switch(finishedWork.tag){
+        case HostComponent:{
+            debugger;
+        }
+        case HostText:{
+            debugger;
+        }
+        case HostRoot:{
+            debugger;
+        }
         case SuspenseComponent:{
             commitSuspenseComponent(finishedWork);
             // attachSuspenseRetryListeners(finishedWork);

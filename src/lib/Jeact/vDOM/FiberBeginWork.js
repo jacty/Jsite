@@ -395,7 +395,6 @@ export function beginWork(current, workInProgress, renderLanes){
       didReceiveUpdate = true;
     } else if(!includesSomeLane(renderLanes, updateLanes)){
       didReceiveUpdate = false;
-      debugger;
       // This fiber does not have any pending work. Bailout without entering 
       // the begin phase.
       switch (workInProgress.tag){
@@ -407,6 +406,7 @@ export function beginWork(current, workInProgress, renderLanes){
           pushRootCachePool(root);
           break;
         case HostComponent:
+          debugger;
           // pushHostContext()
           break;
         case SuspenseComponent:{
@@ -423,8 +423,10 @@ export function beginWork(current, workInProgress, renderLanes){
               );
             } else {
               push(suspenseStackCursor, 
-                   suspenseStackCursor.current & SubtreeSuspenseContextMask,
-                   workInProgress);   
+                    setDefaultShallowSuspenseContext(
+                      suspenseStackCursor.current
+                    ),
+                  workInProgress);   
               const child = bailoutOnAlreadyFinishedWork(
                 current,
                 workInProgress,

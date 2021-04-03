@@ -519,7 +519,6 @@ function commitRootImpl(root, renderPriority){
 }
 export function pingSuspendedRoot(root, wakeable, pingedLanes){
   // The earliest attach to catch the change from Promise.
-  debugger;
   const pingCache = root.pingCache;
   if (pingCache !== null){
     pingCache.delete(wakeable);

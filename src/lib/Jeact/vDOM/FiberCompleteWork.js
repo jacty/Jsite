@@ -221,7 +221,6 @@ export function completeWork(current, workInProgress,renderLanes){
       const nextDidTimeout = nextState !== null;
       let prevDidTimeout = false;
       if(current !== null){
-        debugger;
         const prevState = current.memoizedState;
         prevDidTimeout = prevState !== null;
       } 

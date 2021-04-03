@@ -12,8 +12,7 @@ const AboutMe = lazy(()=>import('@assets/js/aboutme.jsx'));
 createRoot(document.getElementById('root')).render(
             
         <Suspense>
-            <h1>Demo</h1>
-            {/*<AboutMe />*/}
+            <AboutMe />
         </Suspense>
 
     );

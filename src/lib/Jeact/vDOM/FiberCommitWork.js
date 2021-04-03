@@ -79,6 +79,7 @@ function commitBeforeMutationEffectsOnFiber(finishedWork){
 }
 
 function attachSuspenseRetryListeners(finishedWork){
+    console.log('retrying!!')
     const wakeables = finishedWork.updateQueue;
     if (wakeables !== null){
         finishedWork.updateQueue = null;
@@ -158,7 +159,6 @@ function commitMutationEffectsOnFiber(finishedWork, root){
             break;
         }
         case Update:{
-            debugger;
             const current = finishedWork.alternate;
             commitWork(current, finishedWork);
             break;
@@ -371,7 +371,7 @@ function commitWork(current, finishedWork){
         }
         case SuspenseComponent:{
             commitSuspenseComponent(finishedWork);
-            // attachSuspenseRetryListeners(finishedWork);
+            attachSuspenseRetryListeners(finishedWork);
             return;
         }
         default:

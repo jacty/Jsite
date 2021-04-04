@@ -35,6 +35,7 @@ import {
 import {
   popRootCachePool,
   popCacheProvider,
+  popCachePool
 } from '@Jeact/vDOM/FiberCacheComponent';
 import {
   suspenseStackCursor,
@@ -144,7 +145,7 @@ function bubbleProperties(completedWork){
 
 export function completeWork(current, workInProgress,renderLanes){
   const newProps = workInProgress.pendingProps;
-  
+
   switch(workInProgress.tag){
     case LazyComponent:
     case Fragment:
@@ -256,7 +257,11 @@ export function completeWork(current, workInProgress,renderLanes){
       const nextIsHidden = nextState !== null;
 
       if(current !== null){
-        debugger;
+        const prevState = current.memoizedState;
+        const prevIsHidden = prevState !== null;
+        if (prevIsHidden !== nextIsHidden){
+          workInProgress.flags |= Update;
+        }
       }
 
       // Don't bubble properties for hidden children.
@@ -269,8 +274,7 @@ export function completeWork(current, workInProgress,renderLanes){
 
       const spawnedCachePool = workInProgress.updateQueue;
       if(spawnedCachePool !== null){
-        debugger;
-        // popCachePool(workInProgress);
+        popCachePool(workInProgress);
       }
       return null;
     }

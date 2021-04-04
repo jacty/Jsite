@@ -33,7 +33,10 @@ function commitBeforeMutationEffects_begin(){
 
         const deletions = fiber.deletions;
         if(deletions !== null){
-            debugger;
+            for (let i = 0; i < deletions.length; i++){
+                const deletion = deletions[i];
+                // commitBeforeMutationEffectsDeletion(deletion);
+            }
         }
         const child = fiber.child;
         if(
@@ -69,17 +72,20 @@ function commitBeforeMutationEffects_complete(){
 function commitBeforeMutationEffectsOnFiber(finishedWork){
     const current = finishedWork.alternate;
     const flags = finishedWork.flags;
-    switch(finishedWork.tag){
-        case HostRoot:{
-            // clear container;
-            finishedWork.stateNode.containerInfo.textContent = '';
-        }
-    }
-    
+    // switch(finishedWork.tag){
+    //     case HostRoot:{
+    //         // clear container;
+    //         finishedWork.stateNode.containerInfo.textContent = '';
+    //     }
+    // }  
+}
+
+function commitBeforeMutationEffectsDeletion(deletion){
+    debugger;
+    doesFiberContain(deletion);
 }
 
 function attachSuspenseRetryListeners(finishedWork){
-    console.log('retrying!!')
     const wakeables = finishedWork.updateQueue;
     if (wakeables !== null){
         finishedWork.updateQueue = null;
@@ -107,7 +113,12 @@ function commitMutationEffects_begin(root){
         const fiber = nextEffect;
 
         const deletions = fiber.deletions;
-        if(deletions !==null ) debugger;
+        if(deletions !==null ){
+            for (let i = 0; i < deletions.length; i++){
+                const childToDelete = deletions[i];
+                commitDeletion(root, childToDelete, fiber);
+            }
+        }
 
         const child = fiber.child;
         if((fiber.subtreeFlags & MutationMask) !== NoFlags && child !== null){
@@ -230,11 +241,55 @@ function commitLayoutEffectOnFiber(finishedRoot, current, finishedWork, committe
     }
 }
 
+function commitUnmount(finishedRoot, current, nearestMountedAncestor){
+    switch(current.tag){
+        case FunctionComponent:
+        case HostComponent:
+            return;
+    }
+}
+
+function commitNestedUnmounts(finishedRoot, root, nearestMountedAncestor){
+    let node = root;
+    while(true){
+        commitUnmount(finishedRoot, node, nearestMountedAncestor);
+        if(node.child !== null){
+            node.child.return = node;
+            node = node.child;
+            continue;
+        }
+        if (node === root){
+            return;
+        }
+        while (node.sibling === null){
+            if (node.return === null || node.return === root){
+                return;
+            }
+            node = node.return;
+        }
+        node.sibling.return = node.return;
+        node = node.sibling;
+    }
+}
+
+function detachFiberMutation(fiber){
+    const alternate = fiber.alternate;
+    if (alternate !== null){
+        alternate.return = null;
+    }
+    fiber.return = null;
+}
+
 function toggleAllChildren(finishedWork, isHidden){
     let node = finishedWork;
     while(true){
         if (node.tag === HostComponent){
-            debugger;
+            const instance = node.stateNode;
+            if (isHidden){
+                debugger;
+            } else {
+                //todo
+            }
         } else if (node.tag === HostText){
             debugger
         } else if (
@@ -253,7 +308,14 @@ function toggleAllChildren(finishedWork, isHidden){
         if (node == finishedWork){
             return;
         }
-        debugger;
+        while(node.sibling === null){
+            if (node.return === null || node.return === finishedWork){
+                return;
+            }
+            node = node.return;
+        }
+        node.sibling.return = node.return;
+        node = node.sibling;
     }
 }
 
@@ -358,8 +420,66 @@ function insertOrAppendPlacementNode(node, before, parent){
     }
 }
 
+function unmountHostComponents(finishedRoot, current, nearestMountedAncestor){
+    let node = current;
+    let currentParentIsValid = false;
+    let currentParent;
+    let currentParentIsContainer;
+    while(true){
+        if (!currentParentIsValid){
+            let parent = node.return;
+            findParent: while(true){
+                const parentStateNode = parent.stateNode;
+                switch(parent.tag){
+                    case HostComponent:
+                        currentParent = parentStateNode;
+                        currentParentIsContainer = false;
+                        break findParent;
+                    case HostRoot:
+                        currentParent = parentStateNode.containerInfo;
+                        currentParentIsContainer = true;
+                        break findParent;
+                }
+                parent = parent.return;
+            }
+            currentParentIsValid = true;
+        }
+
+        if (node.tag === HostComponent || node.tag === HostText){
+            commitNestedUnmounts(finishedRoot, node, nearestMountedAncestor);
+            currentParent.removeChild(node.stateNode);
+        } else {
+            commitUnmount(finishedRoot, node, nearestMountedAncestor);
+            if (node.child !== null){
+                node.child.return = node;
+                node = node.child;
+                continue;
+            }
+        }
+        if (node === current){
+            return;
+        }
+        while (node.sibling === null){
+            if (node.return === null || node.return === current){
+                return;
+            }
+            node = node.return;
+        }
+        node.sibling.return = node.return;
+        node = node.sibling;
+    }
+
+}
+
+function commitDeletion(finishedRoot, current, nearestMountedAncestor){
+    unmountHostComponents(finishedRoot, current, nearestMountedAncestor);
+    detachFiberMutation(current);
+}
+
 function commitWork(current, finishedWork){
     switch(finishedWork.tag){
+        case FunctionComponent:
+            debugger;
         case HostComponent:{
             debugger;
         }
@@ -374,8 +494,12 @@ function commitWork(current, finishedWork){
             attachSuspenseRetryListeners(finishedWork);
             return;
         }
-        default:
-            debugger;
+        case OffscreenComponent:{
+            const newState = finishedWork.memoizedState;
+            const isHidden = newState !== null;
+            toggleAllChildren(finishedWork, isHidden);
+            return;
+        }
     }
 }
 

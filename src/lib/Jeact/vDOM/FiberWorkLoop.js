@@ -478,11 +478,6 @@ function commitRootImpl(root, renderPriority){
     wipRootRenderLanes = NoLanes;
   }
 
-  if((finishedWork.subtreeFlags & PassiveMask)!== NoFlags ||
-      (finishedWork.flags & PassiveMask) !== NoFlags
-    ){
-    debugger;
-  }
 
   const subtreeHasEffects = 
     (finishedWork.subtreeFlags &
@@ -555,6 +550,7 @@ function retryTimedOutBoundary(boundaryFiber, retryLane=NoLane){
   if (retryLane === NoLane) {
     retryLane = claimNextRetryLane();
   }
+
   const eventTime = requestEventTime();
   const root = markUpdateLaneFromFiberToRoot(boundaryFiber, retryLane);
   if (root !== null){

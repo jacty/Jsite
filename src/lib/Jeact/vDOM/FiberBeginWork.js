@@ -11,9 +11,13 @@ import {
   DidCapture,
   NoFlags,
   Fragment,
-  JEACT_OFFSCREEN_TYPE
+  JEACT_OFFSCREEN_TYPE,
+  ChildDeletion
 } from '@Jeact/shared/Constants';
-import {includesSomeLane} from '@Jeact/vDOM/FiberLane';
+import {
+  includesSomeLane,
+  mergeLanes
+} from '@Jeact/vDOM/FiberLane';
 import {
   reconcileChildFibers,
   cloneChildFibers,
@@ -34,7 +38,8 @@ import {shouldSetTextContent} from '@Jeact/vDOM/DOMComponent';
 import {
   pushRootCachePool,
   pushCacheProvider,
-  getSuspendedCachePool
+  getSuspendedCachePool,
+  restoreSpawnedCachePool
 } from '@Jeact/vDOM/FiberCacheComponent';
 import {
   suspenseStackCursor,
@@ -48,6 +53,7 @@ import {
 import {push} from '@Jeact/vDOM/FiberStack';
 import {
   createFiber,
+  createWorkInProgress,
 } from '@Jeact/vDOM/Fiber';
 import {pushRenderLanes} from '@Jeact/vDOM/FiberWorkLoop';
 import {createElement} from '@Jeact/Element';
@@ -73,7 +79,16 @@ function updateOffscreenComponent(
     let subtreeRenderLanes;
     if (prevState !== null){
       // toggle hidden tree to visible.
-      debugger;
+      subtreeRenderLanes = mergeLanes(prevState.baseLanes, renderLanes);
+      const prevCachePool = prevState.cachePool;
+      if(prevCachePool !== null){
+        spawnedCachePool = restoreSpawnedCachePool(
+          workInProgress,
+          prevCachePool,
+        )
+      }
+      // Not hidden anymore.
+      workInProgress.memoizedState = null;
     } else{
       subtreeRenderLanes = renderLanes;
     }
@@ -204,6 +219,7 @@ function mountLazyComponent(
   let Component = init(payload);
 
   workInProgress.type = Component;
+
   const resolvedTag = workInProgress.tag = FunctionComponent;
   switch(resolvedTag){
     case FunctionComponent:{
@@ -232,7 +248,11 @@ function shouldRemainOnFallback(suspenseContext, current, workInProgress){
   // If we're already showing a fallback, there are cases where we need to 
   // remain on that fallback regardless of whether the content has resolved.
   if (current !== null){
-    debugger;
+    const suspenseState = current.memoizedState;
+    if(suspenseState === null){
+      debugger;
+      return false;
+    }
   }
 
   // Not currently showing content. Consult the Suspense context.
@@ -309,7 +329,26 @@ function updateSuspenseComponent(current, workInProgress, renderLanes){
     }
   } else {
     // Update.
-    debugger;
+    // If the current fiber has a SuspenseState, that means it's already 
+    // showing a fallback.
+    const prevState = current.memoizedState;
+    if (prevState !== null){
+      if (showFallback){
+        debugger;
+      } else {
+        const nextPrimaryChildren = nextProps.children;
+        const primaryChildFragment = updateSuspensePrimaryChildren(
+          current,
+          workInProgress,
+          nextPrimaryChildren,
+          renderLanes,
+        );
+        workInProgress.memoizedState = null;
+        return primaryChildFragment;
+      }
+    } else {
+      debugger;
+    }
   }
 }
 
@@ -356,7 +395,7 @@ function mountSuspenseFallbackChildren(
     null,
   );
   primaryChildFragment.elementType = JEACT_OFFSCREEN_TYPE;
-  primaryChildFragment.lanes = renderLanes;
+  primaryChildFragment.lanes = NoLanes;
 
   fallbackChildFragment = createFiber(
     Fragment,
@@ -370,6 +409,40 @@ function mountSuspenseFallbackChildren(
   primaryChildFragment.sibling = fallbackChildFragment;
   workInProgress.child = primaryChildFragment;
   return fallbackChildFragment;
+}
+
+
+function updateSuspensePrimaryChildren(
+  current,
+  workInProgress,
+  primaryChildren,
+  renderLanes
+){
+
+  const currentPrimaryChildFragment = current.child;
+  const currentFallbackChildFragment = currentPrimaryChildFragment.sibling;
+  // createWorkInProgressOffscreenFiber()
+  const primaryChildFragment = createWorkInProgress(
+    currentPrimaryChildFragment,
+    {
+      mode: 'visible',
+      children: primaryChildren,
+    }
+  )
+  primaryChildFragment.return = workInProgress;
+  primaryChildFragment.sibling = null;
+  if (currentFallbackChildFragment !== null){
+    // Delete the fallback child fragment
+    const deletions = workInProgress.deletions;
+    if (deletions === null){
+      workInProgress.deletions = [currentFallbackChildFragment];
+      workInProgress.flags |= ChildDeletion;
+    } else {
+      debugger;
+    }
+  }
+  workInProgress.child = primaryChildFragment;
+  return primaryChildFragment;
 }
 
 function bailoutOnAlreadyFinishedWork(current, workInProgress, renderLanes){
@@ -391,7 +464,6 @@ export function beginWork(current, workInProgress, renderLanes){
     const oldProps = current.memoizedProps;
     const newProps = workInProgress.pendingProps;
     if(oldProps !== newProps){
-      debugger;
       didReceiveUpdate = true;
     } else if(!includesSomeLane(renderLanes, updateLanes)){
       didReceiveUpdate = false;

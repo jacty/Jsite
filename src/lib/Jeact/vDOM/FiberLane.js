@@ -27,7 +27,6 @@ function getHighestPriorityLanes(lanes){
       highestLanePriority = DefaultLanePriority;
       return DefaultLane
     case RetryLane1:
-      debugger
       return lanes & RetryLanes;
     default:
       debugger;

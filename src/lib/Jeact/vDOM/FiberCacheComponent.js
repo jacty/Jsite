@@ -3,6 +3,11 @@ import {
     pushProvider,
     popProvider
 } from '@Jeact/vDOM/FiberNewContext';
+import {
+    createCursor,
+    push,
+    pop
+} from '@Jeact/vDOM/FiberStack';
 
 export const CacheContext = {
     $$typeof:JEACT_CONTEXT_TYPE,
@@ -12,6 +17,8 @@ export const CacheContext = {
 // The cache that newly mounted Cache boundaries should use. It's either 
 // retrieved from the cache pool, or the result of a refresh.
 let pooledCache = null;
+
+const prevFreshCacheOnStack = createCursor(null);
 
 export function pushCacheProvider(workInProgress, cache){
     pushProvider(workInProgress, CacheContext, cache);
@@ -25,13 +32,34 @@ export function pushRootCachePool(root){
     pooledCache = root.pooledCache;
 }
 
-let _suspendedPooledCache = null;
-
 export function popRootCachePool(root, renderLanes){
     root.pooledCache = pooledCache;
     if(pooledCache !== null){
         root.pooledCacheLanes |= renderLanes;
     }
+}
+
+export function restoreSpawnedCachePool(
+    offscreenWip,
+    prevCachePool
+){
+    const nextParentCache = CacheContext._currentValue;
+    if (nextParentCache !== prevCachePool.parent){
+        return null;
+    } else {
+        push(prevFreshCacheOnStack, pooledCache, offscreenWip);
+        pooledCache = prevCachePool.pool;
+
+        return prevCachePool;
+    }
+}
+
+let _suspendedPooledCache = null;
+
+export function popCachePool(workInProgress){
+    _suspendedPooledCache = pooledCache;
+    pooledCache = prevFreshCacheOnStack.current;
+    pop(prevFreshCacheOnStack, workInProgress);
 }
 
 export function getSuspendedCachePool(){

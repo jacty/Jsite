@@ -7,10 +7,7 @@ const Aboutme = React.lazy(()=>import('@com/aboutme.jsx'));
 function App(){
     const [cur, setCur] = useState(0);
     return(
-        <section>
-            <p>{cur}</p>
-            <a onClick={()=>{setCur(2)}}>xxx</a>
-        </section>
+       <a onClick={()=>{setCur(x=>x+1)}}>{cur}</a>
         )
 }
 

@@ -53,6 +53,7 @@ export function renderWithHooks(current,workInProgress,nextRenderLanes){
   if (didScheduleRenderPhaseUpdateDuringThisPass){
     debugger;
   }
+  currentlyRenderingFiber = null;
 
   return children
 }
@@ -103,7 +104,7 @@ function updateWorkInProgressHook(){
 
   let nextWorkInProgressHook;
   if (workInProgressHook === null){
-    console.error('x');
+    debugger;
     nextWorkInProgressHook = currentlyRenderingFiber.memoizedState;
   } else {
     nextWorkInProgressHook = workInProgressHook.next;
@@ -111,7 +112,7 @@ function updateWorkInProgressHook(){
 
   if (nextWorkInProgressHook !== null){
     // There's already a work-in-progress. Reuse it.
-    console.error('x');
+    debugger;
   } else {
     // Clone from the current hook.
     if(nextCurrentHook === null){
@@ -132,7 +133,7 @@ function updateWorkInProgressHook(){
 
     if (workInProgressHook === null){
       // This is the first hook in the list.
-      console.error('y');
+      debugger;
       currentlyRenderingFiber.memoizedState = workInProgressHook = newHook;
     } else {
       // Append to the end of the list.
@@ -158,7 +159,7 @@ function updateReducer(reducer, initial){
     // We have new updates that haven't been processed yet. We'll add them to // the base queue.
     if(baseQueue !==null){
       // Merge the pending queue and the base queue.
-      console.error('x');
+      debugger;
       const baseFirst = baseQueue.next;
       const pendingFirst = pendingQueue.next; 
     }
@@ -175,14 +176,15 @@ function updateReducer(reducer, initial){
     let newBaseQueueFirst = null;
     let newBaseQueueLast = null;
     let update = first;
+
     do {
       const updateLane = update.lane;
       if (!isSubsetOfLanes(renderLanes, updateLane)){
-        console.error('x');
+        debugger;
       } else {
         // This update does have sufficient priority.
         if (newBaseQueueLast!==null){
-          console.error('x');
+          debugger;
         }
 
         // Process this update.
@@ -199,7 +201,7 @@ function updateReducer(reducer, initial){
     if (newBaseQueueLast === null){
       newBaseState = newState;
     } else {
-      console.error('x');
+      debugger;
     }
 
     // Mark that the fiber performed work, but only if the new state is 
@@ -214,7 +216,9 @@ function updateReducer(reducer, initial){
 
     queue.lastRenderedState = newState;
   }
-  
+  if(baseQueue === null){
+    debugger;
+  }
   const dispatch = queue.dispatch;
   return [hook.memoizedState, dispatch];
 }
@@ -244,8 +248,8 @@ function updateState(initialState){
 }
 
 function dispatchAction(fiber, queue, action){
-  const eventTime = requestEventTime();debugger;
-  // const lane = requestUpdateLane(InputDiscreteLanePriority,fiber.lanes);
+  const eventTime = requestEventTime();
+  const lane = requestUpdateLane();
 
   const update = {
     lane,
@@ -258,39 +262,47 @@ function dispatchAction(fiber, queue, action){
   if(
     fiber === currentlyRenderingFiber ||
     (alternate !== null && alternate === currentlyRenderingFiber)
-  ){
-    console.error('dispatchAction1');
-  } else {
-    const pending = queue.pending;
-    if(pending === null){
-      // First update.
+  ){// render phase update.
+    didScheduleRenderPhaseUpdateDuringThisPass = didScheduleRenderPhaseUpdate = true;
+    const pending = queue.pending
+    if (pending === null){ 
       update.next = update;
     } else {
-      console.error('dispatchAction2');
+      update.next = pending.next;
+      pending.next = update;
     }
     queue.pending = update;
+  } else {
+    const pending = queue.pending;
+    if (pending === null){
+      update.next = update;
+    } else {
+      debugger;
+      update.next = pending.next;
+      pending.next = update;
+    }
+    queue.pending = update;
+  }
 
-    if(
-      fiber.lanes === NoLanes &&
-      (alternate === null || alternate.lanes === NoLanes)
-      ){
-      const lastRenderedReducer = queue.lastRenderedReducer;
-      if (lastRenderedReducer !== null){
-          const currentState = queue.lastRenderedState;
-          const eagerState = lastRenderedReducer(currentState, action);
-          update.eagerReducer = lastRenderedReducer;
-          update.eagerState = eagerState;
-          if (Object.is(eagerState, currentState)){
-            return;
-          }
+  if (
+    fiber.lanes === NoLanes && 
+    (alternate === null || alternate.lanes === NoLanes)
+  ){
+    const lastRenderedReducer = queue.lastRenderedReducer;
+    if(lastRenderedReducer !== null){
+      const currentState = queue.lastRenderedState;
+      const eagerState = lastRenderedReducer(currentState, action);
+      update.eagerReducer = lastRenderedReducer;
+      update.eagerState = eagerState;
+      if (Object.is(eagerState, currentState)){
+        return;
       }
     }
+  }
+  const root = scheduleUpdateOnFiber(fiber, lane, eventTime);
 
-    const root = scheduleUpdateOnFiber(fiber, lane, eventTime);
-
-    if(isTransitionLane(lane) && root !== null){
-      console.error('dispatchAction4')
-    }
+  if (isTransitionLane(lane) && root !== null){
+    debugger;
   }
 }
 

@@ -100,7 +100,7 @@ let currentEventTransitionLane = NoLanes;
 export function requestEventTime(){
   if ((executionContext & (RenderContext | CommitContext)) !== NoContext){
     // We're inside Jeact
-    debugger;
+    return performance.now();
   }
   // We're not inside Jeact, so we may be in the middle of a browser event like click.
   if (currentEventTime !== NoTimestamp){
@@ -121,9 +121,6 @@ export function scheduleUpdateOnFiber(fiber, lane, eventTime){
   markRootUpdated(root, lane, eventTime);
 
   if (root === wipRoot){
-    debugger;
-  }
-  if (lane === SyncLane){
     debugger;
   }
 
@@ -183,36 +180,31 @@ function ensureRootIsScheduled(root, currentTime){
 
   if (existingCallbackNode !== null) debugger;
 
-  let newCallbackNode;
-  if (newCallbackPriority === SyncLane){
-    debugger;
-  } else {
-    let schedulerPriorityLevel;
-    switch(lanesToEventPriority(nextLanes)){
-      case DiscreteEventContext:
-        debugger;
-        schedulerPriorityLevel = ImmediateSchedulePriority;
-        break;
-      case ContinuousEventPriority:
-        debugger;
-        schedulerPriorityLevel = UserBlockingSchedulePriority;
-        break;
-      case DefaultEventPriority:
-        schedulerPriorityLevel = NormalSchedulePriority;
-        break;
-      case IdleEventPriority:
-        debugger;
-        schedulerPriorityLevel = IdleSchedulePriority;
-        break;
-      default:
-        schedulerPriorityLevel = NormalSchedulePriority;
-        break;        
-    }
-    newCallbackNode = scheduleCallback(
-      schedulerPriorityLevel,
-      performConcurrentWorkOnRoot.bind(null, root),
-    )
+  let schedulerPriorityLevel;
+  switch(lanesToEventPriority(nextLanes)){
+    case DiscreteEventContext:
+      debugger;
+      schedulerPriorityLevel = ImmediateSchedulePriority;
+      break;
+    case ContinuousEventPriority:
+      debugger;
+      schedulerPriorityLevel = UserBlockingSchedulePriority;
+      break;
+    case DefaultEventPriority:
+      schedulerPriorityLevel = NormalSchedulePriority;
+      break;
+    case IdleEventPriority:
+      debugger;
+      schedulerPriorityLevel = IdleSchedulePriority;
+      break;
+    default:
+      schedulerPriorityLevel = NormalSchedulePriority;
+      break;        
   }
+  let newCallbackNode = scheduleCallback(
+    schedulerPriorityLevel,
+    performConcurrentWorkOnRoot.bind(null, root),
+  )
 
   root.callbackPriority = newCallbackPriority;
   root.callbackNode = newCallbackNode;

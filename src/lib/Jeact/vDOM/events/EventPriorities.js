@@ -15,7 +15,14 @@ export const DefaultEventPriority = DefaultLane;
 export const IdleEventPriority = IdleLane;
 
 export function getEventPriority(domEventName){
-    debugger;
+    switch (domEventName){
+        case 'click':
+        case 'message':
+            return DiscreteEventPriority;
+        default:
+            debugger;
+            return DefaultEventPriority;
+    }
 }
 
 export function getCurrentEventPriority(){
@@ -23,7 +30,6 @@ export function getCurrentEventPriority(){
     if(currentEvent === undefined){
         return DefaultEventPriority;
     }
-    debugger;
     return getEventPriority(currentEvent.type);
 }
 

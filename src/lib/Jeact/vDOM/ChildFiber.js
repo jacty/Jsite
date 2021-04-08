@@ -84,11 +84,28 @@ export function reconcileChildFibers(
       lanes,
     );
   }
-
-  if(newChild==='function'&&newChild[Symbol.iterator]){
+  // getIteratorFn()
+  if(newChild === 'function' && newChild[Symbol.iterator]){
     debugger;
   }
 
+  if (isObject){
+    debugger;
+  }
+
+  if (typeof newChild === 'undefined' && !isUnkeyedTopLevelFragment){
+    return deleteRemainingChildren(returnFiber, currentFirstChild, shouldTrackEffects);
+  }
+}
+
+function deleteRemainingChildren(
+  returnFiber, 
+  currentFirstChild, 
+  shouldTrackEffects
+){
+  if (!shouldTrackEffects){
+    return null;
+  }
 
   debugger;
 }

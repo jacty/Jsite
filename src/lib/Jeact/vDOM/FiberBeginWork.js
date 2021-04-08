@@ -537,7 +537,6 @@ export function beginWork(current, workInProgress, renderLanes){
       );
     }
     case FunctionComponent:
-      debugger;
       return updateFunctionComponent(current,workInProgress,renderLanes);
     case HostRoot:
       return updateHostRoot(current, workInProgress, renderLanes);

@@ -9,7 +9,7 @@ function App(){
     return(
         <section>
             <p>{cur}</p>
-            <a onClick={()=>{setCur(2)}}></a>
+            <a onClick={()=>{setCur(2)}}>xxx</a>
         </section>
         )
 }

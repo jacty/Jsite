@@ -20,14 +20,13 @@ import { markWorkInProgressReceivedUpdate } from '@Jeact/vDOM/FiberBeginWork';
 let renderLanes = NoLanes;
 // The work-in-progress fiber. 
 let currentlyRenderingFiber = null;
-
-let currentHook = null; //Hooks belong to the current fiber;
+// Hooks belong to the current fiber.
+let currentHook = null; 
+// Hooks will be added to work-in-progress fiber.
 let workInProgressHook = null;
 
 // Whether an update was scheduled at any point during the render phase. This
-// does not get reset if we do another render pass; only when we're completely
-// finished evaluating this component. This is an optimization so we know 
-// whether we need to clear render phase updates after a throw.
+// does not get reset if we do another render pass; 
 let didScheduleRenderPhaseUpdate = false;
 // Where an update was scheduled only during the current render pass. This
 // gets reset after each attempt.
@@ -59,6 +58,7 @@ export function renderWithHooks(current,workInProgress,nextRenderLanes){
 }
 
 export function bailoutHooks(current, workInProgress, lanes){
+  debugger;
   workInProgress.updateQueue = current.updateQueue;
   workInProgress.flags &= ~(Passive | Update);
 
@@ -79,6 +79,7 @@ function mountWorkInProgressHook(){
     // first hook in the list.
     currentlyRenderingFiber.memoizedState = workInProgressHook = hook;
   } else {
+    debugger;
     // append to the end of the list.
     workInProgressHook = workInProgressHook.next = hook;
   }
@@ -96,9 +97,11 @@ function updateWorkInProgressHook(){
     if (current !== null){
       nextCurrentHook = current.memoizedState;
     } else {
+      debugger;
       nextCurrentHook = null;
     }
   } else {
+    debugger;
     nextCurrentHook = currentHook.next;
   }
 
@@ -115,9 +118,6 @@ function updateWorkInProgressHook(){
     debugger;
   } else {
     // Clone from the current hook.
-    if(nextCurrentHook === null){
-      console.error('Rendered more hooks than during the previous render.')
-    };
 
     currentHook = nextCurrentHook;
 
@@ -233,7 +233,7 @@ function mountState(initialState){
     pending: null,
     lanes: NoLanes,
     dispatch: null,
-    lastRenderedReducer:basicStateReducer,
+    lastRenderedReducer: basicStateReducer,
     lastRenderedState: initialState, 
   }
 
@@ -248,6 +248,7 @@ function updateState(initialState){
 }
 
 function dispatchAction(fiber, queue, action){
+
   const eventTime = requestEventTime();
   const lane = requestUpdateLane();
 
@@ -263,6 +264,7 @@ function dispatchAction(fiber, queue, action){
     fiber === currentlyRenderingFiber ||
     (alternate !== null && alternate === currentlyRenderingFiber)
   ){// render phase update.
+    debugger;
     didScheduleRenderPhaseUpdateDuringThisPass = didScheduleRenderPhaseUpdate = true;
     const pending = queue.pending
     if (pending === null){ 
@@ -289,14 +291,12 @@ function dispatchAction(fiber, queue, action){
     (alternate === null || alternate.lanes === NoLanes)
   ){
     const lastRenderedReducer = queue.lastRenderedReducer;
-    if(lastRenderedReducer !== null){
-      const currentState = queue.lastRenderedState;
-      const eagerState = lastRenderedReducer(currentState, action);
-      update.eagerReducer = lastRenderedReducer;
-      update.eagerState = eagerState;
-      if (Object.is(eagerState, currentState)){
-        return;
-      }
+    const currentState = queue.lastRenderedState;
+    const eagerState = lastRenderedReducer(currentState, action);
+    update.eagerReducer = lastRenderedReducer;
+    update.eagerState = eagerState;
+    if (Object.is(eagerState, currentState)){
+      return;
     }
   }
   const root = scheduleUpdateOnFiber(fiber, lane, eventTime);
@@ -306,9 +306,6 @@ function dispatchAction(fiber, queue, action){
   }
 }
 
-export const ContextOnlyDispatcher = {
-  'ContextOnlyDispatcher':1
-}
 
 const HooksDispatcherOnMount ={
   useState: mountState,

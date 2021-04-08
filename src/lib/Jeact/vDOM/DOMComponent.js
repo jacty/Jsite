@@ -46,6 +46,76 @@ export function setInitialDOMProperties(domElement, workInProgress){
     }
 }
 
+export function diffProperties(
+    domElement,
+    tag,
+    lastProps,
+    nextProps,
+    rootContainerElement,
+){
+    let propKey;
+    let updatePayload = null;
+    for (propKey in lastProps){
+        if(
+            nextProps.hasOwnProperty(propKey) ||
+            !lastProps.hasOwnProperty(propKey) ||
+            lastProps[propKey] == null
+        ){
+            continue;
+        }
+        debugger;
+        if (registrationNameDependencies.hasOwnProperty(propKey)){
+            if (!updatePayload){
+                updatePayload = [];
+            }
+        } else {
+            updatePayload.push(propKey, null);
+        }
+    }
+    for (propKey in nextProps){
+        const nextProp = nextProps[propKey];
+        const lastProp = lastProps !== null ? lastProps[propKey] : undefined;
+        if (
+            !nextProps.hasOwnProperty(propKey) ||
+            nextProp === lastProp ||
+            (nextProp === null && lastProp === null)
+        ){
+                continue;
+        }
+        if (propKey === DANGER_HTML){
+            debugger;
+        } else if(propKey === CHILDREN){
+            if (typeof nextProp === 'string' || typeof nextProp === 'number'){
+                updatePayload.push(propKey, '' + nextProp);
+            }
+        } else if(propKey === 'onClick'){
+            if (!updatePayload && lastProp !== nextProp){
+                updatePayload = [];
+            }
+        } else {
+            updatePayload.push(propKey, nextProp);
+        }
+    }
+    return updatePayload;   
+}
+
+export function updateDOMProperties(
+    domElement,
+    updatePayload,
+){
+    for (let i = 0; i < updatePayload.length; i+= 2){
+        const propKey = updatePayload[i];
+        const propValue = updatePayload[i + 1];
+        if(propKey === DANGER_HTML){
+            debugger
+        } else if (propKey === CHILDREN){
+            setTextContent(domElement, propValue);
+        } else {
+            debugger;
+        }
+    }
+}
+
 export function shouldSetTextContent(props){
     if(props.dangerouslySetInnerHTML) debugger;
   return (
@@ -65,8 +135,7 @@ function setTextContent(node, text){
         ){  
         // For text updates, it's faster to set the `nodeValue` of the Text 
         // node directly instead of using `.textContent` which will remove the 
-        // existing node and create a new one.
-        debugger;          
+        // existing node and create a new one.         
         firstChild.nodeValue = text;
         return;
         }

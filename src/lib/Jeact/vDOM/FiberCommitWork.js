@@ -15,10 +15,11 @@ import{
  SuspenseComponent,
  OffscreenComponent,
 } from '@Jeact/shared/Constants';
-
 import {
     resolveRetryWakeable
 } from '@Jeact/vDOM/FiberWorkLoop';
+import { updateFiberProps } from '@Jeact/vDOM/DOMComponentTree';
+import { updateDOMProperties } from '@Jeact/vDOM/DOMComponent'
 
 let nextEffect = null;
 
@@ -229,7 +230,7 @@ function commitLayoutEffectOnFiber(finishedRoot, current, finishedWork, committe
                 debugger;
             }
             case HostComponent:{
-                debugger;
+                break;
             }
             case HostText:
                 break;
@@ -481,7 +482,25 @@ function commitWork(current, finishedWork){
         case FunctionComponent:
             debugger;
         case HostComponent:{
-            debugger;
+            const instance = finishedWork.stateNode;
+            if (instance !== null){
+                const newProps = finishedWork.memoizedProps;
+                const oldProps = current !== null ? current.memoizedProps : newProps;
+                const type = finishedWork.type;
+                const updatePayload = finishedWork.updateQueue;
+                finishedWork.updateQueue = null;
+                if (updatePayload !== null){
+                    commitUpdate(
+                        instance,
+                        updatePayload,
+                        type,
+                        oldProps,
+                        newProps,
+                        finishedWork,
+                    )
+                }
+            }
+            return;
         }
         case HostText:{
             debugger;
@@ -510,4 +529,16 @@ function commitSuspenseComponent(finishedWork){
         //hideOrUnhideAllChildren()
         toggleAllChildren(primaryChildParent, true); 
     }
+}
+
+function commitUpdate(
+    domElement,
+    updatePayload,
+    type,
+    oldProps,
+    newProps,
+    internalInstanceHandle
+){
+    updateFiberProps(domElement, newProps);
+    updateDOMProperties(domElement, updatePayload);
 }

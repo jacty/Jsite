@@ -56,6 +56,7 @@ export function reconcileChildFibers(
             currentFirstChild,
             newChild,
             lanes,
+            shouldTrackEffects,
           ),
           shouldTrackEffects
         );
@@ -93,9 +94,11 @@ export function reconcileChildFibers(
     debugger;
   }
 
-  if (typeof newChild === 'undefined' && !isUnkeyedTopLevelFragment){
-    return deleteRemainingChildren(returnFiber, currentFirstChild, shouldTrackEffects);
-  }
+  return deleteRemainingChildren(
+            returnFiber, 
+            currentFirstChild, 
+            shouldTrackEffects
+          );  
 }
 
 function deleteRemainingChildren(
@@ -107,7 +110,11 @@ function deleteRemainingChildren(
     return null;
   }
 
-  debugger;
+  let childToDelete = currentFirstChild;
+  while(childToDelete !== null){
+    debugger;
+  }
+  return null;
 }
 
 function placeSingleChild(newFiber, shouldTrackEffects){
@@ -130,20 +137,49 @@ function reconcileSingleElement(
   returnFiber,
   currentFirstChild,
   element,
-  lanes
+  lanes,
+  shouldTrackEffects,
 ){
   const key = element.key;
   let child = currentFirstChild;
   while (child !== null){
-    debugger;
-    deleteChild(returnFiber, child);
+    if (child.key === key){
+      const elementType = element.type;
+      if (elementType === JEACT_FRAGMENT_TYPE){
+        debugger;
+      } else {
+        if (child.elementType === elementType ||
+            (typeof elementType === 'object' && 
+              elementType !== null &&
+              elementType.$$typeof === JEACT_LAZY_TYPE
+            )
+          ){
+            deleteRemainingChildren(
+              returnFiber, 
+              child.sibling, 
+              shouldTrackEffects
+            );
+            const existing = useFiber(child, element.props);
+            existing.return = returnFiber;
+            return existing;
+        }
+      }
+      debugger;
+      deleteRemainingChildren(returnFiber, child, shouldTrackEffects);
+      break;
+    } else {
+      deleteChild(returnFiber, child);
+    }
     child = child.sibling;
   }
-  if (element.type === JEACT_FRAGMENT_TYPE) debugger;
-  // createFiberFromTypeAndProps() has been merged to createFiberFromElement
-  const created = createFiberFromElement(element, lanes);
-  created.return = returnFiber;
-  return created;
+  if (element.type === JEACT_FRAGMENT_TYPE){
+    debugger;
+  } else{
+    // createFiberFromTypeAndProps() has been merged to createFiberFromElement
+    const created = createFiberFromElement(element, lanes);
+    created.return = returnFiber;
+    return created;
+  }
 }
 
 function reconcileChildrenArray(
@@ -207,6 +243,13 @@ function createChild(returnFiber, newChild, lanes){
   }
 
   return null;
+}
+
+function useFiber(fiber, pendingProps){
+  const clone = createWorkInProgress(fiber, pendingProps);
+  clone.index = 0;
+  clone.sibling = null;
+  return clone;
 }
 
 function placeChild(

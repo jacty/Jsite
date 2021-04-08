@@ -27,6 +27,7 @@ import {
   createTextNode, 
   createElement,
   setInitialDOMProperties,
+  diffProperties,
 } from '@Jeact/vDOM/DOMComponent';
 import {
   precacheFiberNode,
@@ -49,6 +50,10 @@ import {
   subtreeRenderLanes,
 } from '@Jeact/vDOM/FiberWorkLoop';
 
+function markUpdate(workInProgress){
+  workInProgress.flags |= Update;
+}
+
 function updateHostComponent(
   current, 
   workInProgress,
@@ -60,9 +65,9 @@ function updateHostComponent(
   if (oldProps === newProps){
     return;
   }
-
+  
   const instance = workInProgress.stateNode;
-  const updatePayload = prepareUpdate(
+  const updatePayload = diffProperties(
     instance,
     type,
     oldProps,
@@ -70,6 +75,9 @@ function updateHostComponent(
     rootContainerInstance,
   )
   workInProgress.updateQueue = updatePayload;
+  if (updatePayload){
+    markUpdate(workInProgress);
+  }
 }
 
 function appendAllChildren(parent, workInProgress){
@@ -166,7 +174,6 @@ export function completeWork(current, workInProgress,renderLanes){
       const rootContainerInstance = getRootHostContainer();
       const type = workInProgress.type;
       if(current !== null && workInProgress.stateNode !== null){
-        debugger;
         updateHostComponent(
           current,
           workInProgress,
@@ -282,6 +289,3 @@ export function completeWork(current, workInProgress,renderLanes){
       console.error('completeWork', workInProgress)
   }
 }
-
-
-

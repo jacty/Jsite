@@ -342,12 +342,13 @@ function renderRootConcurrent(root, lanes){
     //create a new FiberNode by cloning root.current and set it to wip.
     prepareFreshStack(root, lanes);
   }
-  //Keep trying until all caught error handled.
+  //Keep trying until all caught errors handled.
   do{
     try {
       workLoopConcurrent();
       break;
     } catch(thrownValue){
+      debugger;
       handleError(root, thrownValue);
     }
   } while (true);

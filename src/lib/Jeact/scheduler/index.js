@@ -1,22 +1,20 @@
 import {
   NORMAL_PRIORITY_TIMEOUT,
-  USER_BLOCKING_PRIORITY_TIMEOUT,
-  ImmediateSchedulePriority,
-  UserBlockingSchedulePriority,
   NormalSchedulePriority,
-  LowSchedulePriority,
-  IdleSchedulePriority,
 } from '@Jeact/shared/Constants';
-import {push,pop,peek} from './SchedulerMinHeap';
+import {
+  push,
+  pop,
+  peek
+} from './SchedulerMinHeap';
 
 let taskQueue = [];
 let taskIdCount = 1;
 
 let currentTask = null;
 let currentPriorityLevel = NormalSchedulePriority;
-// This is set while performing work, to prevent re-entry.
-let isPerformingWork = false;
 
+let isPerformingWork = false;
 let isHostCallbackScheduled = false;
 
 let isMessageLoopRunning = false;
@@ -82,24 +80,11 @@ export function scheduleCallback(priorityLevel, callback){
   let startTime = performance.now();
   let timeout;
   switch (priorityLevel) {
-    case ImmediateSchedulePriority:
-      debugger;
-      timeout = IMMEDIATE_PRIORITY_TIMEOUT;
-      break;
-    case UserBlockingSchedulePriority:
-      debugger;
-      timeout = USER_BLOCKING_PRIORITY_TIMEOUT;
-      break;
-    case IdleSchedulePriority:
-      debugger;
-      timeout = IDLE_PRIORITY_TIMEOUT;
-      break;
-    case LowSchedulePriority:
-      debugger;
-      timeout = LOW_PRIORITY_TIMEOUT;
-      break;
     case NormalSchedulePriority:
     default:
+      if(priorityLevel!==NormalSchedulePriority){
+        debugger;
+      }
       timeout = NORMAL_PRIORITY_TIMEOUT;
       break;
   }

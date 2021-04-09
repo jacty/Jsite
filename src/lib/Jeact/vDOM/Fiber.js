@@ -53,7 +53,6 @@ export const createFiber = function(tag, pendingProps, lanes){
   return new FiberNode(tag, pendingProps, lanes);
 };
 
-
 // This is used to create an alternate fiber to do work on.
 export function createWorkInProgress(current, pendingProps=null){
   let workInProgress = current.alternate;

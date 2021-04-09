@@ -16,7 +16,7 @@ import {
 } from '@Jeact/vDOM/FiberLane';
 import { markWorkInProgressReceivedUpdate } from '@Jeact/vDOM/FiberBeginWork';
 
-// Set right before calling the component.
+// Set for the first time in renderWithHooks().
 let renderLanes = NoLanes;
 // The work-in-progress fiber. 
 let currentlyRenderingFiber = null;
@@ -40,7 +40,7 @@ export function renderWithHooks(current,workInProgress,nextRenderLanes){
 
   renderLanes = nextRenderLanes;
   currentlyRenderingFiber = workInProgress;
-
+  // Only when current.memoizedState is not null, the Hooks have been mounted
   CurrentDispatcher.current =
     current === null || current.memoizedState === null
     ? HooksDispatcherOnMount
@@ -100,12 +100,13 @@ function updateWorkInProgressHook(){
       nextCurrentHook = null;
     }
   } else {
-    debugger;
     nextCurrentHook = currentHook.next;
   }
 
   let nextWorkInProgressHook;
   if (workInProgressHook === null){
+    // shouldn't be reached since workInProgressHook will always be set
+    // in mountWorkInProgressHook().
     debugger;
     nextWorkInProgressHook = currentlyRenderingFiber.memoizedState;
   } else {
@@ -154,8 +155,9 @@ function updateReducer(reducer, initial){
 
   let baseQueue = current.baseQueue;
   const pendingQueue = queue.pending;
+
   if(pendingQueue !== null){
-    // We have new updates that haven't been processed yet. We'll add them to // the base queue.
+    // Found unprocessed new updates and add them to the base queue.
     if(baseQueue !==null){
       // Merge the pending queue and the base queue.
       debugger;
@@ -170,7 +172,6 @@ function updateReducer(reducer, initial){
     // We have a queue to process.
     const first = baseQueue.next;
     let newState = current.baseState;
-
     let newBaseState = null;
     let newBaseQueueFirst = null;
     let newBaseQueueLast = null;
@@ -181,11 +182,9 @@ function updateReducer(reducer, initial){
       if (!isSubsetOfLanes(renderLanes, updateLane)){
         debugger;
       } else {
-        // This update does have sufficient priority.
         if (newBaseQueueLast!==null){
           debugger;
         }
-
         // Process this update.
         if(update.eagerReducer === reducer){
           newState = update.eagerState;
@@ -219,6 +218,7 @@ function updateReducer(reducer, initial){
     debugger;
   }
   const dispatch = queue.dispatch;
+
   return [hook.memoizedState, dispatch];
 }
 
@@ -247,10 +247,8 @@ function updateState(initialState){
 }
 
 function dispatchAction(fiber, queue, action){
-
   const eventTime = requestEventTime();
   const lane = requestUpdateLane();
-
   const update = {
     lane,
     action,
@@ -259,6 +257,7 @@ function dispatchAction(fiber, queue, action){
     next:null,
   };
   const alternate = fiber.alternate;
+
   if(
     fiber === currentlyRenderingFiber ||
     (alternate !== null && alternate === currentlyRenderingFiber)
@@ -283,33 +282,35 @@ function dispatchAction(fiber, queue, action){
       pending.next = update;
     }
     queue.pending = update;
-  }
 
-  if (
-    fiber.lanes === NoLanes && 
-    (alternate === null || alternate.lanes === NoLanes)
-  ){
-    const lastRenderedReducer = queue.lastRenderedReducer;
-    const currentState = queue.lastRenderedState;
-    const eagerState = lastRenderedReducer(currentState, action);
-    update.eagerReducer = lastRenderedReducer;
-    update.eagerState = eagerState;
-    if (Object.is(eagerState, currentState)){
-      return;
+    if (
+        fiber.lanes === NoLanes && 
+        (alternate === null || alternate.lanes === NoLanes)
+      )
+    { 
+      // prepare the first item for the queue without schedule a task in 
+      // scheduler for Render Phase 
+      const lastRenderedReducer = queue.lastRenderedReducer;
+      const currentState = queue.lastRenderedState;
+      const eagerState = lastRenderedReducer(currentState, action);
+      update.eagerReducer = lastRenderedReducer;
+      update.eagerState = eagerState;
+      if (Object.is(eagerState, currentState)){
+        return;
+      }
+    }
+    
+    const root = scheduleUpdateOnFiber(fiber, lane, eventTime);
+
+    if (isTransitionLane(lane) && root !== null){
+      debugger;
     }
   }
-  const root = scheduleUpdateOnFiber(fiber, lane, eventTime);
-
-  if (isTransitionLane(lane) && root !== null){
-    debugger;
-  }
 }
-
 
 const HooksDispatcherOnMount ={
   useState: mountState,
 }
-
 const HooksDispatcherOnUpdate = {
   useState: updateState
 }

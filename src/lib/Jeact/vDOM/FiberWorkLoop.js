@@ -237,10 +237,12 @@ function performConcurrentWorkOnRoot(root){
     root.finishedLanes = lanes;
     finishConcurrentRender(root, exitStatus, lanes);
   }
-  //schedule to finish extra work scheduled in Render Phase
+  //schedule new tasks found in Render Phase
   ensureRootIsScheduled(root, performance.now());
+  // root.callbackNode is always relevant to a task which hasn't completely 
+  // finished due to expiration or some other reasons and it will be set to 
+  // null in Commit Phase.
   if (root.callbackNode === originalCallbackNode){
-    // Continue expired tasks.
     return performConcurrentWorkOnRoot.bind(null, root);
   }
   return null;

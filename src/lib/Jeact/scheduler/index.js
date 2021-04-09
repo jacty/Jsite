@@ -27,23 +27,21 @@ let yieldInterval = 5;
 let deadline = 0;
 
 function flushWork(currentTime){
-  // For next time work scheduled.
   isHostCallbackScheduled = false;
   isPerformingWork = true;
   try{
     return workLoop(currentTime);
   } finally {
-    // flags may be set in workLoop should be reset finally.
-    currentTask = null;
+    currentTask = null;// for GC
     isPerformingWork = false;
   }
 }
-// the return value of this function decides will be set to hasMoreWork.
+// the return value of this function will be set to hasMoreWork.
 function workLoop(currentTime){
   currentTask = peek(taskQueue);
   while(currentTask !== null){
     if(currentTask.expirationTime > currentTime &&
-      shouldYieldToHost()
+        shouldYieldToHost()
       ){
       // deadline reached but currentTask hasn't expired.
       break;
@@ -55,22 +53,23 @@ function workLoop(currentTime){
       currentTask.callback = null;
       const continuationCallback = callback();
       if(typeof continuationCallback === 'function'){
+        // set for next iteration in while loop to use.
         currentTask.callback = continuationCallback
       } else {
+        // current task in taskQueue has finished.
         if(currentTask === peek(taskQueue)){
           pop(taskQueue);
         }
       }
-    } else {
-      pop(taskQueue);
     }
+    // find next task in taskQueue if there is.
+    currentTask = peek(taskQueue);
   }
   // Return whether there's additional work.
   if (currentTask !== null){
     return true;
-  } else {
-    return false;
   }
+  return false;
 }
 
 export function scheduleCallback(priorityLevel, callback){
@@ -110,7 +109,7 @@ export function shouldYieldToHost(){
   return performance.now() >= deadline;
 }
 
-function performWorkUntilDeadline(){  
+function performWorkUntilDeadline(){ 
   const currentTime = performance.now();
   deadline = currentTime + yieldInterval;
   let hasMoreWork = true;

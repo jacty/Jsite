@@ -45,7 +45,6 @@ import {
   suspenseStackCursor,
   ForceSuspenseFallback,
   InvisibleParentSuspenseContext,
-  SubtreeSuspenseContextMask,
   hasSuspenseContext,
   addSubtreeSuspenseContext,
   setDefaultShallowSuspenseContext,
@@ -55,7 +54,10 @@ import {
   createFiber,
   createWorkInProgress,
 } from '@Jeact/vDOM/Fiber';
-import {pushRenderLanes} from '@Jeact/vDOM/FiberWorkLoop';
+import {
+  pushRenderLanes,
+  markSkippedUpdateLanes,
+} from '@Jeact/vDOM/FiberWorkLoop';
 import {createElement} from '@Jeact/Element';
 
 let didReceiveUpdate = false;
@@ -446,13 +448,17 @@ function updateSuspensePrimaryChildren(
 }
 
 function bailoutOnAlreadyFinishedWork(current, workInProgress, renderLanes){
-  if (workInProgress.lanes !== 0) debugger;
+  
+  markSkippedUpdateLanes(workInProgress.lanes);
+
   // Check if the children have any pending work.
   if (!includesSomeLane(renderLanes, workInProgress.childLanes)){
     // The children don't have any work either.
     return null;
   }
-    // This fiber doesn't have work, but its subtree does. Clone the child fibers and continue.
+    // This fiber doesn't have work, but its subtree does. Clone the child 
+    // fibers and continue. And RootFiber always clones its ChildFibers 
+    // here.
     cloneChildFibers(current, workInProgress);
     return workInProgress.child;
 }
@@ -467,8 +473,6 @@ export function beginWork(current, workInProgress, renderLanes){
       didReceiveUpdate = true;
     } else if(!includesSomeLane(renderLanes, updateLanes)){
       didReceiveUpdate = false;
-      // This fiber does not have any pending work. Bailout without entering 
-      // the begin phase.
       switch (workInProgress.tag){
         case HostRoot:
           pushHostContainer(workInProgress);
@@ -482,6 +486,7 @@ export function beginWork(current, workInProgress, renderLanes){
           // pushHostContext()
           break;
         case SuspenseComponent:{
+          debugger;
           const state = workInProgress.memoizedState;
           if (state !== null){
             const primaryChildFragment = workInProgress.child;
@@ -529,6 +534,7 @@ export function beginWork(current, workInProgress, renderLanes){
   workInProgress.lanes = NoLanes;
   switch (workInProgress.tag){
     case LazyComponent:{
+      debugger;
       return mountLazyComponent(
         current, 
         workInProgress,
@@ -545,13 +551,16 @@ export function beginWork(current, workInProgress, renderLanes){
     case HostText:
       return null;
     case SuspenseComponent:
+      debugger;
       return updateSuspenseComponent(current, workInProgress, renderLanes);
     case Fragment:
+      debugger;
       return updateFragment(current, workInProgress, renderLanes);
     case OffscreenComponent:
+      debugger;
       return updateOffscreenComponent(current, workInProgress, renderLanes);
     default:
-      console.error('beginWork4', workInProgress);
+      debugger;
   }
 }
 

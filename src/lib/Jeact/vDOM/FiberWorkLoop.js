@@ -308,6 +308,7 @@ function handleError(root, thrownValue){
 }
 
 export function markSkippedUpdateLanes(lane){
+  if (lane !== 0) debugger;
   wipRootSkippedLanes = mergeLanes(
     lane, 
     wipRootSkippedLanes,

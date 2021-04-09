@@ -12,7 +12,6 @@ let taskQueue = [];
 let taskIdCount = 1;
 
 let currentTask = null;
-let currentPriorityLevel = NormalSchedulePriority;
 
 let isPerformingWork = false;
 let isHostCallbackScheduled = false;
@@ -31,13 +30,11 @@ function flushWork(currentTime){
   // For next time work scheduled.
   isHostCallbackScheduled = false;
   isPerformingWork = true;
-  const previousPriorityLevel = currentPriorityLevel;
   try{
     return workLoop(currentTime);
   } finally {
     // flags may be set in workLoop should be reset finally.
     currentTask = null;
-    currentPriorityLevel = previousPriorityLevel;
     isPerformingWork = false;
   }
 }

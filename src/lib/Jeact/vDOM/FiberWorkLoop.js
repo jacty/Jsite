@@ -279,12 +279,6 @@ export function popRenderLanes(fiber){
 }
 
 function prepareFreshStack(root, lanes){
-  // to keep next stack fresh.
-  root.finishedWork = null;
-  root.finishedLanes = NoLanes;
-  if (wip !== null){
-    debugger;
-  }
   wipRoot = root;
   wip = createWorkInProgress(root.current);
   wipRootRenderLanes = subtreeRenderLanes =

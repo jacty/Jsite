@@ -89,16 +89,15 @@ export function createWorkInProgress(current, pendingProps=null){
       'type'
     ];
 
-    if(workInProgress.flags !== NoFlags || 
-      workInProgress.subtreeFlags !== NoFlags){
-      debugger;
-    } 
+    // We already have an alternate.
+    // Reset the flags.
     workInProgress.flags = NoFlags;
     workInProgress.subtreeFlags = NoFlags;
     workInProgress.deletions = null;
   }
   // Static effects are not specific to a render. 
   workInProgress.flags = current.flags & StaticMask;
+  if (workInProgress.flags !== NoFlags) debugger;
   cloneKeys = cloneKeys.concat([
     'childLanes',
     'lanes',

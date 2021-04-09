@@ -23,7 +23,6 @@ export const OffscreenComponent = 22;
 
 /* JeactFiberWorkLoop */
 export const NoContext = /*             */ 0b0000000;
-export const DiscreteEventContext = /*  */ 0b0000100;
 export const RenderContext = /*         */ 0b0010000;
 export const CommitContext = /*         */ 0b0100000;
 export const RetryAfterError = /*       */ 0b1000000;

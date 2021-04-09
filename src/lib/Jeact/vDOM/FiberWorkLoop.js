@@ -6,8 +6,7 @@ import {
   Incomplete,
   NoContext,
   RenderContext,
-  CommitContext,
-  DiscreteEventContext, 
+  CommitContext, 
   RetryAfterError,
   HostRoot,
   PassiveMask,
@@ -218,7 +217,7 @@ function performConcurrentWorkOnRoot(root){
       return null;
     }
 
-    // now we have a consistent tree.
+    // now we have a consistent tree and ready to commit.
     const finishedWork = root.current.alternate
     root.finishedWork = finishedWork;
     root.finishedLanes = lanes;
@@ -546,8 +545,4 @@ export function resolveRetryWakeable(boundaryFiber, wakeable){
     retryCache.delete(wakeable);
   }
   retryTimedOutBoundary(boundaryFiber);
-}
-
-export function updateExecutionContext(){
-  executionContext |= DiscreteEventContext;
 }

@@ -58,7 +58,6 @@ export function renderWithHooks(current,workInProgress,nextRenderLanes){
 }
 
 export function bailoutHooks(current, workInProgress, lanes){
-  debugger;
   workInProgress.updateQueue = current.updateQueue;
   workInProgress.flags &= ~(Passive | Update);
 

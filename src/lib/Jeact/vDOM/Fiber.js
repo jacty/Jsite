@@ -17,9 +17,9 @@ import {
 
 let debugCounter = 1;
 
-function FiberNode(tag=HostRoot, pendingProps=null, key=null){
+function FiberNode(tag=HostRoot, pendingProps=null, lanes=NoLanes){
   this.tag = tag; 
-  this.key = key;
+  this.key = null;
   this.elementType = null;
   this.type = null;
   this.stateNode = null; 
@@ -32,7 +32,7 @@ function FiberNode(tag=HostRoot, pendingProps=null, key=null){
   
   this.pendingProps = pendingProps;
   this.memoizedProps = null;
-  this.memoizedState = null; // As baseState in update queue.
+  this.memoizedState = null;
   this.updateQueue = null;
 
   // Effects
@@ -40,20 +40,17 @@ function FiberNode(tag=HostRoot, pendingProps=null, key=null){
   this.subtreeFlags = NoFlags;
   this.deletions = null;
 
-  this.lanes = NoLanes;
+  this.lanes = lanes;
   this.childLanes = NoLanes;
 
   this.alternate = null; 
   if (__ENV__){
     this._debugID = debugCounter++;
-    this._debugOwner = null;
-    Object.preventExtensions(this);
   }
 }
 
-export const createFiber = function(tag, pendingProps, key){
-  // TODO: add argument lane
-  return new FiberNode(tag, pendingProps, key);
+export const createFiber = function(tag, pendingProps, lanes){
+  return new FiberNode(tag, pendingProps, lanes);
 };
 
 
@@ -65,13 +62,14 @@ export function createWorkInProgress(current, pendingProps=null){
     workInProgress = createFiber(
       current.tag,
       pendingProps,
-      current.key,
+      current.lanes,
     );
 
     cloneKeys = [
       'elementType',
       'type',
       'stateNode',
+      'key',
     ];
 
     if (__ENV__){
@@ -115,10 +113,6 @@ export function createWorkInProgress(current, pendingProps=null){
   return workInProgress;
 }
 
-export function createFiberFromTypeAndProps(element, lanes, owner){
-
-}
-
 export function createFiberFromElement(element, lanes){
   const type = element.type;
   const pendingProps = element.props;
@@ -130,6 +124,7 @@ export function createFiberFromElement(element, lanes){
   } else if(typeof type === 'string'){
     fiberTag = HostComponent;
   } else {
+    debugger;
     getTag: switch(type){
       case JEACT_FRAGMENT_TYPE: debugger;
       case JEACT_SUSPENSE_TYPE:
@@ -151,17 +146,16 @@ export function createFiberFromElement(element, lanes){
     }
   }
 
-  const fiber = createFiber(fiberTag, pendingProps, key);
+  const fiber = createFiber(fiberTag, pendingProps, lanes);
   fiber.type = type;
   fiber.elementType = type;
-  fiber.lanes = lanes;
+  fiber.key = key;
 
   return fiber;
 }
 
 export function createFiberFromText(content, lanes){
-  const fiber = createFiber(HostText, content);
-  fiber.lanes = lanes;
+  const fiber = createFiber(HostText, content, lanes);
   return fiber;
 }
 /* 

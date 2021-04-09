@@ -3,11 +3,11 @@ import {
   JEACT_ELEMENT_TYPE,
   JEACT_FRAGMENT_TYPE,
   JEACT_LAZY_TYPE,
-  Placement
+  Placement,
+  HostText,
 } from '@Jeact/shared/Constants';
 import {
   createFiberFromElement,
-  createFiberFromText,
   createWorkInProgress
 } from '@Jeact/vDOM/Fiber';
 
@@ -128,7 +128,7 @@ function placeSingleChild(newFiber, shouldTrackEffects){
 }
 
 function reconcileSingleTextNode(returnFiber, currentFirstChild, text, lanes){
-  const created = createFiberFromText(text, lanes);
+  const created = createFiber(HostText, text, lanes);
   created.return = returnFiber;
   return created;
 }
@@ -222,10 +222,7 @@ function reconcileChildrenArray(
 
 function createChild(returnFiber, newChild, lanes){
   if (typeof newChild === 'string' || typeof newChild === 'number'){
-    const created = createFiberFromText(
-      ''+ newChild,
-      lanes,
-    );
+    const created = createFiber(HostText, ''+newChild, lanes);
     created.return = returnFiber;
     return created;
   }

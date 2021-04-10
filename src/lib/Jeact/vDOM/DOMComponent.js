@@ -1,6 +1,5 @@
 import {registrationNameDependencies} from '@Jeact/vDOM/events/EventRegistry';
 
-const DANGER_HTML = 'dangerouslySetInnerHTML';
 const CHILDREN = 'children';
 const TEXT_NODE = 3;
 
@@ -31,9 +30,7 @@ export function setInitialDOMProperties(domElement, workInProgress){
             continue;
         }
         const prop = props[propKey];
-        if(propKey === DANGER_HTML){
-            console.error('setInitialDOMProperties');
-        } else if(propKey === CHILDREN) {
+        if(propKey === CHILDREN) {
             if (typeof prop === 'string' || typeof prop === 'number'){
                 setTextContent(domElement, prop);
             }
@@ -82,9 +79,7 @@ export function diffProperties(
         ){
                 continue;
         }
-        if (propKey === DANGER_HTML){
-            debugger;
-        } else if(propKey === CHILDREN){
+        if(propKey === CHILDREN){
             if (typeof nextProp === 'string' || typeof nextProp === 'number'){
                 updatePayload.push(propKey, '' + nextProp);
             }
@@ -106,9 +101,7 @@ export function updateDOMProperties(
     for (let i = 0; i < updatePayload.length; i+= 2){
         const propKey = updatePayload[i];
         const propValue = updatePayload[i + 1];
-        if(propKey === DANGER_HTML){
-            debugger
-        } else if (propKey === CHILDREN){
+        if (propKey === CHILDREN){
             setTextContent(domElement, propValue);
         } else {
             debugger;
@@ -117,7 +110,6 @@ export function updateDOMProperties(
 }
 
 export function shouldSetTextContent(props){
-    if(props.dangerouslySetInnerHTML) debugger;
   return (
     typeof props.children === 'string' ||
     typeof props.children === 'number'

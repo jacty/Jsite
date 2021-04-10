@@ -11,13 +11,14 @@ import {
   createWorkInProgress
 } from '@Jeact/vDOM/Fiber';
 
+let shouldTrackEffects;
+
 export function reconcileChildFibers(
   returnFiber,
   current,
   newChild,// from payload.element
   lanes
 ){
-  let shouldTrackEffects;
   let currentFirstChild;
   if(current === null){
     //mount
@@ -51,10 +52,9 @@ export function reconcileChildFibers(
           returnFiber,
           currentFirstChild,
           newChild,
-          lanes,
-          shouldTrackEffects,
+          lanes
         );
-        placeSingleChild(newFiber, shouldTrackEffects);        
+        placeSingleChild(newFiber);        
 
         return newFiber;
       }
@@ -101,8 +101,7 @@ export function reconcileChildFibers(
 
 function deleteRemainingChildren(
   returnFiber, 
-  currentFirstChild, 
-  shouldTrackEffects
+  currentFirstChild
 ){
   if (!shouldTrackEffects){
     return null;
@@ -115,8 +114,8 @@ function deleteRemainingChildren(
   return null;
 }
 
-function placeSingleChild(newFiber, shouldTrackEffects){
-  // This is a simpler for the single child case. We only need to 
+function placeSingleChild(newFiber){
+  // This is a simpler for the single child inserting case
   if (shouldTrackEffects && newFiber.alternate === null){
     newFiber.flags = Placement;
   }
@@ -132,8 +131,7 @@ function reconcileSingleElement(
   returnFiber,
   currentFirstChild,
   element,
-  lanes,
-  shouldTrackEffects,
+  lanes
 ){
   const key = element.key;
   let child = currentFirstChild;
@@ -151,8 +149,7 @@ function reconcileSingleElement(
           ){
             deleteRemainingChildren(
               returnFiber, 
-              child.sibling, 
-              shouldTrackEffects
+              child.sibling
             );
             const existing = useFiber(child, element.props);
             existing.return = returnFiber;
@@ -160,7 +157,7 @@ function reconcileSingleElement(
         }
       }
       debugger;
-      deleteRemainingChildren(returnFiber, child, shouldTrackEffects);
+      deleteRemainingChildren(returnFiber, child);
       break;
     } else {
       deleteChild(returnFiber, child);

@@ -11,9 +11,6 @@ import {
   createWorkInProgress
 } from '@Jeact/vDOM/Fiber';
 
-// This API will tag the children with the side-effect of the reconciliation
-// itself. They will be added to the side-effect list as we pass through the
-// children and the parent.
 export function reconcileChildFibers(
   returnFiber,
   current,
@@ -49,17 +46,18 @@ export function reconcileChildFibers(
 
   if (isObject){
     switch(newChild.$$typeof){
-      case JEACT_ELEMENT_TYPE:
-        return placeSingleChild(//update flag to Placement.
-          reconcileSingleElement(
-            returnFiber,
-            currentFirstChild,
-            newChild,
-            lanes,
-            shouldTrackEffects,
-          ),
-          shouldTrackEffects
+      case JEACT_ELEMENT_TYPE:{
+        const newFiber = reconcileSingleElement(
+          returnFiber,
+          currentFirstChild,
+          newChild,
+          lanes,
+          shouldTrackEffects,
         );
+        placeSingleChild(newFiber, shouldTrackEffects);        
+
+        return newFiber;
+      }
       case JEACT_LAZY_TYPE:
         debugger;        
     };
@@ -118,13 +116,10 @@ function deleteRemainingChildren(
 }
 
 function placeSingleChild(newFiber, shouldTrackEffects){
-  // This is a simpler for the single child case. We only need to do a
-  // placement for inserting new children.
+  // This is a simpler for the single child case. We only need to 
   if (shouldTrackEffects && newFiber.alternate === null){
     newFiber.flags = Placement;
   }
-  
-  return newFiber;
 }
 
 function reconcileSingleTextNode(returnFiber, currentFirstChild, text, lanes){

@@ -5,6 +5,7 @@ import {
   JEACT_LAZY_TYPE,
   Placement,
   HostText,
+  ChildDeletion,
 } from '@Jeact/shared/Constants';
 import {
   createFiberFromElement,
@@ -92,11 +93,13 @@ export function reconcileChildFibers(
     debugger;
   }
 
-  return deleteRemainingChildren(
-            returnFiber, 
-            currentFirstChild, 
-            shouldTrackEffects
-          );  
+  deleteRemainingChildren(
+    returnFiber, 
+    currentFirstChild, 
+    shouldTrackEffects
+  );
+
+  return null;  
 }
 
 function deleteRemainingChildren(
@@ -109,9 +112,9 @@ function deleteRemainingChildren(
 
   let childToDelete = currentFirstChild;
   while(childToDelete !== null){
-    debugger;
+    deleteChild(returnFiber, childToDelete);
+    childToDelete = childToDelete.sibling;
   }
-  return null;
 }
 
 function placeSingleChild(newFiber){
@@ -156,7 +159,6 @@ function reconcileSingleElement(
             return existing;
         }
       }
-      debugger;
       deleteRemainingChildren(returnFiber, child);
       break;
     } else {
@@ -250,7 +252,13 @@ function placeChild(
 }
 
 function deleteChild(returnFiber, childToDelete){
-  const deletions = returnFiber.deletions;    
+  const deletions = returnFiber.deletions;  
+  if (deletions === null){
+    returnFiber.deletions = [childToDelete];
+    returnFiber.flags |= ChildDeletion;
+  } else {
+    deletions.push(childToDelete);
+  } 
 }
 
 export function cloneChildFibers(current, workInProgress){

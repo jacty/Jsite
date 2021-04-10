@@ -163,10 +163,6 @@ function updateHostRoot(current, workInProgress, renderLanes){
 
   const nextChildren = nextState.element;
   if(nextChildren === prevChildren){
-    /* 
-    * First run of UpdateHostRoot() will not have a child, since 
-    * first Fiber(RootFiber) which has no any relevant DOM/VDOM node yet.
-    */
     debugger;
     return bailoutOnAlreadyFinishedWork(current, workInProgress, renderLanes);
   }

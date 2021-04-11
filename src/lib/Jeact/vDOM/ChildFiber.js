@@ -311,7 +311,9 @@ function reconcileChildrenArray(
     oldFiber = nextOldFiber;
   }
   if (newIdx === newChildren.length){
-    debugger;
+    // reached the end of new children.
+    deleteRemainingChildren(returnFiber, oldFiber);
+    return resultingFirstChild;
   }
 
   if (oldFiber === null){
@@ -440,7 +442,7 @@ export function cloneChildFibers(current, workInProgress){
   newChild.sibling = null;
 }
 
-function isTextNode(newChild){
+export function isTextNode(newChild){
   if(typeof newChild === 'string' || typeof newChild === 'number'){
     return true;
   }

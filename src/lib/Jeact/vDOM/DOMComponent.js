@@ -60,13 +60,12 @@ export function diffProperties(
         ){
             continue;
         }
-        debugger;
         if (registrationNameDependencies.hasOwnProperty(propKey)){
             if (!updatePayload){
                 updatePayload = [];
             }
         } else {
-            updatePayload.push(propKey, null);
+            (updatePayload = updatePayload || []).push(propKey, null);
         }
     }
     for (propKey in nextProps){
@@ -81,14 +80,15 @@ export function diffProperties(
         }
         if(propKey === CHILDREN){
             if (typeof nextProp === 'string' || typeof nextProp === 'number'){
-                updatePayload.push(propKey, '' + nextProp);
+                (updatePayload = updatePayload || []).push(propKey, '' + nextProp);
+                
             }
         } else if(propKey === 'onClick'){
             if (!updatePayload && lastProp !== nextProp){
                 updatePayload = [];
             }
         } else {
-            updatePayload.push(propKey, nextProp);
+            (updatePayload = updatePayload || []).push(propKey, nextProp);
         }
     }
     return updatePayload;   
@@ -104,7 +104,10 @@ export function updateDOMProperties(
         if (propKey === CHILDREN){
             setTextContent(domElement, propValue);
         } else {
-            debugger;
+            if (nextProp !== null){
+                debugger;
+                setValueForProperty(domElement, propKey, nextProp);
+            }
         }
     }
 }
@@ -133,4 +136,10 @@ function setTextContent(node, text){
         }
     }
     node.textContent = text;
+}
+
+function setValueForProperty(node, name, value){
+    debugger;
+    const propertyInfo = 
+    getPropertyInfo(name);
 }

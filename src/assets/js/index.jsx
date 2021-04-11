@@ -13,8 +13,7 @@ function App(){
     if(cur>0){
         return (
             <main>
-                <p key={1}>1</p>
-                <p key={2}>2</p>
+                <p key={1} >1</p>
                 <a onClick={()=>{setCur(x=>x+1)}}>{cur}</a>
             </main>
         )

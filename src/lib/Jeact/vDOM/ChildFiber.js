@@ -84,10 +84,6 @@ export function reconcileChildFibers(
       lanes,
     );
   }
-  // getIteratorFn()
-  if(newChild === 'function' && newChild[Symbol.iterator]){
-    debugger;
-  }
 
   if (isObject){
     debugger;
@@ -100,6 +96,29 @@ export function reconcileChildFibers(
   );
 
   return null;  
+}
+
+function placeSingleChild(newFiber){
+  // This is a simpler for the single child inserting case
+  if (shouldTrackEffects && newFiber.alternate === null){
+    newFiber.flags = Placement;
+  }
+}
+
+function updateElement(returnFiber, current, element, lanes){
+  const elementType = element.type;
+  if (current !== null){
+    if (current.elementType === elementType){
+      const existing = useFiber(current, element.props);
+      existing.return = returnFiber;
+      return existing;
+    }
+  }
+  // Key hasn't been changed but types are different.
+  // Insert
+  const created = createFiberFromElement(element, lanes);
+  created.return = returnFiber;
+  return created;
 }
 
 function deleteRemainingChildren(
@@ -117,11 +136,236 @@ function deleteRemainingChildren(
   }
 }
 
-function placeSingleChild(newFiber){
-  // This is a simpler for the single child inserting case
-  if (shouldTrackEffects && newFiber.alternate === null){
-    newFiber.flags = Placement;
+function mapRemainingChildren(currentFirstChild){
+  const existingChildren = new Map();
+
+  let existingChild = currentFirstChild;
+  while (existingChild !== null){
+    if (existingChild.key !== null){
+      existingChildren.set(existingChild.key, existingChild);
+    } else {
+      // TODO: Set index in order when fiber is created since currently index 
+      // is defaulted to 0 if the fibers haven't been rearranged.
+      existingChildren.set(existingChild.index, existingChild);
+    }
+    existingChild = existingChild.sibling;
   }
+  return existingChildren;
+}
+
+function useFiber(fiber, pendingProps){
+  const clone = createWorkInProgress(fiber, pendingProps);
+  clone.index = 0;
+  clone.sibling = null;
+  return clone;
+}
+
+function placeChild(
+  newFiber,
+  lastPlacedIndex,
+  newIndex
+){
+  newFiber.index = newIndex;
+  if (!shouldTrackEffects){
+    return lastPlacedIndex;
+  }
+  const current = newFiber.alternate;
+  if (current !== null){
+    const oldIndex = current.index;
+    if (oldIndex < lastPlacedIndex){
+      newFiber.flags |= Placement;
+      return lastPlacedIndex;
+    } else {
+      // stay in place.
+      return oldIndex;
+    }
+  } else {
+    // insertion.
+    newFiber.flags |= Placement;
+    return lastPlacedIndex;
+  }
+}
+
+function createChild(returnFiber, newChild, lanes){
+  if (typeof newChild === 'string' || typeof newChild === 'number'){
+    // Text nodes.
+    debugger;
+    const created = createFiber(HostText, ''+newChild, lanes);
+    created.return = returnFiber;
+    return created;
+  }
+  if(typeof newChild === 'object' && newChild !== null){
+    switch(newChild.$$typeof){
+      case JEACT_ELEMENT_TYPE:{
+        const created = createFiberFromElement(
+          newChild,
+          lanes,
+        );
+        created.return = returnFiber;
+        return created;
+      }
+    }
+  }
+
+  return null;
+}
+
+function deleteChild(returnFiber, childToDelete){
+  const deletions = returnFiber.deletions;  
+  if (deletions === null){
+    returnFiber.deletions = [childToDelete];
+    returnFiber.flags |= ChildDeletion;
+  } else {
+    deletions.push(childToDelete);
+  } 
+}
+
+function updateSlot(returnFiber, oldFiber, newChild, lanes){
+  // Update the fiber if the keys match, otherwise return null.
+
+  if (typeof newChild === 'string' || typeof newChild === 'number'){
+    // Text nodes.
+    debugger;
+  }
+  if (typeof newChild === 'object' && newChild !== null){
+    switch (newChild.$$typeof){
+      case JEACT_ELEMENT_TYPE: {
+        if (newChild.key === oldFiber.key){
+          return updateElement(returnFiber, oldFiber, newChild, lanes);
+        } else {
+          return null;
+        }
+      }
+    }
+    debugger;
+  }
+}
+
+function updateFromMap(
+  existingChildren,
+  returnFiber,
+  newIdx,
+  newChild,
+  lanes
+){
+  if (isTextNode(newChild)){
+    // Text nodes
+    debugger;
+  }
+  if (typeof newChild === 'object' && newChild !== null){
+    switch (newChild.$$typeof){
+      case JEACT_ELEMENT_TYPE:{
+        const matchedFiber = 
+          existingChildren.get(
+            newChild.key === null ? newIdx : newChild.key,
+          ) || null;
+          return updateElement(returnFiber, matchedFiber, newChild, lanes);
+      }
+    }
+  }
+}
+
+function reconcileChildrenArray(
+  returnFiber,
+  currentFirstChild,
+  newChildren,
+  lanes
+){
+
+  let resultingFirstChild = null;
+  let previousNewFiber = null;
+
+  let oldFiber = currentFirstChild;
+  let lastPlacedIndex = 0;
+  let newIdx = 0;
+  let nextOldFiber = null;
+  for (; oldFiber!==null && newIdx < newChildren.length; newIdx++){
+    if (oldFiber.index > newIdx){
+      debugger;
+    } else {
+      nextOldFiber = oldFiber.sibling;
+    }
+    const newFiber = updateSlot(
+      returnFiber,
+      oldFiber,
+      newChildren[newIdx],
+      lanes,
+    );
+    if (newFiber === null){
+      break;
+    }
+    if (shouldTrackEffects){
+      if(oldFiber && newFiber.alternate === null){
+        // Slot matched but types are different, so we need to delete the old
+        // children.
+        deleteChild(returnFiber, oldFiber);
+      }
+    }
+    lastPlacedIndex = placeChild(newFiber, lastPlacedIndex, newIdx);
+    if (previousNewFiber === null){
+      resultingFirstChild = newFiber;
+    } else {
+      previousNewFiber.sibling = newFiber;
+    }
+    previousNewFiber = newFiber;
+    oldFiber = nextOldFiber;
+  }
+  if (newIdx === newChildren.length){
+    debugger;
+  }
+
+  if (oldFiber === null){
+    // Inserting remaining children.
+    for (; newIdx < newChildren.length; newIdx++){
+      const newFiber = createChild(returnFiber, newChildren[newIdx], lanes);
+      lastPlacedIndex = placeChild(newFiber, lastPlacedIndex, newIdx);
+      if(previousNewFiber === null){
+        resultingFirstChild = newFiber;
+      } else {
+        previousNewFiber.sibling = newFiber;
+      }
+      previousNewFiber = newFiber;
+    }
+
+    return resultingFirstChild;
+  }
+  // keys don't match due to position change.
+  const existingChildren = mapRemainingChildren(oldFiber);
+  // scanning and restoring deleted items as moves.
+  for (; newIdx < newChildren.length; newIdx++){
+    const newFiber = updateFromMap(
+      existingChildren,
+      returnFiber,
+      newIdx,
+      newChildren[newIdx],
+      lanes,
+    );
+    if (newFiber !== null){
+      if (shouldTrackEffects){
+        if (newFiber.alternate !== null){
+          // The new fiber is a work in progress, but if there is a current, it
+          // means that we are gonna reuse the fiber. We need to delete it 
+          // from the child list in case adding it to deletion list.
+          existingChildren.delete(
+            newFiber.key === null ? newIdx : newFiber.key,
+          )
+        }
+      }
+      lastPlacedIndex = placeChild(newFiber, lastPlacedIndex, newIdx);
+      if (previousNewFiber === null){
+        resultingFirstChild = newFiber;
+      } else {
+        previousNewFiber.sibling = newFiber;
+      }
+      previousNewFiber = newFiber;
+    }
+  }
+  if (shouldTrackEffects){
+    // Any existing children that weren't consumed above should be deleted.
+    existingChildren.forEach(child => deleteChild(returnFiber, child));
+  }
+  
+  return resultingFirstChild;
 }
 
 function reconcileSingleTextNode(returnFiber, currentFirstChild, text, lanes){
@@ -176,91 +420,6 @@ function reconcileSingleElement(
   }
 }
 
-function reconcileChildrenArray(
-  returnFiber,
-  currentFirstChild,
-  newChildren,
-  lanes
-){
-
-  let resultingFirstChild = null;
-  let previousNewFiber = null;
-
-  let oldFiber = currentFirstChild;
-  let newIdx = 0;
-  let nextOldFiber = null;
-  for (; oldFiber!==null && newIdx < newChildren.length; newIdx++){
-    debugger;
-  }
-  if (newIdx === newChildren.length){
-    debugger;
-  }
-
-  if (oldFiber === null){
-    // If we don't have any more existing children we can choose a fast path
-    // since the rest will all be insertions.
-    for (; newIdx < newChildren.length; newIdx++){
-      const newFiber = createChild(returnFiber, newChildren[newIdx], lanes);
-      if(previousNewFiber === null){
-        resultingFirstChild = newFiber;
-      } else {
-        previousNewFiber.sibling = newFiber;
-      }
-      previousNewFiber = newFiber;
-    }
-
-    return resultingFirstChild;
-  }
-  debugger;
-}
-
-function createChild(returnFiber, newChild, lanes){
-  if (typeof newChild === 'string' || typeof newChild === 'number'){
-    const created = createFiber(HostText, ''+newChild, lanes);
-    created.return = returnFiber;
-    return created;
-  }
-  if(typeof newChild === 'object' && newChild !== null){
-    switch(newChild.$$typeof){
-      case JEACT_ELEMENT_TYPE:{
-        const created = createFiberFromElement(
-          newChild,
-          lanes,
-        );
-        created.return = returnFiber;
-        return created;
-      }
-    }
-  }
-
-  return null;
-}
-
-function useFiber(fiber, pendingProps){
-  const clone = createWorkInProgress(fiber, pendingProps);
-  clone.index = 0;
-  clone.sibling = null;
-  return clone;
-}
-
-function placeChild(
-  newFiber,
-  lastPlacedIndex,
-  newIndex
-){
-  return lastPlacedIndex;
-}
-
-function deleteChild(returnFiber, childToDelete){
-  const deletions = returnFiber.deletions;  
-  if (deletions === null){
-    returnFiber.deletions = [childToDelete];
-    returnFiber.flags |= ChildDeletion;
-  } else {
-    deletions.push(childToDelete);
-  } 
-}
-
 export function cloneChildFibers(current, workInProgress){
   if(workInProgress.child === null){
     return;
@@ -279,4 +438,11 @@ export function cloneChildFibers(current, workInProgress){
     newChild.return = workInProgress;
   }
   newChild.sibling = null;
+}
+
+function isTextNode(newChild){
+  if(typeof newChild === 'string' || typeof newChild === 'number'){
+    return true;
+  }
+  return false;
 }

@@ -61,11 +61,7 @@ function updateHostComponent(
   newProps,
   rootContainerInstance,
 ){
-  const oldProps = current.memoizedProps;
-  if (oldProps === newProps){
-    return;
-  }
-  
+  const oldProps = current.memoizedProps;  
   const instance = workInProgress.stateNode;
   const updatePayload = diffProperties(
     instance,

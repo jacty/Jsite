@@ -188,7 +188,7 @@ function updateHostComponent(current, workInProgress,renderLanes){
   if (isDirectTextChild){
     // Handle direct text node in host environment to avoid another traversing.
     nextChildren = null;
-  } else if(prevProps !== null && shouldSetTextContent(type, prevProps)) {
+  } else if(prevProps !== null && shouldSetTextContent(prevProps)) {
     debugger;
   }
   

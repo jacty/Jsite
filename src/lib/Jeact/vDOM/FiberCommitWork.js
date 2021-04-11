@@ -348,8 +348,25 @@ function getHostSibling(fiber){
         }
         node.sibling.return = node.return;
         node = node.sibling;
+        while (
+            node.tag !== HostComponent &&
+            node.tag !== HostText
+        ){
+            if (node.flags & Placement){
+                continue siblings;
+            }
+
+            if (node.child === null){
+                continue siblings;
+            } else {
+                node.child.return = node;
+                node = node.child;
+            }
+        }
+        if (!(node.flags & Placement)){
+            return node.stateNode;
+        }
     }
-    console.error('getHostSibling');
 }
 
 function commitPlacement(finishedWork){
@@ -374,7 +391,6 @@ function commitPlacement(finishedWork){
     if(isContainer){
         insertOrAppendPlacementNodeIntoContainer(finishedWork, before, parent);
     } else {
-        debugger;
         insertOrAppendPlacementNode(finishedWork, before, parent);
     }
 }
@@ -412,7 +428,7 @@ function insertOrAppendPlacementNode(node, before, parent){
     if (isHost){
         const stateNode = node.stateNode;
         if (before){
-            console.error('insertOrAppendPlacementNode')
+            parent.insertBefore(stateNode, before);
         } else {
             parent.append(stateNode);
         }

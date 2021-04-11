@@ -9,7 +9,8 @@ import {
 } from '@Jeact/shared/Constants';
 import {
   createFiberFromElement,
-  createWorkInProgress
+  createWorkInProgress,
+  createFiber
 } from '@Jeact/vDOM/Fiber';
 
 let shouldTrackEffects;
@@ -105,6 +106,18 @@ function placeSingleChild(newFiber){
   }
 }
 
+function updateTextNode(returnFiber, current, textContent, lanes){
+  if (current === null || current.tag !== HostText){
+    const created = createFiber(HostText, textContent, lanes);
+    created.return = returnFiber;
+    return created;
+  } else {
+    const existing = useFiber(current, textContent);
+    existing.return = returnFiber;
+    return existing;
+  }
+}
+
 function updateElement(returnFiber, current, element, lanes){
   const elementType = element.type;
   if (current !== null){
@@ -189,7 +202,6 @@ function placeChild(
 function createChild(returnFiber, newChild, lanes){
   if (typeof newChild === 'string' || typeof newChild === 'number'){
     // Text nodes.
-    debugger;
     const created = createFiber(HostText, ''+newChild, lanes);
     created.return = returnFiber;
     return created;
@@ -222,23 +234,26 @@ function deleteChild(returnFiber, childToDelete){
 
 function updateSlot(returnFiber, oldFiber, newChild, lanes){
   // Update the fiber if the keys match, otherwise return null.
-
-  if (typeof newChild === 'string' || typeof newChild === 'number'){
+  const key = oldFiber !== null ? oldFiber.key : null;
+  if (isTextNode(newChild)){
     // Text nodes.
-    debugger;
+    if (key !== null){
+      return null
+    }
+    return updateTextNode(returnFiber, oldFiber, '' + newChild, lanes);
   }
   if (typeof newChild === 'object' && newChild !== null){
     switch (newChild.$$typeof){
       case JEACT_ELEMENT_TYPE: {
-        if (newChild.key === oldFiber.key){
+        if (newChild.key === key){
           return updateElement(returnFiber, oldFiber, newChild, lanes);
         } else {
           return null;
         }
       }
     }
-    debugger;
   }
+  return null;
 }
 
 function updateFromMap(
@@ -250,7 +265,8 @@ function updateFromMap(
 ){
   if (isTextNode(newChild)){
     // Text nodes
-    debugger;
+    const matchedFiber = existingChildren.get(newIdx) || null;
+    return updateTextNode(returnFiber, matchedFiber, ''+newChild, lanes);
   }
   if (typeof newChild === 'object' && newChild !== null){
     switch (newChild.$$typeof){
@@ -281,7 +297,8 @@ function reconcileChildrenArray(
   let nextOldFiber = null;
   for (; oldFiber!==null && newIdx < newChildren.length; newIdx++){
     if (oldFiber.index > newIdx){
-      debugger;
+      nextOldFiber = oldFiber;
+      oldFiber = null;
     } else {
       nextOldFiber = oldFiber.sibling;
     }

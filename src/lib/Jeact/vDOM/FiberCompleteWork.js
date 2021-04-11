@@ -201,10 +201,9 @@ export function completeWork(current, workInProgress,renderLanes){
       return null;
     }
     case HostText: {//6
-      debugger;
       const newText = newProps;
       if (workInProgress.alternate& workInProgress.stateNode!==null){
-        console.error('x');
+        debugger;
       }
       const rootContainerInstance = getRootHostContainer();
       const instance = createTextNode(

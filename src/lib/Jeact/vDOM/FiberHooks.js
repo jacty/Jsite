@@ -78,7 +78,6 @@ function mountWorkInProgressHook(){
     // first hook in the list.
     currentlyRenderingFiber.memoizedState = workInProgressHook = hook;
   } else {
-    debugger;
     // append to the end of the list.
     workInProgressHook = workInProgressHook.next = hook;
   }
@@ -215,7 +214,7 @@ function updateReducer(reducer, initial){
     queue.lastRenderedState = newState;
   }
   if(baseQueue === null){
-    debugger;
+    queue.lanes = NoLanes;
   }
   const dispatch = queue.dispatch;
 

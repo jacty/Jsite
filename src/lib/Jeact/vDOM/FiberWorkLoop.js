@@ -96,7 +96,6 @@ export function requestEventTime(){
   }
   // We're not inside Jeact, so we may be in the middle of a browser event like click.
   if (currentEventTime !== NoTimestamp){
-    debugger;
     // Use the same start time for all updates until we enter Jeact again.
     return currentEventTime;
   }

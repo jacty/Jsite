@@ -1,4 +1,5 @@
 import {registrationNameDependencies} from '@Jeact/vDOM/events/EventRegistry';
+import {setValueForProperty} from '@Jeact/vDOM/DOMProperty';
 
 const CHILDREN = 'children';
 const TEXT_NODE = 3;
@@ -35,7 +36,7 @@ export function setInitialDOMProperties(domElement, workInProgress){
                 setTextContent(domElement, prop);
             }
         } else if (registrationNameDependencies.hasOwnProperty(propKey)){
-            console.error('setInitialDOMProperties')
+            debugger;
         } else if (prop !== null){
             propKey = propKey === 'className' ? 'class':propKey;
             domElement.setAttribute(propKey, prop);
@@ -49,7 +50,7 @@ export function diffProperties(
     lastProps,
     nextProps,
     rootContainerElement,
-){
+){  
     let propKey;
     let updatePayload = null;
     for (propKey in lastProps){
@@ -104,10 +105,7 @@ export function updateDOMProperties(
         if (propKey === CHILDREN){
             setTextContent(domElement, propValue);
         } else {
-            if (nextProp !== null){
-                debugger;
-                setValueForProperty(domElement, propKey, nextProp);
-            }
+            setValueForProperty(domElement, propKey, propValue)         
         }
     }
 }
@@ -138,8 +136,3 @@ function setTextContent(node, text){
     node.textContent = text;
 }
 
-function setValueForProperty(node, name, value){
-    debugger;
-    const propertyInfo = 
-    getPropertyInfo(name);
-}

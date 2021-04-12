@@ -1,19 +1,20 @@
-import React, {Suspense, useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import ReactDOM from 'react-dom';
 
 import '@assets/styles/main.sass';
 const Aboutme = React.lazy(()=>import('@com/aboutme.jsx'));
 
 function App(){
-    const [cur, setCur] = useState(0);
-    const [cur1, setCur1] = useState(1);
-    function handleClick(){
-        setCur(cur+1);
-        setCur1(cur1+1);
-    }
+    const [cur, setCur] = useState(0)
+    useEffect(()=>{
+        document.title = '11';
+        return ()=>{
+            document.title = '2';
+        }
+    })
     return (
         <main>
-            <a onClick={handleClick}>{cur}{cur1}</a>
+            <a onClick={()=>{setCur(cur+1)}}>{cur}</a>
         </main>
     )
      

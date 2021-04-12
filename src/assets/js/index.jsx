@@ -6,23 +6,17 @@ const Aboutme = React.lazy(()=>import('@com/aboutme.jsx'));
 
 function App(){
     const [cur, setCur] = useState(0);
-    if(cur>0){
-        return (
-            <main>
-                <p key={1}>1</p>
-                <p key={2}>2</p>
-                <a onClick={()=>{setCur(x=>x+1)}}>{cur}</a>
-            </main>
-        )
-    } else {
-        return (
-            <main>
-                <p key={2} className='2'>2</p>
-                <p key={1}>1</p>
-                <a onClick={()=>{setCur(x=>x+1)}}>{cur}</a>
-            </main>
-        )
-    } 
+    const [cur1, setCur1] = useState(1);
+    function handleClick(){
+        setCur(cur+1);
+        setCur1(cur1+1);
+    }
+    return (
+        <main>
+            <a onClick={handleClick}>{cur}{cur1}</a>
+        </main>
+    )
+     
 }
 
 

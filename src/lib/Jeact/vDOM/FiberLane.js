@@ -299,7 +299,6 @@ export function markRootFinished(root, remainingLanes){
     root.pooledCache = null;
   }
 
-  const entanglements = root.entanglements;
   const eventTimes = root.eventTimes;
   const expirationTimes = root.expirationTimes;
 
@@ -309,7 +308,6 @@ export function markRootFinished(root, remainingLanes){
     const index = laneToIndex(lanes);
     const lane = 1 << index;
 
-    entanglements[index] = NoLanes;
     eventTimes[index] = 0;
     expirationTimes[index] = NoTimestamp;
 

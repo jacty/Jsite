@@ -12,7 +12,6 @@ export function getClosestFiberFromNode(targetNode){
     if (targetFiber){
         return targetFiber;
     }
-    console.error('getClosestFiberFromNode', targetFiber)
 }
 
 export function getPropsFromFiber(stateNode){

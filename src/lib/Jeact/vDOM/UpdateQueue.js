@@ -6,7 +6,6 @@ import {
 } from '@Jeact/shared/Constants';
 import {
   isSubsetOfLanes,
-  isTransitionLane,
 } from '@Jeact/vDOM/FiberLane';
 import {markSkippedUpdateLanes} from '@Jeact/vDOM/FiberWorkLoop';
 
@@ -68,17 +67,6 @@ export function enqueueUpdate(fiber, update){
     pending.next = update;
   }
   updateQueue.pending = update;
-}
-
-export function entangleTransitions(root, fiber, lane){
-  const updateQueue = fiber.updateQueue;
-  if (updateQueue === null){
-    // fiber unmounted.
-    return;
-  }
-  if (isTransitionLane(lane)){
-    debugger;
-  }
 }
 
 function getStateFromUpdate(

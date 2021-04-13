@@ -13,7 +13,6 @@ import {
 } from '@Jeact/vDOM/FiberWorkLoop';
 import {
   requestUpdateLane,
-  isTransitionLane,
   isSubsetOfLanes,
   removeLanes
 } from '@Jeact/vDOM/FiberLane';
@@ -387,10 +386,6 @@ function dispatchAction(fiber, queue, action){
     }
     
     const root = scheduleUpdateOnFiber(fiber, lane, eventTime);
-
-    if (isTransitionLane(lane) && root !== null){
-      debugger;
-    }
   }
 }
 

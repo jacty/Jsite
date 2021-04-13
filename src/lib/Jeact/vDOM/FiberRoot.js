@@ -1,7 +1,6 @@
 import {
   NoTimestamp,
-  NoLanes,
-  NoLanePriority
+  NoLanes
 } from '@Jeact/shared/Constants';
 import { createFiber } from '@Jeact/vDOM/Fiber';
 import {initializeUpdateQueue} from '@Jeact/vDOM/UpdateQueue';
@@ -9,22 +8,18 @@ import {initializeUpdateQueue} from '@Jeact/vDOM/UpdateQueue';
 function FiberRootNode(containerInfo){
   this.containerInfo = containerInfo; 
   this.current=null; 
-
-  this.pingCache = null;//Suspense related
-  this.finishedWork = null; 
-
+  this.pendingLanes = NoLanes;
+  
   this.callbackNode = null;
-  this.callbackPriority = NoLanePriority;
   this.eventTimes = Array(31).fill(0);
   this.expirationTimes = Array(31).fill(NoTimestamp);;
-
-  this.pendingLanes = NoLanes;
+  // Suspense related.
   this.suspendedLanes = NoLanes;
   this.pingedLanes = NoLanes;// Suspense related
+  this.pingCache = null;
   this.finishedLanes = NoLanes;
-
-  this.entangledLanes = NoLanes;
-  this.entanglements = Array(31).fill(0);
+  this.finishedWork = null;
+  // Cache Component
   this.pooledCache = null;
   this.pooledCacheLanes = NoLanes;
 }

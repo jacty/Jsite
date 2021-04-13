@@ -1,42 +1,33 @@
-import {
-  __ENV__,  
+import { 
   JEACT_ELEMENT_TYPE,
 } from '@Jeact/shared/Constants';
 
 const hasOwnProperty = Object.prototype.hasOwnProperty;
-// Attributes reserved for internal usage.
+
 const RESERVED_ATTR = {
   key: true,
   ref: true,
 };
 
-function JeactElement(type, key, ref, props){
+function JeactElement(type, key, props){
   const element = {
     $$typeof: JEACT_ELEMENT_TYPE,
 
     // Built-in properties
     type: type,
     key: key,
-    ref: ref,
     props: props,
   };
 
   return element;
 };
 
-/**
-* @arg comp: Component|DOM
-* @arg attrs: attributes attached on {comp}
-* @arg children: Children of {comp}
-*/
-export function createElement(comp, attrs, children){
-  let propName; // key in object {attrs}
-  const props = {};// To keep items from {attrs}
+export function createElement(type, attrs, children){
+  let propName; 
+  const props = {};
   let key = null;
-  let ref = null;
 
   if (attrs != null) {
-    ref = attrs.ref=== undefined ? null : attrs.ref; //TD:Support string ref ?
     key = attrs.key=== undefined ? null : '' + attrs.key;
 
     for (propName in attrs){
@@ -58,9 +49,8 @@ export function createElement(comp, attrs, children){
   }
 
   return JeactElement(
-    comp,
+    type,
     key,
-    ref,
     props,
   );
 }

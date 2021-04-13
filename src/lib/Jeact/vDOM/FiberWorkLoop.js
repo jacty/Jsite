@@ -345,7 +345,6 @@ function renderRootConcurrent(root, lanes){
       workLoopConcurrent();
       break;
     } catch(thrownValue){
-      debugger;
       handleError(root, thrownValue);
     }
   } while (true);

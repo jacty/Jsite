@@ -40,6 +40,8 @@ import {
   commitBeforeMutationEffects,
   commitMutationEffects,
   commitLayoutEffects,
+  commitPassiveUnmountEffects,
+  commitPassiveMountEffects,
 } from '@Jeact/vDOM/FiberCommitWork';
 import {throwException} from '@Jeact/vDOM/FiberThrow';
 import {
@@ -84,7 +86,8 @@ let globalMostRecentFallbackTime = 0;
 const FALLBACK_THROTTLE_MS = 500;
 
 let rootDoesHavePassiveEffects = false;
-let rootsWithPendingDiscreteUpdates = null;
+let rootWithPendingPassiveEffects = null;
+let pendingPassiveEffectsLanes = NoLanes;
 
 let currentEventTime = NoTimestamp;
 let currentEventTransitionLane = NoLanes;
@@ -453,6 +456,20 @@ function commitRootImpl(root, renderPriority){
     wipRootRenderLanes = NoLanes;
   }
 
+  // schedule a callback to process pending passive effects.
+  if (
+    (finishedWork.subtreeFlags & PassiveMask) !== NoFlags ||
+    (finishedWork.flags & PassiveMask) !== NoFlags
+  ){
+    if(!rootDoesHavePassiveEffects){
+      rootDoesHavePassiveEffects = true;
+      scheduleCallback(NormalSchedulePriority, ()=>{
+        flushPassiveEffects();
+        return null;
+      })
+    }
+  }
+
 
   const subtreeHasEffects = 
     (finishedWork.subtreeFlags &
@@ -479,14 +496,37 @@ function commitRootImpl(root, renderPriority){
   
   const rootDidHavePassiveEffects = rootDoesHavePassiveEffects;
   if (rootDoesHavePassiveEffects){
-    debugger;
-    }
-
-  // Read this again, since an effect might have updated it.
+    rootDoesHavePassiveEffects = false;
+    rootWithPendingPassiveEffects = root;
+    pendingPassiveEffectsLanes = lanes;
+  }
 
   ensureRootIsScheduled(root, performance.now())
+}
+
+function flushPassiveEffects(){
+  if (pendingPassiveEffectsLanes !== NoLanes){
+    flushPassiveEffectsImpl();
+  }
+  return false;
+}
+
+function flushPassiveEffectsImpl(){
+  const root = rootWithPendingPassiveEffects;
+  const lanes = pendingPassiveEffectsLanes;
+  rootWithPendingPassiveEffects = null;
+  pendingPassiveEffectsLanes = NoLanes;
+
+  const prevExecutionContext = executionContext;
+  executionContext |= CommitContext;
+
+  commitPassiveUnmountEffects(root.current);
+  commitPassiveMountEffects(root, root.current);
+
+  executionContext = prevExecutionContext;
 
 }
+
 export function pingSuspendedRoot(root, wakeable, pingedLanes){
   // The earliest attach to catch the change from Promise.
   const pingCache = root.pingCache;

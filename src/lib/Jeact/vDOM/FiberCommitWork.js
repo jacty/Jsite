@@ -14,6 +14,11 @@ import{
  LayoutMask,
  SuspenseComponent,
  OffscreenComponent,
+ ChildDeletion,
+ PassiveMask,
+ Passive,
+ HookPassive,
+ HookHasEffect
 } from '@Jeact/shared/Constants';
 import {
     resolveRetryWakeable
@@ -84,6 +89,47 @@ function commitBeforeMutationEffectsOnFiber(finishedWork){
 function commitBeforeMutationEffectsDeletion(deletion){
     debugger;
     doesFiberContain(deletion);
+}
+
+function commitHookEffectListUnmount(
+    flags, 
+    finishedWork, 
+    nearestMountedAncestor
+){
+    const updateQueue = finishedWork.updateQueue;
+    const lastEffect = updateQueue !== null ? updateQueue.lastEffect : null;
+    if (lastEffect !== null){
+        const firstEffect = lastEffect.next;
+        let effect = firstEffect;
+        do {
+            if ((effect.tag & flags) === flags){
+                // unmount
+                const destroy = effect.destroy;
+                effect.destroy = undefined;
+                if (destroy !== undefined){
+                     destroy();
+                }
+            }
+            effect = effect.next;
+        } while (effect !== firstEffect);
+    }
+}
+
+function commitHookEffectListMount(tag, finishedWork){
+    const updateQueue = finishedWork.updateQueue;
+    const lastEffect = updateQueue !== null ? updateQueue.lastEffect : null;
+    if (lastEffect !== null){
+        const firstEffect = lastEffect.next;
+        let effect = firstEffect;
+        do {
+            if ((effect.tag & tag) === tag){
+                // Mount
+                const create = effect.create;
+                effect.destroy = create();
+            }
+            effect = effect.next;
+        } while(effect !== firstEffect);
+    }
 }
 
 function attachSuspenseRetryListeners(finishedWork){
@@ -222,6 +268,61 @@ function commitLayoutMountEffects_complete(subtreeRoot, root, committedLanes){
     }
 }
 
+export function commitPassiveMountEffects(root, finishedWork){
+    nextEffect = finishedWork;
+    commitPassiveMountEffects_begin(finishedWork, root);
+}
+
+function commitPassiveMountEffects_begin(subtreeRoot, root){
+    while(nextEffect!== null){
+        const fiber = nextEffect;
+        const firstChild = fiber.child;
+        if ((fiber.subtreeFlags & PassiveMask) !== NoFlags && firstChild !== null){
+            nextEffect = firstChild;
+        } else {
+            commitPassiveMountEffects_complete(subtreeRoot, root);
+        }
+    }
+}
+
+function commitPassiveMountEffects_complete(subtreeRoot, root){
+    while(nextEffect !== null){
+        const fiber = nextEffect;
+        if ((fiber.flags & Passive) !== NoFlags){
+            try{
+                commitPassiveMountOnFiber(root, fiber);
+            } catch(error){
+                debugger;
+            }
+        }
+
+        if (fiber === subtreeRoot){
+            nextEffect = null;
+            return ;
+        }
+
+        const sibling = fiber.sibling;
+        if (sibling !== null){
+            nextEffect = sibling;
+            return;
+        }
+
+        nextEffect = fiber.return;
+    }
+}
+
+function commitPassiveMountOnFiber(finishedRoot, finishedWork){
+    switch(finishedWork.tag){
+        case FunctionComponent:{
+            commitHookEffectListMount(
+                HookPassive | HookHasEffect, 
+                finishedWork
+            );
+            break;
+        }
+    }
+}
+
 function commitLayoutEffectOnFiber(finishedRoot, current, finishedWork, committedLanes){
     if ((finishedWork.flags & Update) !== NoFlags){
         switch(finishedWork.tag){
@@ -238,6 +339,56 @@ function commitLayoutEffectOnFiber(finishedRoot, current, finishedWork, committe
                 break;
             case OffscreenComponent:
                 break;
+        }
+    }
+}
+
+export function commitPassiveUnmountEffects(firstChild){
+    nextEffect = firstChild;
+    commitPassiveUnmountEffects_begin();
+}
+
+function commitPassiveUnmountEffects_begin(){
+    while(nextEffect !== null){
+        const fiber = nextEffect;
+        const child = fiber.child;
+
+        if ((nextEffect.flags & ChildDeletion) !== NoFlags){
+            debugger;
+        }
+        if ((fiber.subtreeFlags & PassiveMask) !== NoFlags && child !== null){
+            nextEffect = child;
+        } else {
+            commitPassiveUnmountEffects_complete();
+        }
+    }
+}
+
+function commitPassiveUnmountEffects_complete(){
+    while (nextEffect !== null){
+        const fiber = nextEffect;
+        if ((fiber.flags & Passive) !== NoFlags){
+            commitPassiveUnmountOnFiber(fiber);
+        }
+
+        const sibling = fiber.sibling;
+        if (sibling !== null){
+            nextEffect = sibling;
+            return;
+        }
+
+        nextEffect = fiber.return;
+    }
+}
+
+function commitPassiveUnmountOnFiber(finishedWork){
+    switch(finishedWork.tag){
+        case FunctionComponent:{
+            commitHookEffectListUnmount(
+                HookPassive | HookHasEffect,
+                finishedWork,
+                finishedWork.return
+            )
         }
     }
 }

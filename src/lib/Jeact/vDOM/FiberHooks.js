@@ -1,7 +1,10 @@
 import {
   NoLanes,
   Passive,
-  Update
+  PassiveStatic,
+  HookHasEffect,
+  HookPassive,
+  Update,
 } from '@Jeact/shared/Constants';
 import {CurrentDispatcher} from '@Jeact/shared/internals';
 import {
@@ -33,6 +36,19 @@ let didScheduleRenderPhaseUpdate = false;
 // TODO: Maybe there's some way to consolidate this with
 // `didScheduleRenderPhaseUpdate`. Or with `numberOfReRenders`.
 let didScheduleRenderPhaseUpdateDuringThisPass = false;
+
+function areHookInputsEqual(nextDeps, prevDeps){
+  if (prevDeps === null){
+    return false;
+  }
+  for (let i=0; i < prevDeps.length && i < nextDeps.length; i++){
+    if (Object.is(nextDeps[i], prevDeps[i])){
+      continue;
+    }
+    return false;
+  }
+  return true;
+}
 
 export function renderWithHooks(current,workInProgress,nextRenderLanes){
   const Component = workInProgress.type;
@@ -245,6 +261,78 @@ function updateState(initialState){
   return updateReducer(basicStateReducer, initialState);
 }
 
+function pushEffect(tag, create, destroy, deps){
+  const effect = {
+    tag,
+    create,
+    destroy,
+    deps,
+    next: null
+  };
+  let updateQueue = currentlyRenderingFiber.updateQueue;
+  if (updateQueue === null){
+    // createFunctionComponentUpdateQueue()
+    updateQueue = {
+      lastEffect: null,
+    };
+    currentlyRenderingFiber.updateQueue = updateQueue;
+    updateQueue.lastEffect = effect.next = effect;
+  } else {
+    const lastEffect = updateQueue.lastEffect;
+    if (lastEffect === null){
+      updateQueue.lastEffect = effect.next = effect;
+    } else {
+      const firstEffect = lastEffect.next;
+      lastEffect.next = effect;
+      effect.next = firstEffect;
+      updateQueue.lastEffect = effect;
+    }
+  }
+  return effect;
+}
+
+// mountEffectImpl()
+function mountEffect(create, deps){
+  const fiberFlags = Passive | PassiveStatic;
+  const hookFlags = HookPassive;
+  const hook = mountWorkInProgressHook();
+  const nextDeps = deps === undefined ? null : deps;
+  currentlyRenderingFiber.flags |= fiberFlags;
+  hook.memoizedState = pushEffect(
+    HookHasEffect | hookFlags,
+    create,
+    undefined,
+    nextDeps,
+  ); 
+}
+// updateEffectImpl
+function updateEffect(create, deps){
+  const hook = updateWorkInProgressHook();
+  const nextDeps = deps === undefined ? null : deps;
+  let destroy = undefined;
+
+  if (currentHook !== null){
+    const prevEffect = currentHook.memoizedState;
+    destroy = prevEffect.destroy;
+    if(nextDeps !== null){
+      const prevDeps = prevEffect.deps;
+      if(areHookInputsEqual(nextDeps, prevDeps)){
+        hook.memoizedState = pushEffect(HookPassive,create, destroy, nextDeps);
+        return;
+      }
+    }
+  }
+
+  currentlyRenderingFiber.flags |= Passive;
+
+  hook.memoizedState = pushEffect(
+    HookHasEffect | HookPassive,
+    create,
+    destroy,
+    nextDeps,
+  )
+}
+
 function dispatchAction(fiber, queue, action){
   const eventTime = requestEventTime();
   const lane = requestUpdateLane();
@@ -276,7 +364,6 @@ function dispatchAction(fiber, queue, action){
     if (pending === null){
       update.next = update;
     } else {
-      debugger;
       update.next = pending.next;
       pending.next = update;
     }
@@ -309,7 +396,9 @@ function dispatchAction(fiber, queue, action){
 
 const HooksDispatcherOnMount ={
   useState: mountState,
+  useEffect: mountEffect,
 }
 const HooksDispatcherOnUpdate = {
-  useState: updateState
+  useState: updateState,
+  useEffect: updateEffect,
 }

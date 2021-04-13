@@ -94,7 +94,7 @@ export function createWorkInProgress(current, pendingProps=null){
   }
   // Static effects are not specific to a render. 
   workInProgress.flags = current.flags & StaticMask;
-  if (workInProgress.flags !== NoFlags) debugger;
+
   cloneKeys = cloneKeys.concat([
     'childLanes',
     'lanes',

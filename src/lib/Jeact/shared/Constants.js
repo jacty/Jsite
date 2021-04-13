@@ -92,7 +92,7 @@ export const NORMAL_PRIORITY_TIMEOUT = 5000;
 export const PassiveStatic = /*                */ 0b001000000000000000000;
 export const StaticMask = PassiveStatic;
 
-
-
-
-
+/* Hook Effects Tags*/
+export const NoEffects = 0b000;
+export const HookHasEffect = 0b001;
+export const HookPassive = 0b100;

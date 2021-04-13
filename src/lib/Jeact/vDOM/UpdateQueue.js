@@ -1,12 +1,8 @@
 import {
-  __ENV__,
   UpdateState,
   NoLanes,
-  ShouldCapture,
 } from '@Jeact/shared/Constants';
-import {
-  isSubsetOfLanes,
-} from '@Jeact/vDOM/FiberLane';
+
 import {markSkippedUpdateLanes} from '@Jeact/vDOM/FiberWorkLoop';
 
 export function initializeUpdateQueue(fiber){
@@ -51,18 +47,11 @@ export function createUpdate(eventTime, lane, element=null){
 
 export function enqueueUpdate(fiber, update){
   const updateQueue = fiber.updateQueue;
-  if (updateQueue === null){// fiber has been unmounted.
-    debugger;
-    return;
-  }
-
   const pending = updateQueue.pending;
-
   if (pending === null) {
     // First update.
     update.next = update;
   } else {
-    debugger;
     update.next = pending.next;
     pending.next = update;
   }
@@ -84,8 +73,6 @@ function getStateFromUpdate(
       }
       return Object.assign({}, prevState, partialState);
     }
-    default:
-      debugger;
   }
   return prevState;
 }
@@ -110,7 +97,6 @@ export function processUpdateQueue(workInProgress,renderLanes){
     if (lastBaseUpdate === null){
       firstBaseUpdate = firstPendingUpdate;
     } else {
-      debugger;
       lastBaseUpdate.next = firstPendingUpdate;
     }
     lastBaseUpdate = lastPendingUpdate;
@@ -123,7 +109,6 @@ export function processUpdateQueue(workInProgress,renderLanes){
         if (currentLastBaseUpdate === null){
           currentQueue.firstBaseUpdate = firstPendingUpdate;
         } else {
-          debugger;
           currentLastBaseUpdate.next = firstPendingUpdate;
         }
         currentQueue.lastBaseUpdate = lastPendingUpdate;
@@ -143,29 +128,21 @@ export function processUpdateQueue(workInProgress,renderLanes){
       do {
         const updateLane = update.lane;
         const updateEventTime = update.eventTime;
-        if(!isSubsetOfLanes(renderLanes, updateLane)){
-          debugger;
-        } else {
-          if(newLastBaseUpdate !== null){
-            debugger;
-          }
-          // Process this update.
-          newState = getStateFromUpdate(
-            workInProgress,
-            queue,
-            update,
-            newState
-          );
-      
-        }
+        
+        // Process this update.
+        newState = getStateFromUpdate(
+          workInProgress,
+          queue,
+          update,
+          newState
+        );
+              
         update = update.next;
         if (update=== null){
           pendingQueue = queue.pending;
           if (pendingQueue === null){
             break;
-          } else {
-            debugger;
-          }
+          } 
         }
       } while(true);
 
@@ -176,13 +153,6 @@ export function processUpdateQueue(workInProgress,renderLanes){
       queue.baseState = newBaseState;
       queue.firstBaseUpdate = newFirstBaseUpdate;
       queue.lastBaseUpdate = newLastBaseUpdate;
-
-      const lastInterleaved = queue.interleaved;
-      if (lastInterleaved !== undefined){
-        debugger;
-      } else if (firstBaseUpdate === null){
-        debugger;
-      }
 
       markSkippedUpdateLanes(newLanes);
       workInProgress.lanes = newLanes;

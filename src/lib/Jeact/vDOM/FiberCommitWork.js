@@ -7,7 +7,6 @@ import{
  MutationMask,
  NoFlags,
  ContentReset,
- Ref,
  Placement,
  Update,
  PlacementAndUpdate,
@@ -78,17 +77,6 @@ function commitBeforeMutationEffects_complete(){
 function commitBeforeMutationEffectsOnFiber(finishedWork){
     const current = finishedWork.alternate;
     const flags = finishedWork.flags;
-    // switch(finishedWork.tag){
-    //     case HostRoot:{
-    //         // clear container;
-    //         finishedWork.stateNode.containerInfo.textContent = '';
-    //     }
-    // }  
-}
-
-function commitBeforeMutationEffectsDeletion(deletion){
-    debugger;
-    doesFiberContain(deletion);
 }
 
 function commitHookEffectListUnmount(
@@ -179,18 +167,12 @@ function commitMutationEffects_begin(root){
 function commitMutationEffects_complete(root){
     while(nextEffect !== null){
         const fiber = nextEffect;
-        try {
-            commitMutationEffectsOnFiber(fiber, root);
-        } catch(error){
-            debugger;
-        }
-
+        commitMutationEffectsOnFiber(fiber, root);
         const sibling = fiber.sibling;
         if (sibling !== null){
             nextEffect = sibling;
             return;
         }
-
         nextEffect = fiber.return;
     }
 }
@@ -198,7 +180,6 @@ function commitMutationEffects_complete(root){
 function commitMutationEffectsOnFiber(finishedWork, root){
     const flags = finishedWork.flags;
     if (flags & ContentReset) debugger;
-    if (flags & Ref) debugger;
     const primaryFlags = flags & (Placement | Update);
     switch(primaryFlags){
         case Placement:{
@@ -246,11 +227,7 @@ function commitLayoutMountEffects_complete(subtreeRoot, root, committedLanes){
         const fiber = nextEffect;
         if((fiber.flags & LayoutMask) !== NoFlags){
             const current = fiber.alternate;
-            try{
-                commitLayoutEffectOnFiber(root, current, fiber, committedLanes);
-            } catch(error){
-                debugger;
-            }
+            commitLayoutEffectOnFiber(root, current, fiber, committedLanes);
         }
 
         if (fiber === subtreeRoot){
@@ -289,11 +266,7 @@ function commitPassiveMountEffects_complete(subtreeRoot, root){
     while(nextEffect !== null){
         const fiber = nextEffect;
         if ((fiber.flags & Passive) !== NoFlags){
-            try{
-                commitPassiveMountOnFiber(root, fiber);
-            } catch(error){
-                debugger;
-            }
+            commitPassiveMountOnFiber(root, fiber);
         }
 
         if (fiber === subtreeRoot){

@@ -12,17 +12,8 @@ export function createTextNode(text, rootContainerElement){
 }
 
 export function setInitialDOMProperties(domElement, workInProgress){
-    let rawProps = workInProgress.pendingProps;
-    let props;
+    let props = workInProgress.pendingProps;
     let type = workInProgress.type;
-    switch(type){
-        case 'img':
-            // listenToNonDelegatedEvent('error', domElement);
-            props = rawProps;
-            break;
-        default:
-            props = rawProps;
-    }
 
     // setInitialDOMProperties()
     for (let propKey in props){

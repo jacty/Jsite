@@ -2,8 +2,6 @@ import {
     Incomplete,
     FunctionComponent,
     SuspenseComponent,
-    HostRoot,
-    NoTimestamp,
     ShouldCapture,
 } from '@Jeact/shared/Constants';
 import {
@@ -11,7 +9,6 @@ import {
     InvisibleParentSuspenseContext,
     shouldCaptureSuspense,
 } from '@Jeact/vDOM/FiberSuspenseContext';
-import {createUpdate} from '@Jeact/vDOM/UpdateQueue';
 import {
     renderDidError,
     pingSuspendedRoot,

@@ -1,7 +1,4 @@
 import {createCursor, push, pop} from '@Jeact/vDOM/FiberStack';
-import {
-  getChildNamespace
-} from '@Jeact/vDOM/DOMNamespaces';
 const NO_CONTEXT = {};
 const contextFiberStackCursor = createCursor(NO_CONTEXT);
 const rootInstanceStackCursor = createCursor(NO_CONTEXT);
@@ -39,11 +36,3 @@ export function popHostContext(fiber){
   pop(contextFiberStackCursor, fiber);
 }
 
-function getChildHostContext(
-    parentHostContext,
-    type,
-    rootContainerInstance
-){
-    const parentNamespace = parentHostContext;
-    return getChildNamespace(parentNamespace);
-}

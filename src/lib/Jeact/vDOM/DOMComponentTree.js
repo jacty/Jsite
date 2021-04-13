@@ -22,10 +22,3 @@ export function updateFiberProps(node, props){
     node[internalPropsKey] = props;
 }
 
-export function getEventListenerSet(node){
-    let elementListenerSet = node[internalEventHandlersKey];
-    if (elementListenerSet === undefined){
-        elementListenerSet = node[internalEventHandlersKey] = new Set();
-    }
-    return elementListenerSet;
-}

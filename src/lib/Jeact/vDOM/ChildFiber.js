@@ -1,5 +1,4 @@
 import {
-  __ENV__,
   JEACT_ELEMENT_TYPE,
   JEACT_FRAGMENT_TYPE,
   JEACT_LAZY_TYPE,
@@ -200,7 +199,7 @@ function placeChild(
 }
 
 function createChild(returnFiber, newChild, lanes){
-  if (typeof newChild === 'string' || typeof newChild === 'number'){
+  if (isTextNode(newChild)){
     // Text nodes.
     const created = createFiber(HostText, ''+newChild, lanes);
     created.return = returnFiber;

@@ -14,7 +14,6 @@ import {
   MutationMask,
   LayoutMask,
   HostEffectMask,
-  NormalSchedulePriority,
 } from '@Jeact/shared/Constants';
 import {
   shouldYieldToHost,
@@ -50,13 +49,8 @@ import {
   pop
 } from '@Jeact/vDOM/FiberStack';
 import {unwindWork} from '@Jeact/vDOM/FiberUnwindWork';
-import {
-  DefaultEventPriority,
-  lanesToEventPriority,
-} from '@Jeact/vDOM/events/EventPriorities';
 
 const RootIncomplete = 0;
-const RootFatalErrored = 1;
 const RootErrored = 2;
 const RootSuspended = 3;
 const RootSuspendedWithDelay = 4;
@@ -72,7 +66,6 @@ export let subtreeRenderLanes = NoLanes;
 const subtreeRenderLanesCursor = createCursor(NoLanes);
 
 let wipRootExitStatus = RootIncomplete;
-let wipRootFatalError = null;
 // Lanes that *were* worked on during this render.
 let wipRootIncludedLanes = NoLanes;
 let wipRootSkippedLanes = NoLanes;
@@ -111,10 +104,6 @@ export function scheduleUpdateOnFiber(fiber, lane, eventTime){
   } 
   // update root.pendingLanes, eventTimes etc.
   markRootUpdated(root, lane, eventTime);
-
-  if (root === wipRoot){
-    debugger;
-  }
 
   ensureRootIsScheduled(root, eventTime);
 
@@ -193,7 +182,7 @@ function performConcurrentWorkOnRoot(root){
 
   let exitStatus = renderRootConcurrent(root, lanes);  
   if(exitStatus !== RootIncomplete){
-    if(exitStatus === RootErrored || exitStatus===RootFatalErrored){
+    if(exitStatus === RootErrored){
       executionContext |= RetryAfterError;
       debugger;
       return null;
@@ -266,7 +255,6 @@ function prepareFreshStack(root, lanes){
   wipRootRenderLanes = subtreeRenderLanes =
     wipRootIncludedLanes = lanes;
   wipRootExitStatus = RootIncomplete;
-  wipRootFatalError = null;
   wipRootSkippedLanes = NoLanes;
   wipRootUpdatedLanes = NoLanes;
   wipRootPingedLanes = NoLanes;
@@ -290,7 +278,6 @@ function handleError(root, thrownValue){
 }
 
 export function markSkippedUpdateLanes(lane){
-  if (lane !== 0) debugger;
   wipRootSkippedLanes = mergeLanes(
     lane, 
     wipRootSkippedLanes,
@@ -410,17 +397,9 @@ function completeUnitOfWork(unitOfWork){
 }
 
 function commitRoot(root){
-    commitRootImpl(root)
-}
-
-function commitRootImpl(root){
   const finishedWork = root.finishedWork;
   const lanes = root.finishedLanes;
 
-  if (finishedWork === null){
-    debugger;
-    return null;
-  }
   root.finishedWork = null;
   root.finishedLanes = NoLanes;
   root.callbackNode = null;
@@ -447,7 +426,6 @@ function commitRootImpl(root){
       })
     }
   }
-
 
   const subtreeHasEffects = 
     (finishedWork.subtreeFlags &
@@ -502,7 +480,6 @@ function flushPassiveEffectsImpl(){
   commitPassiveMountEffects(root, root.current);
 
   executionContext = prevExecutionContext;
-
 }
 
 export function pingSuspendedRoot(root, wakeable, pingedLanes){

@@ -1,6 +1,5 @@
 import {
   NORMAL_PRIORITY_TIMEOUT,
-  NormalSchedulePriority,
 } from '@Jeact/shared/Constants';
 import {
   push,

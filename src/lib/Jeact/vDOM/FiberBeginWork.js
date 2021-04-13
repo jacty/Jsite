@@ -7,7 +7,6 @@ import {
   LazyComponent,
   OffscreenComponent,
   NoLanes,
-  Ref,
   DidCapture,
   NoFlags,
   Fragment,
@@ -28,7 +27,6 @@ import {
 } from '@Jeact/vDOM/UpdateQueue';
 import {
   renderWithHooks,
-  bailoutHooks
 } from '@Jeact/vDOM/FiberHooks';
 import {
   pushHostContainer,
@@ -127,12 +125,6 @@ function updateFunctionComponent(current,workInProgress,renderLanes){
     renderLanes,
   );
 
-  if(current!==null && !didReceiveUpdate){
-    debugger;
-    bailoutHooks(current, workInProgress, renderLanes);
-    return bailoutOnAlreadyFinishedWork(current, workInProgress, renderLanes);
-  }
-
   workInProgress.child = reconcileChildFibers(
       workInProgress,
       current,
@@ -157,15 +149,8 @@ function updateHostRoot(current, workInProgress, renderLanes){
   const nextCache = nextState.cache;
   pushRootCachePool(root);
   pushCacheProvider(workInProgress, nextCache);
-  if(nextCache !== prevState.cache){
-    debugger;
-  }
 
   const nextChildren = nextState.element;
-  if(nextChildren === prevChildren){
-    debugger;
-    return bailoutOnAlreadyFinishedWork(current, workInProgress, renderLanes);
-  }
 
   workInProgress.child = reconcileChildFibers(
       workInProgress,
@@ -188,8 +173,6 @@ function updateHostComponent(current, workInProgress,renderLanes){
   if (isDirectTextChild){
     // Handle direct text node in host environment to avoid another traversing.
     nextChildren = null;
-  } else if(prevProps !== null && shouldSetTextContent(prevProps)) {
-    debugger;
   }
   
   workInProgress.child = reconcileChildFibers(
@@ -208,8 +191,6 @@ function mountLazyComponent(
   updateLanes, 
   renderLanes
 ){
-
-  if (_current !== null) debugger;
   const props = workInProgress.pendingProps;
   const lazyComponent = workInProgress.elementType;
   const payload = lazyComponent._payload;
@@ -228,7 +209,6 @@ function mountLazyComponent(
       )
     }
   }
-  debugger;
 }
 
 const SUSPENDED_MARKER = {
@@ -409,7 +389,6 @@ function mountSuspenseFallbackChildren(
   return fallbackChildFragment;
 }
 
-
 function updateSuspensePrimaryChildren(
   current,
   workInProgress,
@@ -446,7 +425,6 @@ function updateSuspensePrimaryChildren(
 function bailoutOnAlreadyFinishedWork(current, workInProgress, renderLanes){
   
   markSkippedUpdateLanes(workInProgress.lanes);
-
   // Check if the children have any pending work.
   if (!includesSomeLane(renderLanes, workInProgress.childLanes)){
     // The children don't have any work either.
@@ -555,8 +533,6 @@ export function beginWork(current, workInProgress, renderLanes){
     case OffscreenComponent:
       debugger;
       return updateOffscreenComponent(current, workInProgress, renderLanes);
-    default:
-      debugger;
   }
 }
 

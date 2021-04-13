@@ -30,31 +30,13 @@ export const RetryAfterError = /*       */ 0b1000000;
 export const NoLanes=/*                          */ 0b0000000000000000000000000000000;
 export const NoLane =/*                          */ 0b0000000000000000000000000000000;
 export const EventLane =/*                        */ 0b0000000000000000000000000000001;
-export const InputContinuousLane = /*            */ 0b0000000000000000000000000000100;
 export const DefaultLane = /*                    */ 0b0000000000000000000000000010000;
 export const TransitionLanes = /*                */ 0b0000000001111111111111111000000;
 
 export const RetryLanes = /*                     */ 0b0000111110000000000000000000000;
 export const RetryLane1 = /*                     */ 0b0000000010000000000000000000000;
 
-export const NonIdleLanes = /*                   */ 0b0001111111111111111111111111111;
-export const IdleLane = /*                       */ 0b0100000000000000000000000000000;
 export const OffscreenLane = /*                  */ 0b1000000000000000000000000000000;
-
-
-/* SchedulerPriorities */
-export const NoSchedulePriority = 0;
-export const ImmediateSchedulePriority = 1;
-export const UserBlockingSchedulePriority = 2;
-export const NormalSchedulePriority = 3;
-export const LowSchedulePriority = 4;
-export const IdleSchedulePriority = 5;
-
-
-/* LanePriorities */
-export const NoLanePriority = 0;
-export const DefaultLanePriority = 1;
-export const SyncLanePriority = 2
 
 /* JeactUpdateQueue.js */
 export const UpdateState = 0;
@@ -67,7 +49,6 @@ export const Deletion = /*                     */ 0b000000000000000000100;
 export const ChildDeletion = /*                */ 0b000000000000000001000;
 export const ContentReset = /*                 */ 0b000000000000000010000; 
 export const DidCapture = /*                   */ 0b000000000000010000000;
-export const Ref = /*                          */ 0b000000000000100000000;
 export const Passive = /*                      */ 0b000000000010000000000;
 
 export const HostEffectMask = /*               */ 0b000000001111111111111;
@@ -80,14 +61,12 @@ export const MutationMask =
     Placement | 
     Update | 
     ChildDeletion | 
-    ContentReset |
-    Ref;
-export const LayoutMask = Update | Ref;
+    ContentReset;
+export const LayoutMask = Update;
 export const PassiveMask = Passive | ChildDeletion;
 /* Timeouts */
 export const noTimeout = -1;
 // Eventually times out
-export const USER_BLOCKING_PRIORITY_TIMEOUT = 250;
 export const NORMAL_PRIORITY_TIMEOUT = 5000;
 export const PassiveStatic = /*                */ 0b001000000000000000000;
 export const StaticMask = PassiveStatic;

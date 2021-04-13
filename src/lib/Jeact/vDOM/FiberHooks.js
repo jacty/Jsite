@@ -14,7 +14,6 @@ import {
 import {
   requestUpdateLane,
   isSubsetOfLanes,
-  removeLanes
 } from '@Jeact/vDOM/FiberLane';
 import { markWorkInProgressReceivedUpdate } from '@Jeact/vDOM/FiberBeginWork';
 

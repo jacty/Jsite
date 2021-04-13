@@ -54,9 +54,6 @@ import {
   DefaultEventPriority,
   lanesToEventPriority,
 } from '@Jeact/vDOM/events/EventPriorities';
-import {
-  getCurrentUpdatePriority
-} from '@Jeact/vDOM/UpdatePriorities';
 
 const RootIncomplete = 0;
 const RootFatalErrored = 1;
@@ -173,24 +170,7 @@ function ensureRootIsScheduled(root, currentTime){
     return;
   }
 
-  if (existingCallbackNode !== null) debugger;
-
-  let schedulePriority;
-  let _schedulePriority = lanesToEventPriority(nextLanes);
-  switch(_schedulePriority){
-    case DefaultEventPriority:
-    default:
-      if(_schedulePriority !== DefaultEventPriority &&
-        _schedulePriority !== 1
-        ){
-        debugger;
-      }
-      schedulePriority = NormalSchedulePriority;
-      break;        
-  }
-
   let newCallbackNode = scheduleCallback(
-    schedulePriority,
     performConcurrentWorkOnRoot.bind(null, root),
   )
 
@@ -430,11 +410,10 @@ function completeUnitOfWork(unitOfWork){
 }
 
 function commitRoot(root){
-    const updateLanePriority = getCurrentUpdatePriority();
-    commitRootImpl(root, updateLanePriority)
+    commitRootImpl(root)
 }
 
-function commitRootImpl(root, renderPriority){
+function commitRootImpl(root){
   const finishedWork = root.finishedWork;
   const lanes = root.finishedLanes;
 
@@ -462,7 +441,7 @@ function commitRootImpl(root, renderPriority){
   ){
     if(!rootDoesHavePassiveEffects){
       rootDoesHavePassiveEffects = true;
-      scheduleCallback(NormalSchedulePriority, ()=>{
+      scheduleCallback(()=>{
         flushPassiveEffects();
         return null;
       })

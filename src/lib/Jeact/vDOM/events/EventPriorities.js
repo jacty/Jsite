@@ -1,15 +1,14 @@
 import { 
-    SyncLane,
+    EventLane,
     InputContinuousLane,
     DefaultLane,
     IdleLane
 } from '@Jeact/shared/Constants';
 import {
     getHighestPriorityLane,
-    includesNonIdleWork
 } from '@Jeact/vDOM/FiberLane';
 
-export const DiscreteEventPriority = SyncLane;
+export const DiscreteEventPriority = EventLane;
 export const ContinuousEventPriority = InputContinuousLane;
 export const DefaultEventPriority = DefaultLane;
 export const IdleEventPriority = IdleLane;
@@ -45,9 +44,6 @@ export function lanesToEventPriority(lanes){
     }
     if (!isHigherEventPriority(ContinuousEventPriority, lane)){
         return ContinuousEventPriority;
-    }
-    if (includesNonIdleWork(lane)){
-        return DefaultEventPriority;
     }
     return IdleEventPriority;
 }

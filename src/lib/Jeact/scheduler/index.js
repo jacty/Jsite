@@ -72,25 +72,14 @@ function workLoop(currentTime){
   return false;
 }
 
-export function scheduleCallback(priorityLevel, callback){
+export function scheduleCallback(callback){
   let startTime = performance.now();
-  let timeout;
-  switch (priorityLevel) {
-    case NormalSchedulePriority:
-    default:
-      if(priorityLevel!==NormalSchedulePriority){
-        debugger;
-      }
-      timeout = NORMAL_PRIORITY_TIMEOUT;
-      break;
-  }
-
+  let timeout = NORMAL_PRIORITY_TIMEOUT;
   let expirationTime = startTime + timeout;
 
   const newTask = {
     id: taskIdCount++,
     callback,
-    priorityLevel,
     startTime,
     expirationTime,
     sortIndex: expirationTime,

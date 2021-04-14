@@ -12,14 +12,14 @@ export let JEACT_OFFSCREEN_TYPE = Symbol.for('Jeact.offscreen');
 /*
 *JeactWorkTags
 */
-export const FunctionComponent = 0;
-export const HostRoot = 3; // Root of a host tree.
-export const HostComponent = 5;
-export const HostText = 6;
-export const Fragment = 7;
-export const SuspenseComponent = 13;
-export const LazyComponent = 16;
-export const OffscreenComponent = 22;
+export const HostRoot = 0; // Root of a host tree.
+export const FunctionComponent = 1;
+export const HostComponent = 2;
+export const HostText = 3;
+export const SuspenseComponent = 4;
+export const LazyComponent = 5;
+export const Fragment = 6;
+export const OffscreenComponent = 7;
 
 /* JeactFiberWorkLoop */
 export const NoContext = /*             */ 0b0000000;

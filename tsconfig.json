@@ -1,0 +1,23 @@
+{
+    "compilerOptions": {
+        "strict": true,
+        "target": "ESNext",
+        "module": "ESNext",
+        "esModuleInterop": true,
+        "preserveConstEnums": true,
+        "jsx": "preserve",
+        "noEmit": true,
+        "skipLibCheck": true,
+        "typeRoots": [
+            "node_modules/@types",
+            "types"
+        ]
+    },
+    "exclude":[
+        "node_modules"
+    ],
+    "include": ["src/assets/js/index.ts"],
+    "paths":{
+        "@Jeact/*": ["src/lib/Jeact/**/*"],
+    }
+}

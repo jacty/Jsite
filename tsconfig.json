@@ -16,7 +16,7 @@
     "exclude":[
         "node_modules"
     ],
-    "include": ["src/assets/js/index.ts"],
+    "include": ["src/assets/js/index.tsx"],
     "paths":{
         "@Jeact/*": ["src/lib/Jeact/**/*"],
     }

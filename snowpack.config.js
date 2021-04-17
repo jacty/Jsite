@@ -5,7 +5,7 @@ module.exports = {
         "@data":"./src/data/",
         "@Jeact":"./src/lib/Jeact"
     },
-    plugins: ["@snowpack/plugin-sass"],
+    plugins: ["@snowpack/plugin-sass","@snowpack/plugin-typescript"],
     mount:{
         src:'/',
     },

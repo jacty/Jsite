@@ -142,7 +142,15 @@ export function processUpdateQueue(workInProgress,renderLanes){
           pendingQueue = queue.pending;
           if (pendingQueue === null){
             break;
-          } 
+          } else {
+            // Add the new pending updates to the end of the list
+            const lastPendingUpdate = pendingQueue;
+            const firstPendingUpdate = lastPendingUpdate.next;
+            lastPendingUpdate.next = null;
+            update = firstPendingUpdate;
+            queue.lastBaseUpdate = lastPendingUpdate
+            queue.pending = null;
+          }
         }
       } while(true);
 

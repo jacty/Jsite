@@ -1,21 +1,16 @@
 import {
     J, 
     createRoot,
-    useEffect,
-    useState, 
+    Suspense 
 } from '@Jeact';
-
+import Avatar from '@com/Avatar/avatar'
 import '@assets/styles/main.sass';
 
 function App(){
-    const [cur, setCur] = useState(0);
-    useEffect(()=>{
-        return ()=>{
-            document.title =1;
-        }
-    })
     return (<main>
-                <a onClick={()=>{setCur(cur+1)}}>{cur}</a>
+             <Suspense fallback={<div>'Loading'</div>}>
+                 <Avatar />
+             </Suspense>   
            </main>)
     
 }

@@ -1,14 +1,16 @@
 import {
     J, 
     createRoot,
-    Suspense 
+    Suspense,
+    lazy, 
 } from '@Jeact';
-import Avatar from '@com/Avatar/avatar'
+
+const Avatar = lazy(() => import('@com/Avatar/avatar'));
 import '@assets/styles/main.sass';
 
 function App(){
     return (<main>
-             <Suspense fallback={<div>'Loading'</div>}>
+             <Suspense fallback={<div>Loading</div>}>
                  <Avatar />
              </Suspense>   
            </main>)

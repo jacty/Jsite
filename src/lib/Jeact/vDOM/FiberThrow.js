@@ -50,12 +50,6 @@ export function throwException(
         typeof value.then === 'function'
     ){
         const wakeable = value;
-        const tag = sourceFiber.tag;
-        if(
-            tag === FunctionComponent 
-        ){
-            debugger;
-        }
 
         // hasSuspenseContext()
         const hasInvisibleParent = 
@@ -72,7 +66,7 @@ export function throwException(
                 )
             ){
                 // Found the nearest boundary.
-
+                //
                 // Stash the promise.
                 const wakeables = wip.updateQueue;
                 if (wakeables === null){

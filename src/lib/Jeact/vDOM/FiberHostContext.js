@@ -26,7 +26,7 @@ export function popHostContainer(fiber){
 }
 
 export function pushHostContext(fiber){
-    push(contextFiberStackCursor, fiber, fiber);
+    push(contextFiberStackCursor, fiber);
 }
 
 export function popHostContext(fiber){

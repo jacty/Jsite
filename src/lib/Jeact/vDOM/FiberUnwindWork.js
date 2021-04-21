@@ -18,7 +18,7 @@ export function unwindWork(wip, renderLanes){
             debugger;
         case SuspenseComponent:
             // popSuspenseContext();
-            pop(suspenseStackCursor, wip)
+            pop(suspenseStackCursor)
             const flags = wip.flags;
             if (flags & ShouldCapture){
                 wip.flags = (flags & ~ShouldCapture) | DidCapture;
@@ -27,11 +27,10 @@ export function unwindWork(wip, renderLanes){
             }
             return null;
         case OffscreenComponent:
-            popRenderLanes(wip);
+            popRenderLanes();
             const spawnedCachePool = wip.updateQueue;
             if(spawnedCachePool !== null){
-                // popCachePool(wip);
-                debugger;
+                popCachePool(wip);
             }
             return null;
         default:

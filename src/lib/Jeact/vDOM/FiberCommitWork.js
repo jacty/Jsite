@@ -327,7 +327,17 @@ function commitPassiveUnmountEffects_begin(){
         const child = fiber.child;
 
         if ((nextEffect.flags & ChildDeletion) !== NoFlags){
-            debugger;
+            const deletions = fiber.deletions;
+            if(deletions !== null){
+                for (let i = 0; i < deletions.length; i++){
+                    const fiberToDel = deletions[i];
+                    nextEffect = fiberToDel;
+                    commitPassiveUnmountEffectsInsideOfDeletedTree_begin(
+                        fiberToDel,
+                        fiber,
+                    )
+                }
+            }
         }
         if ((fiber.subtreeFlags & PassiveMask) !== NoFlags && child !== null){
             nextEffect = child;
@@ -363,6 +373,55 @@ function commitPassiveUnmountOnFiber(finishedWork){
                 finishedWork.return
             )
         }
+    }
+}
+
+function commitPassiveUnmountEffectsInsideOfDeletedTree_begin(
+    deletedSubtreeRoot,
+    nearestMountedAncestor
+){
+    while (nextEffect !== null){
+        const fiber = nextEffect;
+        
+        commitPassiveUnmountInsideDeletedTreeOnFiber(
+            fiber, 
+            nearestMountedAncestor);
+
+        const child = fiber.child;
+        if (child !== null){
+            nextEffect = child;
+        } else {
+            commitPassiveUnmountEffectsInsideOfDeletedTree_complete(
+                deletedSubtreeRoot
+            )
+        }
+    }
+}
+
+function commitPassiveUnmountEffectsInsideOfDeletedTree_complete(deletedSubtreeRoot){
+    while (nextEffect !== null){
+        const fiber = nextEffect;
+        const sibling = fiber.sibling;
+        const returnFiber = fiber.return;
+        if (fiber === deletedSubtreeRoot){
+            detachFiberAfterEffects(fiber);
+            nextEffect = null;
+            return;
+        }
+        if (sibling !== null){
+            nextEffect = sibling;
+            return;
+        }
+        nextEffect = returnFiber;
+    }
+}
+
+function commitPassiveUnmountInsideDeletedTreeOnFiber(
+    current, nearestMountedAncestor
+){
+    switch(current.tag){
+        case FunctionComponent:
+            debugger;
     }
 }
 
@@ -403,6 +462,22 @@ function detachFiberMutation(fiber){
         alternate.return = null;
     }
     fiber.return = null;
+}
+
+function detachFiberAfterEffects(fiber){
+    const alternate = fiber.alternate;
+    if (alternate !== null){
+        debugger;
+    }
+
+    fiber.child = null;
+    fiber.deletions = null;
+    fiber.sibling = null;
+
+    if (fiber.tag === HostComponent){
+        debugger;
+    }
+    fiber.stateNode = null;
 }
 
 function toggleAllChildren(finishedWork, isHidden){
@@ -557,7 +632,15 @@ function insertOrAppendPlacementNode(node, before, parent){
             parent.append(stateNode);
         }
     } else {
-        console.error('insertOrAppendPlacementNode1')
+        const child = node.child;
+        if(child !== null){
+            insertOrAppendPlacementNode(child, before, parent);
+            let sibling = child.sibling;
+            while(sibling !== null){
+                insertOrAppendPlacementNode(sibling, before, parent);
+                sibling = sibling.sibling;
+            }
+        }
     }
 }
 

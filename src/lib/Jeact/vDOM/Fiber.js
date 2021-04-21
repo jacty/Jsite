@@ -123,7 +123,6 @@ export function createFiberFromElement(element, lanes){
   } else if(typeof type === 'string'){
     fiberTag = HostComponent;
   } else {
-    debugger;
     getTag: switch(type){
       case JEACT_FRAGMENT_TYPE: debugger;
       case JEACT_SUSPENSE_TYPE:

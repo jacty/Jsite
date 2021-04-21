@@ -236,7 +236,7 @@ function finishConcurrentRender(root, exitStatus, lanes){
 }
 
 export function pushRenderLanes(fiber, lanes){
-  push(subtreeRenderLanesCursor, subtreeRenderLanes, fiber);
+  push(subtreeRenderLanesCursor, subtreeRenderLanes);
   subtreeRenderLanes = mergeLanes(subtreeRenderLanes, lanes);
   wipRootIncludedLanes = mergeLanes(
     wipRootIncludedLanes,
@@ -244,9 +244,9 @@ export function pushRenderLanes(fiber, lanes){
   );
 }
 
-export function popRenderLanes(fiber){
+export function popRenderLanes(){
   subtreeRenderLanes = subtreeRenderLanesCursor.current;
-  pop(subtreeRenderLanesCursor, fiber);
+  pop(subtreeRenderLanesCursor);
 }
 
 function prepareFreshStack(root, lanes){
@@ -483,32 +483,13 @@ function flushPassiveEffectsImpl(){
 }
 
 export function pingSuspendedRoot(root, wakeable, pingedLanes){
-  // The earliest attach to catch the change from Promise.
+  // The earliest attach to catch the change from Promise. And to resolve 
+  // Suspended Lanes before Commit Phase.
   const pingCache = root.pingCache;
   if (pingCache !== null){
     pingCache.delete(wakeable);
   }
   const eventTime = requestEventTime();
-  markRootPinged(root, pingedLanes, eventTime);
-
-  if (
-    wipRoot === root &&
-    isSubsetOfLanes(wipRootRenderLanes, pingedLanes)
-  ){
-    debugger;
-    if(
-      wipRootExitStatus === RootSuspendedWithDelay ||
-      wipRootExitStatus === RootSuspended
-    )
-    {// More conditions above.
-      debugger;
-    } else {
-      wipRootPingedLanes = mergeLanes(
-        wipRootPingedLanes,
-        pingedLanes,
-      )
-    }
-  }
 
   ensureRootIsScheduled(root, eventTime);
 }

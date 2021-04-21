@@ -47,7 +47,7 @@ export function restoreSpawnedCachePool(
     if (nextParentCache !== prevCachePool.parent){
         return null;
     } else {
-        push(prevFreshCacheOnStack, pooledCache, offscreenWip);
+        push(prevFreshCacheOnStack, pooledCache);
         pooledCache = prevCachePool.pool;
 
         return prevCachePool;

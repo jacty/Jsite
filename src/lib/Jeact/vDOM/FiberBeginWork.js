@@ -225,10 +225,10 @@ function mountSuspenseOffscreenState(renderLanes){
 function shouldRemainOnFallback(suspenseContext, current, workInProgress){
   // If we're already showing a fallback, there are cases where we need to 
   // remain on that fallback regardless of whether the content has resolved.
+  // e.g Suspense has unresolved children. 
   if (current !== null){
     const suspenseState = current.memoizedState;
     if(suspenseState === null){
-      debugger;
       return false;
     }
   }
@@ -264,7 +264,7 @@ function updateSuspenseComponent(current, workInProgress, renderLanes){
       current === null ||
       (current.memoizedState !== null)
     ){
-      // This is a new mount or this boundary is already showing a fallback 
+      // This is a new mount waiting for resolving content or this boundary is already showing a fallback 
      // state.
      // Mark this subtree context as having at least one invisible parent that 
      // could handle the fallback state..
@@ -279,7 +279,7 @@ function updateSuspenseComponent(current, workInProgress, renderLanes){
   suspenseContext = setDefaultShallowSuspenseContext(suspenseContext);
 
   // pushSuspenseContext()
-  push(suspenseStackCursor, suspenseContext, workInProgress);
+  push(suspenseStackCursor, suspenseContext);
 
   if (current === null){
     // Initial mount
@@ -456,8 +456,7 @@ export function beginWork(current, workInProgress, renderLanes){
           pushRootCachePool(root);
           break;
         case HostComponent:
-          debugger;
-          // pushHostContext()
+          pushHostContext(workInProgress)
           break;
         case SuspenseComponent:{
           debugger;
@@ -508,7 +507,6 @@ export function beginWork(current, workInProgress, renderLanes){
   workInProgress.lanes = NoLanes;
   switch (workInProgress.tag){
     case LazyComponent:{
-      debugger;
       return mountLazyComponent(
         current, 
         workInProgress,
@@ -525,13 +523,10 @@ export function beginWork(current, workInProgress, renderLanes){
     case HostText:
       return null;
     case SuspenseComponent:
-      debugger;
       return updateSuspenseComponent(current, workInProgress, renderLanes);
     case Fragment:
-      debugger;
       return updateFragment(current, workInProgress, renderLanes);
     case OffscreenComponent:
-      debugger;
       return updateOffscreenComponent(current, workInProgress, renderLanes);
   }
 }

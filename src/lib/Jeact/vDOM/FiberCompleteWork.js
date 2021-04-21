@@ -153,10 +153,10 @@ export function completeWork(current, workInProgress,renderLanes){
   switch(workInProgress.tag){
     case LazyComponent:
     case Fragment:
-    case FunctionComponent://0
+    case FunctionComponent:
       bubbleProperties(workInProgress);
       return null;
-    case HostRoot:{//3
+    case HostRoot:{
       const fiberRoot = workInProgress.stateNode;
       popRootCachePool(fiberRoot, renderLanes);
       const cache = workInProgress.memoizedState.cache;
@@ -165,7 +165,7 @@ export function completeWork(current, workInProgress,renderLanes){
       bubbleProperties(workInProgress);
       return null;
     }
-    case HostComponent:{//5
+    case HostComponent:{
       popHostContext(workInProgress);
       const rootContainerInstance = getRootHostContainer();
       const type = workInProgress.type;
@@ -216,7 +216,7 @@ export function completeWork(current, workInProgress,renderLanes){
       return null;
     }
     case SuspenseComponent:{
-      pop(suspenseStackCursor, workInProgress);
+      pop(suspenseStackCursor);
       const nextState = workInProgress.memoizedState;
       if((workInProgress.flags & DidCapture) !== NoFlags){
         debugger;

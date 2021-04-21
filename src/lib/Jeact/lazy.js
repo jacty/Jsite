@@ -22,7 +22,6 @@ function lazyInitializer(payload){
                 }
             },
             error =>{
-                debugger;
                 if (payload._status === Pending){
                     const rejected = payload;
                     rejected_status = Rejected;

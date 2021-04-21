@@ -68,7 +68,6 @@ function getStateFromUpdate(
     case UpdateState: {
       let partialState = update.payload;     
       if (partialState === null || partialState === undefined){
-        debugger;
         return prevState;
       }
       return Object.assign({}, prevState, partialState);

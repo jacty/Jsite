@@ -143,7 +143,7 @@ function updateHostRoot(current, workInProgress, renderLanes){
   const prevChildren = prevState.element;
   cloneUpdateQueue(current, workInProgress);
   processUpdateQueue(workInProgress, renderLanes);
-
+  // updated from getStateFromUpdate() in processUpdateQueue();
   const nextState = workInProgress.memoizedState;
   const root = workInProgress.stateNode;
   const nextCache = nextState.cache;

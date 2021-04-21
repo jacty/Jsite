@@ -9,7 +9,7 @@ export function createCursor(defaultValue){
   };
 }
 
-export function pop(cursor, fiber){
+export function pop(cursor){
   if (index < 0){
     if(__ENV__){
       console.error('Unexpected pop.')
@@ -24,7 +24,7 @@ export function pop(cursor, fiber){
   index --;
 }
 
-export function push(cursor, value, fiber){
+export function push(cursor, value){
   index ++;
   
   valueStack[index] = cursor.current;

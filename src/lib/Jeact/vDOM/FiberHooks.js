@@ -62,10 +62,6 @@ export function renderWithHooks(current,workInProgress,nextRenderLanes){
 
   let children = Component(props);
 
-  // Check if there was a render phase update
-  if (didScheduleRenderPhaseUpdateDuringThisPass){
-    debugger;
-  }
   currentlyRenderingFiber = null;
 
   return children

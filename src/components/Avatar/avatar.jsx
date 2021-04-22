@@ -4,7 +4,7 @@ import './avatar.sass';
 
 function Avatar(){
     function handleError(){
-        console.log('error')
+        console.log('display default img');
     }
     return <img className='avatar' onError={handleError} src={Logo} alt="Jacty" title="Jacty"/>
 }

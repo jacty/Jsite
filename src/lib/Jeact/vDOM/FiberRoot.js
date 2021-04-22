@@ -13,29 +13,23 @@ function FiberRootNode(containerInfo){
   this.callbackNode = null;
   this.eventTimes = Array(31).fill(0);
   this.expirationTimes = Array(31).fill(NoTimestamp);;
+  
   // Suspense related.
-  this.suspendedLanes = NoLanes;
-  this.pingedLanes = NoLanes;// Suspense related
+  this.pingedLanes = NoLanes;
   this.pingCache = null;
+
   this.finishedLanes = NoLanes;
   this.finishedWork = null;
-  // Cache Component
-  this.pooledCache = null;
-  this.pooledCacheLanes = NoLanes;
 }
 
 export function createFiberRoot(container){
-  // prepare fiberRoot and fiber and connect them.
   const root = new FiberRootNode(container);
-  const fiber = createFiber();//uninitializedFiber
+  const fiber = createFiber();
   root.current = fiber;
   fiber.stateNode = root;
 
-  const initialCache = new Map();
-  root.pooledCache = initialCache;
   const initialState = {
     element: null,
-    cache: initialCache
   };
   fiber.memoizedState = initialState;
 

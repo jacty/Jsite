@@ -3,8 +3,6 @@ import {
   NoLanes,
 } from '@Jeact/shared/Constants';
 
-import {markSkippedUpdateLanes} from '@Jeact/vDOM/FiberWorkLoop';
-
 export function initializeUpdateQueue(fiber){
   const queue = {
     baseState: fiber.memoizedState,
@@ -161,7 +159,6 @@ export function processUpdateQueue(workInProgress,renderLanes){
       queue.firstBaseUpdate = newFirstBaseUpdate;
       queue.lastBaseUpdate = newLastBaseUpdate;
 
-      markSkippedUpdateLanes(newLanes);
       workInProgress.lanes = newLanes;
       workInProgress.memoizedState = newState;
   }

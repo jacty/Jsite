@@ -7,7 +7,6 @@ import {
   NoContext,
   RenderContext,
   CommitContext, 
-  RetryAfterError,
   HostRoot,
   PassiveMask,
   BeforeMutationMask,
@@ -24,17 +23,14 @@ import {
   markStarvedLanesAsExpired,
   markRootUpdated,
   markRootFinished,
-  markRootPinged,
   getNextLanes,
-  isSubsetOfLanes,
   markRootSuspended,
-  includesOnlyRetries,
   claimNextRetryLane,
   getHighestPriorityLane,
 } from '@Jeact/vDOM/FiberLane';
-import { createWorkInProgress } from '@Jeact/vDOM/Fiber';
-import { beginWork } from '@Jeact/vDOM/FiberBeginWork';
-import { completeWork } from '@Jeact/vDOM/FiberCompleteWork';
+import {createWorkInProgress} from '@Jeact/vDOM/Fiber';
+import {beginWork} from '@Jeact/vDOM/FiberBeginWork';
+import {completeWork} from '@Jeact/vDOM/FiberCompleteWork';
 import {
   commitBeforeMutationEffects,
   commitMutationEffects,
@@ -51,10 +47,9 @@ import {
 import {unwindWork} from '@Jeact/vDOM/FiberUnwindWork';
 
 const RootIncomplete = 0;
-const RootErrored = 2;
-const RootSuspended = 3;
-const RootSuspendedWithDelay = 4;
-const RootCompleted = 5;
+const RootCompleted = 1;
+const RootSuspended = 2;
+const RootErrored = 3;
 
 let executionContext = NoContext;
 let wipRoot = null;
@@ -72,9 +67,6 @@ let wipRootSkippedLanes = NoLanes;
 let wipRootUpdatedLanes = NoLanes;
 let wipRootPingedLanes = NoLanes;
 
-let globalMostRecentFallbackTime = 0;
-const FALLBACK_THROTTLE_MS = 500;
-
 let rootDoesHavePassiveEffects = false;
 let rootWithPendingPassiveEffects = null;
 let pendingPassiveEffectsLanes = NoLanes;
@@ -84,7 +76,6 @@ let currentEventTransitionLane = NoLanes;
 
 export function requestEventTime(){
   if ((executionContext & (RenderContext | CommitContext)) !== NoContext){
-    // We're inside Jeact
     return performance.now();
   }
   // We're not inside Jeact, so we may be in the middle of a browser event like click.
@@ -98,19 +89,15 @@ export function requestEventTime(){
 }
 
 export function scheduleUpdateOnFiber(fiber, lane, eventTime){
-  const root = markUpdateLaneFromFiberToRoot(fiber, lane);
-  if(root === null){
-    return null;
-  } 
+  const root = markUpdateLaneFromChildToRoot(fiber, lane);
   // update root.pendingLanes, eventTimes etc.
   markRootUpdated(root, lane, eventTime);
-
   ensureRootIsScheduled(root, eventTime);
 
   return root;
 }
 
-function markUpdateLaneFromFiberToRoot(sourceFiber, lane){
+function markUpdateLaneFromChildToRoot(sourceFiber, lane){
   sourceFiber.lanes = mergeLanes(sourceFiber.lanes, lane);
   let alternate = sourceFiber.alternate;
   if (alternate !== null){
@@ -145,10 +132,6 @@ function ensureRootIsScheduled(root, currentTime){
   );
 
   if (nextLanes === NoLanes){
-     if (existingCallbackNode !== null){
-       debugger;
-     }
-
      return;
   }
 
@@ -183,7 +166,7 @@ function performConcurrentWorkOnRoot(root){
   let exitStatus = renderRootConcurrent(root, lanes);  
   if(exitStatus !== RootIncomplete){
     if(exitStatus === RootErrored){
-      executionContext |= RetryAfterError;
+      executionContext |= RootErrored;
       debugger;
       return null;
     }
@@ -214,16 +197,6 @@ function finishConcurrentRender(root, exitStatus, lanes){
     case RootSuspended:{  
       markRootSuspended(root, lanes);
 
-      // figure out if we should immediately commit it or wait a bit.
-      if(
-        includesOnlyRetries(lanes)
-      ){
-        const msUntilTimeout = globalMostRecentFallbackTime + FALLBACK_THROTTLE_MS - performance.now();
-        if(msUntilTimeout > 10){
-          debugger;
-        }
-
-      }
       // work expired. Commit immediately.
       commitRoot(root);
       break;
@@ -272,8 +245,7 @@ function handleError(root, thrownValue){
       );
       completeUnitOfWork(erroredWork);
     } catch (yetAnotherThrownValue){
-      console.error('x', yetAnotherThrownValue);
-      debugger;
+      console.error(yetAnotherThrownValue);
     }
 }
 
@@ -503,7 +475,7 @@ function retryTimedOutBoundary(boundaryFiber, retryLane=NoLane){
   }
 
   const eventTime = requestEventTime();
-  const root = markUpdateLaneFromFiberToRoot(boundaryFiber, retryLane);
+  const root = markUpdateLaneFromChildToRoot(boundaryFiber, retryLane);
   if (root !== null){
     markRootUpdated(root, retryLane, eventTime);
     ensureRootIsScheduled(root, eventTime);

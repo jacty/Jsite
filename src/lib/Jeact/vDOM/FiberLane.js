@@ -27,23 +27,14 @@ export function getNextLanes(root, wipLanes){
   if (pendingLanes === NoLanes){
     return NoLanes;
   }
-  
-  let nextLanes = NoLanes;
 
-  const suspendedLanes = root.suspendedLanes;
   const pingedLanes = root.pingedLanes;
   
-  const nonIdleUnblockedLanes = pendingLanes & ~suspendedLanes;
-  if (nonIdleUnblockedLanes !== NoLanes){
-    nextLanes = getHighestPriorityLanes(nonIdleUnblockedLanes);
-  }
+  let nextLanes = getHighestPriorityLanes(pendingLanes);
   
-  if (nextLanes === NoLanes){
-    // suspended case
-    debugger;
-    return NoLanes;
+  if(wipLanes !== nextLanes && wipLanes !== NoLanes){
+    console.error('New lanes found during Render Phase', wipLanes)
   }
-
   return nextLanes;
 }
 
@@ -64,7 +55,7 @@ export function markStarvedLanesAsExpired(root, currentTime){
   if(lanes === 0){// early bail out.
     return;
   }
-  const suspendedLanes = root.suspendedLanes;
+
   const pingedLanes = root.pingedLanes;
   const expirationTimes = root.expirationTimes;
 
@@ -77,7 +68,6 @@ export function markStarvedLanesAsExpired(root, currentTime){
     const expirationTime = expirationTimes[index];
     if (expirationTime === NoTimestamp){
       if (
-        (lane & suspendedLanes) === NoLanes ||
         (lane & pingedLanes) !== NoLanes
         ){
         expirationTimes[index] = computeExpirationTime(lane, currentTime);
@@ -90,12 +80,8 @@ export function markStarvedLanesAsExpired(root, currentTime){
   }
 
   if (expiredLanes !== 0){
-    markRootExpired(root, expiredLanes);
+    console.error('Lanes expired')
   }
-}
-
-export function includesOnlyRetries(lanes){
-  return (lanes & RetryLanes) === lanes;
 }
 
 export function requestUpdateLane(){

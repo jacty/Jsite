@@ -7,6 +7,7 @@
     },
     "private": true,
     "author": "Jacty",
+    "type": "module",
     "devDependencies": {
         "@snowpack/plugin-sass": "^1.1.1",
         "snowpack": "^2.18.5"

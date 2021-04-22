@@ -17,7 +17,7 @@ function createRootImpl(container){
   return root;
 }
 
-export function createRoot(container){
+export function createRoot(container=document.querySelector('#root')){
   return new vRoot(container)
 }
 

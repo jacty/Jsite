@@ -172,7 +172,7 @@ function mountLazyComponent(
   renderLanes
 ){
   const props = workInProgress.pendingProps;
-  const lazyComponent = workInProgress.elementType;
+  const lazyComponent = workInProgress.type;
   const payload = lazyComponent._payload;
   const init = lazyComponent._init;
   let Component = init(payload);
@@ -230,8 +230,7 @@ function updateSuspenseComponent(current, workInProgress, renderLanes){
     shouldRemainOnFallback(
       suspenseContext,
       current,
-      workInProgress,
-      renderLanes,
+      workInProgress
     )
   ){
     // part of the subtree has suspended and render the fallback children.

@@ -146,7 +146,7 @@ export function createFiberFromElement(element, lanes){
 
   const fiber = createFiber(fiberTag, pendingProps, lanes);
   fiber.type = type;
-  fiber.elementType = type;
+  fiber.elementType = fiberTag === LazyComponent ? JEACT_LAZY_TYPE : type;
   fiber.key = key;
 
   return fiber;

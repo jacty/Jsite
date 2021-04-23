@@ -1,8 +1,12 @@
 const randomKey = Math.random().toString(36).slice(2);
 const interalInstanceKey = '__jeactFiber$' + randomKey;
 const internalPropsKey = '__jeactProps$' + randomKey;
-const internalEventHandlersKey = '__jeactEvents$' + randomKey;
 
+export function detachDeletedInstance(node){
+    delete node[interalInstanceKey];
+    delete node[internalPropsKey];
+
+}
 export function precacheFiberNode(hostInst, node){
     node[interalInstanceKey] = hostInst;
 }

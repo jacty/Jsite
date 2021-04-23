@@ -155,12 +155,6 @@ export function markRootFinished(root, remainingLanes){
 
   root.pendingLanes = remainingLanes;
   root.suspendedLanes = 0;
-  root.entangledLanes &= remainingLanes;
-
-  const pooledCacheLanes = root.pooledCacheLanes &= remainingLanes;
-  if(pooledCacheLanes === NoLanes){
-    root.pooledCache = null;
-  }
 
   const eventTimes = root.eventTimes;
   const expirationTimes = root.expirationTimes;

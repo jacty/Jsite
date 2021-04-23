@@ -22,7 +22,10 @@ import{
 import {
     resolveRetryWakeable
 } from '@Jeact/vDOM/FiberWorkLoop';
-import { updateFiberProps } from '@Jeact/vDOM/DOMComponentTree';
+import {
+    updateFiberProps,
+    detachDeletedInstance
+} from '@Jeact/vDOM/DOMComponentTree';
 import { updateDOMProperties } from '@Jeact/vDOM/DOMComponent'
 
 let nextEffect = null;
@@ -58,11 +61,7 @@ function commitBeforeMutationEffects_begin(){
 function commitBeforeMutationEffects_complete(){
     while(nextEffect !== null){
         const fiber = nextEffect;
-        try {
-            commitBeforeMutationEffectsOnFiber(fiber);
-        } catch (error){
-            debugger;
-        }
+        commitBeforeMutationEffectsOnFiber(fiber);
 
         const sibling = fiber.sibling;
         if(sibling !== null){
@@ -266,7 +265,7 @@ function commitPassiveMountEffects_complete(subtreeRoot, root){
     while(nextEffect !== null){
         const fiber = nextEffect;
         if ((fiber.flags & Passive) !== NoFlags){
-            commitPassiveMountOnFiber(root, fiber);
+            commitPassiveMountEffectsOnFiber(root, fiber);
         }
 
         if (fiber === subtreeRoot){
@@ -299,18 +298,7 @@ function commitPassiveMountOnFiber(finishedRoot, finishedWork){
 function commitLayoutEffectOnFiber(finishedRoot, current, finishedWork, committedLanes){
     if ((finishedWork.flags & Update) !== NoFlags){
         switch(finishedWork.tag){
-            case FunctionComponent:
-            case HostRoot:{
-                debugger;
-            }
-            case HostComponent:{
-                break;
-            }
-            case HostText:
-                break;
-            case SuspenseComponent:
-                break;
-            case OffscreenComponent:
+            default:
                 break;
         }
     }
@@ -332,7 +320,7 @@ function commitPassiveUnmountEffects_begin(){
                 for (let i = 0; i < deletions.length; i++){
                     const fiberToDel = deletions[i];
                     nextEffect = fiberToDel;
-                    commitPassiveUnmountEffectsInsideOfDeletedTree_begin(
+                    commitPassiveUnmountEffectsInDelTree_begin(
                         fiberToDel,
                         fiber,
                     )
@@ -376,29 +364,30 @@ function commitPassiveUnmountOnFiber(finishedWork){
     }
 }
 
-function commitPassiveUnmountEffectsInsideOfDeletedTree_begin(
+function commitPassiveUnmountEffectsInDelTree_begin(
     deletedSubtreeRoot,
     nearestMountedAncestor
 ){
     while (nextEffect !== null){
         const fiber = nextEffect;
         
-        commitPassiveUnmountInsideDeletedTreeOnFiber(
+        commitPassiveUnmountEffectsInDelTreeOnFiber(
             fiber, 
-            nearestMountedAncestor);
+            nearestMountedAncestor
+        );
 
         const child = fiber.child;
         if (child !== null){
             nextEffect = child;
         } else {
-            commitPassiveUnmountEffectsInsideOfDeletedTree_complete(
+            commitPassiveUnmountEffectsInDelTree_complete(
                 deletedSubtreeRoot
             )
         }
     }
 }
 
-function commitPassiveUnmountEffectsInsideOfDeletedTree_complete(deletedSubtreeRoot){
+function commitPassiveUnmountEffectsInDelTree_complete(deletedSubtreeRoot){
     while (nextEffect !== null){
         const fiber = nextEffect;
         const sibling = fiber.sibling;
@@ -416,7 +405,7 @@ function commitPassiveUnmountEffectsInsideOfDeletedTree_complete(deletedSubtreeR
     }
 }
 
-function commitPassiveUnmountInsideDeletedTreeOnFiber(
+function commitPassiveUnmountEffectsInDelTreeOnFiber(
     current, nearestMountedAncestor
 ){
     switch(current.tag){
@@ -467,7 +456,8 @@ function detachFiberMutation(fiber){
 function detachFiberAfterEffects(fiber){
     const alternate = fiber.alternate;
     if (alternate !== null){
-        debugger;
+        fiber.alternate = null;
+        detachFiberAfterEffects(alternate);
     }
 
     fiber.child = null;
@@ -475,7 +465,9 @@ function detachFiberAfterEffects(fiber){
     fiber.sibling = null;
 
     if (fiber.tag === HostComponent){
-        debugger;
+        if(fiber.stateNode !== null){
+            detachDeletedInstance(fiber.stateNode);
+        }
     }
     fiber.stateNode = null;
 }
@@ -492,13 +484,6 @@ function toggleAllChildren(finishedWork, isHidden){
             }
         } else if (node.tag === HostText){
             debugger
-        } else if (
-            node.tag === OffscreenComponent && 
-            node.memoizedState !== null &&
-            node !== finishedWork
-            ){
-            // Found a nested Offscreen component that is hidden. Stop going 
-            // search deeper and remain this tree hidden.
         } else if (node.child !== null){
             node.child.return = node;
             node = node.child;
@@ -583,7 +568,7 @@ function commitPlacement(finishedWork){
             isContainer = true;
             break;
         default:
-            console.error('commitPlacement1', parentFiber.tag);
+            console.error('Unknown parentFiber', parentFiber.tag);
     }
     if (parentFiber.flags & ContentReset) debugger;
     const before = getHostSibling(finishedWork);
@@ -702,8 +687,6 @@ function commitDeletion(finishedRoot, current, nearestMountedAncestor){
 
 function commitWork(current, finishedWork){
     switch(finishedWork.tag){
-        case FunctionComponent:
-            debugger;
         case HostComponent:{
             const instance = finishedWork.stateNode;
             if (instance !== null){
@@ -724,12 +707,6 @@ function commitWork(current, finishedWork){
                 }
             }
             return;
-        }
-        case HostText:{
-            debugger;
-        }
-        case HostRoot:{
-            debugger;
         }
         case SuspenseComponent:{
             commitSuspenseComponent(finishedWork);

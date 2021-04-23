@@ -1,7 +1,7 @@
 import {
   NoLanes,
   Passive,
-  PassiveStatic,
+  StaticMask,
   HookHasEffect,
   HookPassive,
   Update,

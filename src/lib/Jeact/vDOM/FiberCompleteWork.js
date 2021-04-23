@@ -158,8 +158,7 @@ export function completeWork(current, workInProgress,renderLanes){
           current,
           workInProgress,
           type,
-          newProps,
-          rootContainerInstance,
+          newProps
         )
       } else {
         if(!newProps){

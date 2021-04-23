@@ -377,11 +377,6 @@ function commitRoot(root){
   let remainingLanes = mergeLanes(finishedWork.lanes, finishedWork.childLanes);
   markRootFinished(root, remainingLanes);  
 
-  if (root === wipRoot){
-    wipRoot = null;
-    wipRootRenderLanes = NoLanes;
-  }
-
   // schedule a callback to process pending passive effects.
   if (
     (finishedWork.subtreeFlags & PassiveMask) !== NoFlags ||
@@ -410,10 +405,9 @@ function commitRoot(root){
     executionContext |= CommitContext;
 
     commitBeforeMutationEffects(finishedWork);
-
     commitMutationEffects(root, finishedWork);
-
     commitLayoutEffects(finishedWork, root, lanes);
+    
     executionContext = prevExecutionContext;
   } 
 
@@ -454,6 +448,7 @@ function flushPassiveEffectsImpl(){
 export function pingSuspendedRoot(root, wakeable, pingedLanes){
   // The earliest attach to catch the change from Promise. And to resolve 
   // Suspended Lanes before Commit Phase.
+
   const pingCache = root.pingCache;
   if (pingCache !== null){
     pingCache.delete(wakeable);

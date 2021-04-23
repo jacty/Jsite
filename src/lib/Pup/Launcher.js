@@ -5,9 +5,10 @@ export class Launcher{
     constructor(){
 
     }
-    async launch(){
-        const runner = new BrowserRunner();
+    async launch(options){
+        const runner = new BrowserRunner(options);
         runner.start();
+        console.error('Browser Launched')
         return 1
     }
 }

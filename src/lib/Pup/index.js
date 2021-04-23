@@ -10,7 +10,6 @@ export class Pup{
     // Launches a pup and a browser instance.
     launch(options){
         // class ChromeLauncher
-
         this.launcher = new Launcher();
         return this.launcher.launch(options);
 

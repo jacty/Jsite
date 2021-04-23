@@ -33,12 +33,6 @@ import {
 } from '@Jeact/vDOM/FiberHostContext';
 import {shouldSetTextContent} from '@Jeact/vDOM/DOMComponent';
 import {
-  pushRootCachePool,
-  pushCacheProvider,
-  getSuspendedCachePool,
-  restoreSpawnedCachePool
-} from '@Jeact/vDOM/FiberCacheComponent';
-import {
   suspenseStackCursor,
   ForceSuspenseFallback,
   InvisibleParentSuspenseContext,
@@ -69,8 +63,6 @@ function updateOffscreenComponent(
 
   const prevState = current !== null ? current.memoizedState : null;
 
-  let spawnedCachePool = null;
-
   if (nextProps.mode === 'hidden'){
     debugger;
   } else {
@@ -79,13 +71,6 @@ function updateOffscreenComponent(
     if (prevState !== null){
       // toggle hidden tree to visible.
       subtreeRenderLanes = mergeLanes(prevState.baseLanes, renderLanes);
-      const prevCachePool = prevState.cachePool;
-      if(prevCachePool !== null){
-        spawnedCachePool = restoreSpawnedCachePool(
-          workInProgress,
-          prevCachePool,
-        )
-      }
       // Not hidden anymore.
       workInProgress.memoizedState = null;
     } else{
@@ -93,7 +78,7 @@ function updateOffscreenComponent(
     }
     pushRenderLanes(workInProgress, subtreeRenderLanes);
   }
-  workInProgress.updateQueue = spawnedCachePool;
+
   // reconcileChildren()
   workInProgress.child = reconcileChildFibers(
       workInProgress,
@@ -145,9 +130,6 @@ function updateHostRoot(current, workInProgress, renderLanes){
   // updated from getStateFromUpdate() in processUpdateQueue();
   const nextState = workInProgress.memoizedState;
   const root = workInProgress.stateNode;
-  const nextCache = nextState.cache;
-  pushRootCachePool(root);
-  pushCacheProvider(workInProgress, nextCache);
 
   const nextChildren = nextState.element;
 
@@ -215,8 +197,7 @@ const SUSPENDED_MARKER = {
 
 function mountSuspenseOffscreenState(renderLanes){
   return {
-    baseLanes: renderLanes,
-    cachePool: getSuspendedCachePool(),
+    baseLanes: renderLanes
   }
 }
 
@@ -450,8 +431,6 @@ export function beginWork(current, workInProgress, renderLanes){
           pushHostContainer(workInProgress);
           const root = workInProgress.stateNode;
           const cache = current.memoizedState.cache;
-          pushCacheProvider(workInProgress, cache);
-          pushRootCachePool(root);
           break;
         case HostComponent:
           break;

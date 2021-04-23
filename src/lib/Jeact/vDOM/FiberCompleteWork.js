@@ -33,11 +33,6 @@ import {
   updateFiberProps
 } from '@Jeact/vDOM/DOMComponentTree';
 import {
-  popRootCachePool,
-  popCacheProvider,
-  popCachePool
-} from '@Jeact/vDOM/FiberCacheComponent';
-import {
   suspenseStackCursor,
   InvisibleParentSuspenseContext,
   hasSuspenseContext
@@ -157,9 +152,6 @@ export function completeWork(current, workInProgress,renderLanes){
       return null;
     case HostRoot:{
       const fiberRoot = workInProgress.stateNode;
-      popRootCachePool(fiberRoot, renderLanes);
-      const cache = workInProgress.memoizedState.cache;
-      popCacheProvider(workInProgress, cache);
       popHostContainer(workInProgress);
       bubbleProperties(workInProgress);
       return null;
@@ -272,10 +264,6 @@ export function completeWork(current, workInProgress,renderLanes){
         bubbleProperties(workInProgress);
       }
 
-      const spawnedCachePool = workInProgress.updateQueue;
-      if(spawnedCachePool !== null){
-        popCachePool(workInProgress);
-      }
       return null;
     }
     default:

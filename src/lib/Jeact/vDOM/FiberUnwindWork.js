@@ -12,10 +12,6 @@ import {pop} from '@Jeact/vDOM/FiberStack';
 
 export function unwindWork(wip, renderLanes){
     switch (wip.tag){
-        case HostRoot:
-            debugger;
-        case HostComponent:
-            debugger;
         case SuspenseComponent:
             // popSuspenseContext();
             pop(suspenseStackCursor)
@@ -28,10 +24,6 @@ export function unwindWork(wip, renderLanes){
             return null;
         case OffscreenComponent:
             popRenderLanes();
-            const spawnedCachePool = wip.updateQueue;
-            if(spawnedCachePool !== null){
-                popCachePool(wip);
-            }
             return null;
         default:
             return null;

@@ -1,6 +1,5 @@
 import {
   JEACT_ELEMENT_TYPE,
-  JEACT_FRAGMENT_TYPE,
   JEACT_LAZY_TYPE,
   Placement,
   HostText,
@@ -36,15 +35,6 @@ export function reconcileChildFibers(
   }
   // Handle object types
   const isObject = typeof newChild === 'object' && newChild !== null;
-
-  const isUnkeyedTopLevelFragment = 
-    isObject &&
-    newChild.type === JEACT_FRAGMENT_TYPE &&
-    newChild.key === null;
-  if(isUnkeyedTopLevelFragment){
-    debugger;
-    newChild = newChild.props.children;
-  }
 
   if (isObject){
     switch(newChild.$$typeof){
@@ -403,24 +393,21 @@ function reconcileSingleElement(
   while (child !== null){
     if (child.key === key){
       const elementType = element.type;
-      if (elementType === JEACT_FRAGMENT_TYPE){
-        debugger;
-      } else {
-        if (child.elementType === elementType ||
-            (typeof elementType === 'object' && 
-              elementType !== null &&
-              elementType.$$typeof === JEACT_LAZY_TYPE
-            )
-          ){
-            deleteRemainingChildren(
-              returnFiber, 
-              child.sibling
-            );
-            const existing = useFiber(child, element.props);
-            existing.return = returnFiber;
-            return existing;
-        }
+      if (child.elementType === elementType ||
+          (typeof elementType === 'object' && 
+            elementType !== null &&
+            elementType.$$typeof === JEACT_LAZY_TYPE
+          )
+        ){
+          deleteRemainingChildren(
+            returnFiber, 
+            child.sibling
+          );
+          const existing = useFiber(child, element.props);
+          existing.return = returnFiber;
+          return existing;
       }
+      
       deleteRemainingChildren(returnFiber, child);
       break;
     } else {
@@ -428,14 +415,12 @@ function reconcileSingleElement(
     }
     child = child.sibling;
   }
-  if (element.type === JEACT_FRAGMENT_TYPE){
-    debugger;
-  } else{
-    // createFiberFromTypeAndProps() has been merged to createFiberFromElement
-    const created = createFiberFromElement(element, lanes);
-    created.return = returnFiber;
-    return created;
-  }
+
+  // createFiberFromTypeAndProps() has been merged to createFiberFromElement
+  const created = createFiberFromElement(element, lanes);
+  created.return = returnFiber;
+  return created;
+  
 }
 
 export function cloneChildFibers(current, workInProgress){

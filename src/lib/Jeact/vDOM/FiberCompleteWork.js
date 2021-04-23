@@ -4,7 +4,6 @@ import {
   SuspenseComponent,
   HostText,
   HostComponent,
-  Fragment,
   HostRoot,
   NoLanes,
   NoFlags,
@@ -146,7 +145,6 @@ export function completeWork(current, workInProgress,renderLanes){
 
   switch(workInProgress.tag){
     case LazyComponent:
-    case Fragment:
     case FunctionComponent:
       bubbleProperties(workInProgress);
       return null;

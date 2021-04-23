@@ -9,8 +9,8 @@ import {
   NoLanes,
   DidCapture,
   NoFlags,
-  Fragment,
   JEACT_OFFSCREEN_TYPE,
+  JEACT_FALLBACK_TYPE,
   ChildDeletion
 } from '@Jeact/shared/Constants';
 import {
@@ -90,25 +90,15 @@ function updateOffscreenComponent(
   return workInProgress.child;
 }
 
-function updateFragment(current, workInProgress, renderLanes){
-  const nextChildren = workInProgress.pendingProps;
-  
-  workInProgress.child = reconcileChildFibers(
-      workInProgress,
-      current,
-      nextChildren,
-      renderLanes
-    );
-  return workInProgress.child;
-}
-
 function updateFunctionComponent(current,workInProgress,renderLanes){
   let nextChildren = renderWithHooks(
     current,
     workInProgress,
     renderLanes,
   );
-
+  if(current!==null && !didReceiveUpdate){
+    console.error('didReceiveUpdate in FunctionComponent!');
+  }
   workInProgress.child = reconcileChildFibers(
       workInProgress,
       current,
@@ -353,12 +343,14 @@ function mountSuspenseFallbackChildren(
   primaryChildFragment.elementType = JEACT_OFFSCREEN_TYPE;
   primaryChildFragment.lanes = NoLanes;
 
-  fallbackChildFragment = createFiber(
-    Fragment,
-    fallbackChildren,
-    null
+  fallbackChildFragment  = reconcileChildFibers(
+      workInProgress,
+      null,
+      fallbackChildren,
+      renderLanes
   );
   fallbackChildFragment.lanes = renderLanes;
+  fallbackChildFragment.elementType = JEACT_FALLBACK_TYPE;
 
   primaryChildFragment.return = workInProgress;
   fallbackChildFragment.return = workInProgress;
@@ -499,8 +491,6 @@ export function beginWork(current, workInProgress, renderLanes){
       return null;
     case SuspenseComponent:
       return updateSuspenseComponent(current, workInProgress, renderLanes);
-    case Fragment:
-      return updateFragment(current, workInProgress, renderLanes);
     case OffscreenComponent:
       return updateOffscreenComponent(current, workInProgress, renderLanes);
   }

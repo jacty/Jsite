@@ -43,8 +43,8 @@ export function shouldCaptureSuspense(
     hasInvisibleParent
 ){
     const nextState = workInProgress.memoizedState;
+    // next ChildFiber has already been resolved
     if (nextState !== null){
-        debugger;
         return false;
     }
     const props = workInProgress.memoizedProps;

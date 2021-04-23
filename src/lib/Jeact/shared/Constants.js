@@ -4,11 +4,10 @@ export const NoTimestamp = -1;
 * JeactSymbols
 */
 export let JEACT_ELEMENT_TYPE = Symbol.for('Jeact.element');
-export let JEACT_FRAGMENT_TYPE = Symbol.for('Jeact.fragment');
-export let JEACT_CONTEXT_TYPE = Symbol.for('Jeact.context');
 export let JEACT_SUSPENSE_TYPE = Symbol.for('Jeact.suspense');
-export let JEACT_LAZY_TYPE = Symbol.for('Jeact.lazy');
 export let JEACT_OFFSCREEN_TYPE = Symbol.for('Jeact.offscreen');
+export let JEACT_LAZY_TYPE = Symbol.for('Jeact.lazy');
+export let JEACT_FALLBACK_TYPE = Symbol.for('Jeact.fallback');
 /*
 *JeactWorkTags
 */
@@ -17,9 +16,9 @@ export const FunctionComponent = 1;
 export const HostComponent = 2;
 export const HostText = 3;
 export const SuspenseComponent = 4;
-export const LazyComponent = 5;
-export const Fragment = 6;
-export const OffscreenComponent = 7;
+export const OffscreenComponent = 5;
+export const LazyComponent = 6;
+
 
 /* JeactFiberWorkLoop */
 export const NoContext = /*             */ 0b0000000;

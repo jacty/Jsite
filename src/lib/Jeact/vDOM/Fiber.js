@@ -9,7 +9,6 @@ import {
   SuspenseComponent,
   LazyComponent,
   JEACT_SUSPENSE_TYPE,
-  JEACT_FRAGMENT_TYPE,
   JEACT_OFFSCREEN_TYPE,
   JEACT_LAZY_TYPE,
   StaticMask,
@@ -124,7 +123,6 @@ export function createFiberFromElement(element, lanes){
     fiberTag = HostComponent;
   } else {
     getTag: switch(type){
-      case JEACT_FRAGMENT_TYPE: debugger;
       case JEACT_SUSPENSE_TYPE:
         const fiber = createFiber(SuspenseComponent, pendingProps, key);
         fiber.elementType = JEACT_SUSPENSE_TYPE;

@@ -72,7 +72,6 @@ let rootWithPendingPassiveEffects = null;
 let pendingPassiveEffectsLanes = NoLanes;
 
 let currentEventTime = NoTimestamp;
-let currentEventTransitionLane = NoLanes;
 
 export function requestEventTime(){
   if ((executionContext & (RenderContext | CommitContext)) !== NoContext){
@@ -154,7 +153,6 @@ function ensureRootIsScheduled(root, currentTime){
 // goes through Scheduler.
 function performConcurrentWorkOnRoot(root){
   currentEventTime = NoTimestamp;
-  currentEventTransitionLane = NoLanes;
 
   const originalCallbackNode = root.callbackNode;
 
@@ -167,7 +165,6 @@ function performConcurrentWorkOnRoot(root){
   if(exitStatus !== RootIncomplete){
     if(exitStatus === RootErrored){
       executionContext |= RootErrored;
-      debugger;
       return null;
     }
 

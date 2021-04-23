@@ -30,7 +30,6 @@ import {
 } from '@Jeact/vDOM/FiberHooks';
 import {
   pushHostContainer,
-  pushHostContext,
 } from '@Jeact/vDOM/FiberHostContext';
 import {shouldSetTextContent} from '@Jeact/vDOM/DOMComponent';
 import {
@@ -162,7 +161,6 @@ function updateHostRoot(current, workInProgress, renderLanes){
 }
 
 function updateHostComponent(current, workInProgress,renderLanes){
-  pushHostContext(workInProgress)
   const type = workInProgress.type;
   const nextProps = workInProgress.pendingProps;
   const prevProps = current !== null ? current.memoizedProps : null;
@@ -456,7 +454,6 @@ export function beginWork(current, workInProgress, renderLanes){
           pushRootCachePool(root);
           break;
         case HostComponent:
-          pushHostContext(workInProgress)
           break;
         case SuspenseComponent:{
           debugger;

@@ -1,6 +1,5 @@
 import {createCursor, push, pop} from '@Jeact/vDOM/FiberStack';
 const NO_CONTEXT = {};
-const contextFiberStackCursor = createCursor(NO_CONTEXT);
 const rootInstanceStackCursor = createCursor(NO_CONTEXT);
 
 function requiredContext(cur){
@@ -17,22 +16,10 @@ export function getRootHostContainer(){
 
 export function pushHostContainer(fiber){
   push(rootInstanceStackCursor,  fiber.stateNode.containerInfo);
-  push(contextFiberStackCursor, fiber);
 }
 
 export function popHostContainer(fiber){
-    pop(contextFiberStackCursor, fiber);
     pop(rootInstanceStackCursor, fiber);
 }
 
-export function pushHostContext(fiber){
-    push(contextFiberStackCursor, fiber);
-}
-
-export function popHostContext(fiber){
-  if(contextFiberStackCursor.current !== fiber){
-    return;
-  }
-  pop(contextFiberStackCursor, fiber);
-}
 

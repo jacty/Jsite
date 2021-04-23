@@ -17,7 +17,6 @@ import {
 import {
   getRootHostContainer,
   popHostContainer,
-  popHostContext,
 } from '@Jeact/vDOM/FiberHostContext';
 import {
   mergeLanes,
@@ -166,7 +165,6 @@ export function completeWork(current, workInProgress,renderLanes){
       return null;
     }
     case HostComponent:{
-      popHostContext(workInProgress);
       const rootContainerInstance = getRootHostContainer();
       const type = workInProgress.type;
       if(current !== null && workInProgress.stateNode !== null){

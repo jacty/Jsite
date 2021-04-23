@@ -1,14 +1,15 @@
 import {setValueForProperty} from '@Jeact/vDOM/DOMProperty';
+import {getRootHostContainer} from '@Jeact/vDOM/FiberHostContext';
 
 const CHILDREN = 'children';
 const TEXT_NODE = 3;
 
-export function createElement(type, rootContainerElement){
-    return rootContainerElement.ownerDocument.createElement(type);
+export function createElement(type){
+    return getRootHostContainer().ownerDocument.createElement(type);
 }
 
-export function createTextNode(text, rootContainerElement){
-    return rootContainerElement.ownerDocument.createTextNode(text);
+export function createTextNode(text){
+    return getRootHostContainer().ownerDocument.createTextNode(text);
 }
 
 export function setInitialDOMProperties(domElement, workInProgress){
@@ -37,7 +38,6 @@ export function diffProperties(
     tag,
     lastProps,
     nextProps,
-    rootContainerElement,
 ){  
     let propKey;
     let updatePayload = null;

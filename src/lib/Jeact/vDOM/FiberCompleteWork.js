@@ -14,7 +14,6 @@ import {
   StaticMask,
 } from '@Jeact/shared/Constants';
 import {
-  getRootHostContainer,
   popHostContainer,
 } from '@Jeact/vDOM/FiberHostContext';
 import {
@@ -52,7 +51,6 @@ function updateHostComponent(
   workInProgress,
   type,
   newProps,
-  rootContainerInstance,
 ){
   const oldProps = current.memoizedProps;  
   const instance = workInProgress.stateNode;
@@ -60,8 +58,7 @@ function updateHostComponent(
     instance,
     type,
     oldProps,
-    newProps,
-    rootContainerInstance,
+    newProps
   )
   workInProgress.updateQueue = updatePayload;
   if (updatePayload){
@@ -155,7 +152,6 @@ export function completeWork(current, workInProgress,renderLanes){
       return null;
     }
     case HostComponent:{
-      const rootContainerInstance = getRootHostContainer();
       const type = workInProgress.type;
       if(current !== null && workInProgress.stateNode !== null){
         updateHostComponent(
@@ -167,14 +163,12 @@ export function completeWork(current, workInProgress,renderLanes){
         )
       } else {
         if(!newProps){
-          debugger;
           bubbleProperties(workInProgress);
           return null;
         }
 
         const instance = createElement(
           type,
-          rootContainerInstance,
         );
         
         precacheFiberNode(workInProgress, instance);
@@ -193,10 +187,8 @@ export function completeWork(current, workInProgress,renderLanes){
       if (workInProgress.alternate& workInProgress.stateNode!==null){
         debugger;
       }
-      const rootContainerInstance = getRootHostContainer();
       const instance = createTextNode(
-        newText,
-        rootContainerInstance,
+        newText
       );
       workInProgress.stateNode = instance;
       precacheFiberNode(workInProgress, instance)

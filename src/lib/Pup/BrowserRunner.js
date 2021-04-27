@@ -5,9 +5,11 @@ import { WebSocketTransport} from './WebSocketTransport.js'
 import {Connection} from './Connection.js';
 
 export class BrowserRunner{
+    _closed = true;
+    _listeners = [];
     constructor(
         executablePath = '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome',
-        processArg = ['--headless',"--user-data-dir=temp",'--remote-debugging-port=9222']
+        processArg = ['--headless',"--user-data-dir=temp",'--remote-debugging-port=9222'],
         ){
         this._executablePath = executablePath;
         this._processArg = processArg;
@@ -43,6 +45,7 @@ export class BrowserRunner{
         return this._processClosing;
     }
     kill(){
+        console.error('kill', this.proc);
         if(this.proc && this.proc.pid && !this.proc.killed){
             try{
                 this.proc.kill('SIGKILL');

@@ -19,9 +19,15 @@ export class Target{
             console.error('opener', opener)
             const openerPage = await opener._pagePromise;
         });
+        this._isClosedPromise = new Promise(
+            (fulfill) => (this._closedCallback = fulfill)
+        );
         this._isInitialized = 
             this._targetInfo.type !== 'page' || this._targetInfo.url !== '';
         if (this._isInitialized) this._initializedCallback(true);
+    }
+    url(){
+        return this._targetInfo.url;
     }
     type(){
         const type = this._targetInfo.type;
@@ -47,5 +53,17 @@ export class Target{
         const { openerId } = this._targetInfo;
         if (!openerId) return null;
         return this.browser()._targets.get(openerId);
+    }
+    _targetInfoChanged(targetInfo){
+        this._targetInfo = targetInfo;
+
+        if (
+            !this._isInitialized &&
+            (this._targetInfo.type !== 'page' || this._targetInfo.url !== '')
+        ){
+            this._isInitialized = true;
+            this._initializedCallback(true);
+            return;
+        }
     }
 }

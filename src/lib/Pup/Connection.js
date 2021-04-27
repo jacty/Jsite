@@ -6,6 +6,8 @@ export const ConnectionEmittedEvents = {
 
 export class Connection extends Events{
     _lastId = 0;
+    _sessions = new Map();
+    _closed = false;
     _callbacks = new Map();
     constructor(url, transport){
         super();
@@ -56,7 +58,31 @@ export class Connection extends Events{
     }
 
     _onClose(){
-        console.error('_onClose');
+        if (this._closed) return;
+        this._closed = true;
+        this._transport.onmessage = null;
+        this._transport.onclose = null;
+        for (const callback of this._callbacks.values()){
+            callback.reject(
+                rewriteError(
+                    callback.error,
+                    `Protocol error (${callback.method}): Target closed.`
+                )
+            )
+        }
+        this._callbacks.clear();
+        for (const session of this._sessions.values()) session._onClosed();
+        this._sessions.clear();
+        this.emit(ConnectionEmittedEvents.Disconnected);
+    }
+
+    dispose(){
+        this._onClose();
+        this._transport.close();
+    }
+
+    async createSession(targetInfo){
+        console.error('createSession');
     }
 }
 
@@ -71,8 +97,4 @@ function rewriteError(error, msg){
     return error;
 }
 
-export async function connectToBrowser(options){
-    const connection = new Connection();
-    const id = await connection.send('Target.getBrowserContexts');
-}
 

@@ -7,9 +7,9 @@ export class WebSocketTransport{
                 perMessageDeflate: false,
                 maxPayload: 256 * 1024 * 1024,
             });
-
-            ws.addEventListener('open', ()=>
+            ws.addEventListener('open', ()=>{
                 resolve(new WebSocketTransport(ws))
+            }
             );
             ws.addEventListener('error', reject);
         });

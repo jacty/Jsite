@@ -70,6 +70,7 @@ export class Browser extends Events{
             context,
             () => this._connection.createSession(targetInfo),
         )
+
         this._targets.set(targetInfo.targetId, target);
         
         if (await target._initializedPromise){
@@ -82,7 +83,7 @@ export class Browser extends Events{
         const target = this._targets.get(event.targetId);
         target._initializedCallback(false);
         this._targets.delete(event.targetId);
-        target._closeCallback();
+        target._closedCallback();
         if(await target._initializedPromise){
             this.emit(BrowserEmittedEvents.TargetDestroyed, target);
             target
@@ -90,7 +91,9 @@ export class Browser extends Events{
                 .emit(BrowserContextEmittedEvents.TargetDestroyed, target);
         }
     }
-
+    async newPage(){
+        return this._defaultContext.newPage();
+    }
     _targetInfoChanged(event){
         const target = this._targets.get(event.targetInfo.targetId);
         const previousURL = target.url();
@@ -115,7 +118,7 @@ export class Browser extends Events{
         let resolve;
         const targetPromise = new Promise((x) => (resolve = x));
         this.on(BrowserEmittedEvents.TargetCreated, check);
-        this.on(BrowserEmittedEvents.TargetCreated, check);
+        this.on(BrowserEmittedEvents.TargetChanged, check);
         try {
             if (!timeout) return await targetPromise;
             return await helper.waitWithTimeout(
@@ -124,13 +127,20 @@ export class Browser extends Events{
                 timeout
             );
         } finally {
-            this.removeListener(BrowserEmittedEvents.TargetCreated, check);
-            this.removeListener(BrowserEmittedEvents.TargetChanged, check);
+            this.off(BrowserEmittedEvents.TargetCreated, check);
+            this.off(BrowserEmittedEvents.TargetChanged, check);
         }
         
         function check(target){
             if (predicate(target)) resolve(target);
         }
+    }
+    async close(){
+        await this._closeCallback.call(null);
+        this.disconnect();
+    }
+    disconnect(){
+        this._connection.dispose();
     }
 }
 
@@ -140,6 +150,9 @@ export class BrowserContext extends Events{
         this._connection = connection;
         this._browser = browser;
         this._id = contextId;
+    }
+    newPage(){
+        console.error('newPage');
     }
     browser(){
         return this._browser;

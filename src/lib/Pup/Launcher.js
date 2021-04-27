@@ -1,14 +1,25 @@
 import {BrowserRunner} from './BrowserRunner.js';
-
+import {Browser} from './Browser.js';
 // class ChromeLauncher
 export class Launcher{
-    constructor(){
-
-    }
+    constructor(){}
     async launch(options){
-        const runner = new BrowserRunner(options);
+        const {timeout = 30000} = options;
+        const runner = new BrowserRunner();
         runner.start();
-        console.error('Browser Launched')
-        return 1
+        try{
+            const connection = await runner.setupConnection({timeout});
+            const browser = await Browser.create(
+                connection,
+                [],
+                runner.proc,
+                runner.close.bind(runner)
+            );
+            await browser.waitForTarget((t) => t.type() === 'page');
+            return browser;
+        } catch(error){
+            runner.kill();
+            throw error;
+        }
     }
 }

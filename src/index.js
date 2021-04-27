@@ -4,5 +4,6 @@ import {Pup} from './lib/Pup/index.js';
 
   const pup = new Pup();
 const browser = await pup.launch();  
+console.error('browser', browser)
 
 

@@ -3,10 +3,11 @@
     "version": "0.0.1",
     "description": "My personal website",
     "scripts": {
-        "start": "snowpack dev"
+        "start": "node src/index.js"
     },
     "private": true,
     "author": "Jacty",
+    "type": "module",
     "devDependencies": {
         "@snowpack/plugin-sass": "^1.1.1",
         "snowpack": "^2.18.5"

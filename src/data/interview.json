@@ -1,8 +1,0 @@
-[
-{"header":"Why should we not update the state directly?",
- "content":"<p>If you try to update state directly then it won't re-render the component. Instead use <code>setState()</code> method, it schedules an update to a component's state object. When state changes, the component responds by re-rendering.</p>"},
-{"header":"What is HOC?",
- "content":"<p>Higher Order Component is a function that takes a component and returns a new component.</p>"},
- {"header":"What is portal in React?",
-  "content":"<p>Portal is a recommended way to render children into a DOM node that exists outside the DOM hierarchy of the parent component.</p>"}
-]

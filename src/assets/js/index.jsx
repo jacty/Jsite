@@ -7,7 +7,7 @@ const Aboutme = React.lazy(()=>import('@com/aboutme.jsx'));
 function App(){
 
     return (
-        <main>
+        <main className='demo' onClick={()=>{console.log(1)}}>
             <Suspense fallback={<div>Loading</div>}>
                 <Aboutme />
             </Suspense>

@@ -1,16 +1,14 @@
-import React, {Suspense} from 'react';
+import React, {useState} from 'react';
 import ReactDOM from 'react-dom';
 
 import '@assets/styles/main.sass';
 const Aboutme = React.lazy(()=>import('@com/aboutme.jsx'));
 
 function App(){
-
+  const [cur, setCur] = useState(0)
     return (
-        <main className='demo' onClick={()=>{console.log(1)}}>
-            <Suspense fallback={<div>Loading</div>}>
-                <Aboutme />
-            </Suspense>
+        <main onClick={()=>setCur(cur+1)}>
+          {cur}
         </main>
     )
      

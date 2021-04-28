@@ -1,5 +1,6 @@
 import {setValueForProperty} from '@Jeact/vDOM/DOMProperty';
 import {getRootHostContainer} from '@Jeact/vDOM/FiberHostContext';
+import {EventMatchTovEvent} from '@Jeact/events/'
 
 const CHILDREN = 'children';
 const TEXT_NODE = 3;
@@ -16,7 +17,6 @@ export function setInitialDOMProperties(domElement, workInProgress){
     let props = workInProgress.pendingProps;
     let type = workInProgress.type;
 
-    // setInitialDOMProperties()
     for (let propKey in props){
         if (!props.hasOwnProperty(propKey)){
             continue;
@@ -26,9 +26,10 @@ export function setInitialDOMProperties(domElement, workInProgress){
             if (typeof prop === 'string' || typeof prop === 'number'){
                 setTextContent(domElement, prop);
             }
+        } else if (EventMatchTovEvent.hasOwnProperty(propKey)){
+            // event register
         } else if (prop !== null){
-            propKey = propKey === 'className' ? 'class':propKey;
-            domElement.setAttribute(propKey, prop);
+           setValueForProperty(domElement,propKey, prop);
         }
     }
 }

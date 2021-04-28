@@ -1,5 +1,4 @@
 import {createFiberRoot} from '@Jeact/vDOM/FiberRoot';
-import {listenToAllSupportedEvents} from '@Jeact/vDOM/FiberEvent';
 import {requestUpdateLane} from '@Jeact/vDOM/FiberLane';
 import {
   requestEventTime,
@@ -20,7 +19,6 @@ vRoot.prototype.render = function(children){
 
 function createRootImpl(container){
   const root = createFiberRoot(container);
-  listenToAllSupportedEvents(container);
   return root;
 }
 

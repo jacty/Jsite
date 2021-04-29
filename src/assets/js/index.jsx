@@ -12,7 +12,7 @@ function App(){
     return (<div className='page'>
                 {curPage}
                 <Aboutme />
-                <Footer onClick={()=>console.log(1)} cur={curPage}/>
+                <Footer onClick={()=>setCurPage(curPage + 1)} cur={curPage}/>
             </div>
            )
     

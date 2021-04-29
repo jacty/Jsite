@@ -182,14 +182,23 @@ export function completeWork(current, workInProgress,renderLanes){
     }
     case HostText: {//6
       const newText = newProps;
-      if (workInProgress.alternate& workInProgress.stateNode!==null){
-        debugger;
+      const current = workInProgress.alternate;
+      if (current && workInProgress.stateNode!==null){
+        // Update text node
+        const oldText = current.memoizedProps;
+        // updateHostText
+        if (oldText !== newText){
+          markUpdate(workInProgress);
+        }
+      } else {
+        // Mount text node
+        const instance = createTextNode(
+          newText
+        );      
+        workInProgress.stateNode = instance;
+        precacheFiberNode(workInProgress, instance)
       }
-      const instance = createTextNode(
-        newText
-      );
-      workInProgress.stateNode = instance;
-      precacheFiberNode(workInProgress, instance)
+
       bubbleProperties(workInProgress);
       return null;
     }

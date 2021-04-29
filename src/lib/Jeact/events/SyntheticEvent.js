@@ -23,3 +23,8 @@ const EventInterface = {
   isTrusted:0,
 };
 export const SyntheticEvent = createSyntheticEvent(EventInterface);
+
+const MouseEventInterface = {
+}
+
+export const SyntheticMouseEvent = createSyntheticEvent(MouseEventInterface);

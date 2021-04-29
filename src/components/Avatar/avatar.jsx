@@ -6,7 +6,7 @@ function Avatar(){
     function handlerError(){
       console.error('handlerError')
     }
-    return <img className='avatar' src={'Logo'} onError={handlerError} alt="Jacty" title="Jacty"/>
+    return <img className='avatar' src={Logo} onError={handlerError} alt="Jacty" title="Jacty"/>
 }
 
 export default Avatar

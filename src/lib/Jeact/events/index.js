@@ -8,7 +8,10 @@ import {
   addListener,
   getListener
 } from '@Jeact/events/Listener';
-import {SyntheticEvent} from '@Jeact/events/SyntheticEvent';
+import {
+  SyntheticEvent,
+  SyntheticMouseEvent
+} from '@Jeact/events/SyntheticEvent';
 import {getEventListenerSet} from '@Jeact/vDOM/DOMComponentTree';
 
 const listeningMarker = '_jeactListening' 
@@ -188,6 +191,7 @@ function extractEvents(
   switch (domEventName){
     case 'click':
       SyntheticEventCtor = SyntheticMouseEvent;
+      break;
     default:
       SyntheticEventCtor = SyntheticEvent;
   }

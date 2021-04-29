@@ -10,6 +10,7 @@ import {
 } from '@Jeact/vDOM/DOMComponentTree';
 import {dispatchEventsFromSystem} from '@Jeact/events/';
 import {batchedEventUpdates} from '@Jeact/vDOM/FiberWorkLoop';
+import {discreteUpdates} from '@Jeact/vDOM/DOMUpdateBatching';
 
 export function addListener(
   target,
@@ -36,30 +37,27 @@ export function createEventListener(target, domEventName, eventSystemFlags){
   return listenerWrapper.bind(
     null,
     domEventName,
-    target,
-    eventSystemFlags
+    eventSystemFlags,
+    target
   )
 }
 
-function dispatchDiscreteEvent(domEventName, target, nativeEvent){
-  console.error('dispatchDiscreteEvent', domEventName,target,nativeEvent)
+function dispatchDiscreteEvent(
+  domEventName,
+  eventSystemFlags,
+  target, 
+  nativeEvent, 
+){
+  discreteUpdates(
+    dispatchEvent,
+    domEventName,
+    eventSystemFlags,
+    target,
+    nativeEvent
+  )
 }
 
 function dispatchEvent(domEventName, target, eventSystemFlags, nativeEvent){
-  const blockedOn = attemptToDispatchEvent(domEventName, target, nativeEvent, eventSystemFlags);
-
-  if (blockedOn === null){
-    return;
-  }
-  console.error('dispatchEvent', blockedOn, domEventName);
-}
-
-function attemptToDispatchEvent(
-  domEventName, 
-  target, 
-  nativeEvent, 
-  eventSystemFlags
-){
   const nativeEventTarget = nativeEvent.target;
   let targetInst = getClosestFiberFromNode(nativeEventTarget);
   if(!!targetInst){

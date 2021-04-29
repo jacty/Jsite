@@ -7,7 +7,7 @@ class Avatar extends React.Component {
         super(props)
     }
     render(){
-        return <img src={'Logo'} alt="Jsite's Logo" title="Jsite's Logo"/>
+        return <img src={'Logo'} onError={()=>{console.error(1)}}alt="Jsite's Logo" title="Jsite's Logo"/>
     }
 }
 

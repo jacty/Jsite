@@ -139,7 +139,6 @@ function bubbleProperties(completedWork){
 
 export function completeWork(current, workInProgress,renderLanes){
   const newProps = workInProgress.pendingProps;
-
   switch(workInProgress.tag){
     case LazyComponent:
     case FunctionComponent:

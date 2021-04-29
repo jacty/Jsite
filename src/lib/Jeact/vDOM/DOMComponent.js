@@ -1,7 +1,7 @@
 import {setValueForProperty} from '@Jeact/vDOM/DOMProperty';
 import {getRootHostContainer} from '@Jeact/vDOM/FiberHostContext';
-import {EventMatchTovEvent} from '@Jeact/events/Registry'
-
+import {vEventMatchToEvent} from '@Jeact/events/Registry'
+import {listenToNonDelegatedEvent} from '@Jeact/events/'
 const CHILDREN = 'children';
 const TEXT_NODE = 3;
 
@@ -14,8 +14,12 @@ export function createTextNode(text){
 }
 
 export function setInitialDOMProperties(domElement, workInProgress){
-    let props = workInProgress.pendingProps;
-    let type = workInProgress.type;
+    const props = workInProgress.pendingProps;
+    const tag = workInProgress.type;
+    switch(tag){
+        case 'img':
+            listenToNonDelegatedEvent('error', domElement);
+    }
 
     for (let propKey in props){
         if (!props.hasOwnProperty(propKey)){
@@ -26,7 +30,7 @@ export function setInitialDOMProperties(domElement, workInProgress){
             if (typeof prop === 'string' || typeof prop === 'number'){
                 setTextContent(domElement, prop);
             }
-        } else if (EventMatchTovEvent.hasOwnProperty(propKey)){
+        } else if (vEventMatchToEvent.hasOwnProperty(propKey)){
             // event register
         } else if (prop !== null){
            setValueForProperty(domElement,propKey, prop);

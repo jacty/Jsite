@@ -22,8 +22,9 @@ export const LazyComponent = 6;
 * JeactFiberWorkLoop 
 */
 export const NoContext = /*             */ 0b0000000;
-export const RenderContext = /*         */ 0b0000001;
-export const CommitContext = /*         */ 0b0000010;
+export const EventContext = /*          */ 0b0000010;
+export const RenderContext = /*         */ 0b0000100;
+export const CommitContext = /*         */ 0b0001000;
 /* 
 * JeactFiberLane 
 */

@@ -1,6 +1,8 @@
 export const allNativeEvents = new Set();
+// topLevelEventsToReactNames
+export const EventMapTovEvent = new Map();
 // registrationNameDependencies
-export const EventMatchTovEvent = {};
+export const vEventMatchToEvent = {};
 const EventNames = [
   'click',
   'error',
@@ -8,6 +10,7 @@ const EventNames = [
 // registerSimpleEvents
 for(let name of EventNames){
   const vEventName = 'on' + name[0].toUpperCase() + name.slice(1);
+  EventMapTovEvent.set(name, vEventName);
   registerEvents([name], vEventName);
 }
 
@@ -18,7 +21,7 @@ export function registerEvents(event, vevent){
 }
 // registerDirectEvent
 function registerEvent(name, dependencies){
-  EventMatchTovEvent[name] = dependencies;
+  vEventMatchToEvent[name] = dependencies;
   for(let item of dependencies){
     allNativeEvents.add(item)
   }

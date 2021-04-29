@@ -8,6 +8,7 @@ import {
   RenderContext,
   CommitContext, 
   HostRoot,
+  EventContext,
   PassiveMask,
   BeforeMutationMask,
   MutationMask,
@@ -205,6 +206,16 @@ function finishConcurrentRender(root, exitStatus, lanes){
   }
 }
 
+export function batchedEventUpdates(fn, a){
+  const prevExecutionContext = executionContext;
+  executionContext |= EventContext;
+  try {
+    return fn(a);
+  } finally {
+    executionContext = prevExecutionContext;
+  }
+}
+
 export function pushRenderLanes(fiber, lanes){
   push(subtreeRenderLanesCursor, subtreeRenderLanes);
   subtreeRenderLanes = mergeLanes(subtreeRenderLanes, lanes);
@@ -346,7 +357,6 @@ function completeUnitOfWork(unitOfWork){
         returnFiber.subtreeFlags = NoFlags;
         returnFiber.deletions = null;
       }
-
     }
 
     const siblingFiber = completedWork.sibling;

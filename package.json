@@ -3,7 +3,8 @@
     "version": "0.0.1",
     "description": "My personal website",
     "scripts": {
-        "start": "snowpack dev"
+        "start": "snowpack dev",
+        "crawl": "node src/index.js"
     },
     "private": true,
     "author": "Jacty",
@@ -11,6 +12,6 @@
         "@snowpack/plugin-sass": "^1.1.1",
         "react": "^0.0.0-experimental-48740429b",
         "react-dom": "^0.0.0-experimental-48740429b",
-        "snowpack": "^2.17.0"
+        "snowpack": "^2.18.5"
     }
 }

@@ -2,13 +2,11 @@ import React from 'react';
 import Logo from './logo.jpg';
 // import './avatar.sass';
 
-class Avatar extends React.Component {
-    constructor(props){
-        super(props)
+function Avatar(){
+    function handlerError(){
+      console.error('handlerError')
     }
-    render(){
-        return <img src={'Logo'} onError={()=>{console.error(1)}}alt="Jsite's Logo" title="Jsite's Logo"/>
-    }
+    return <img className='avatar' src={Logo} onError={handlerError} alt="Jacty" title="Jacty"/>
 }
 
 export default Avatar

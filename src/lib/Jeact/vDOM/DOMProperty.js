@@ -1,5 +1,4 @@
 // props reserved for Jeact and shouldn't be written to DOM.
-
 const RESERVED = 0;
 const STRING = 1;
 
@@ -9,39 +8,38 @@ const reservedProps = [
     'children',
 ]
 
-function PropertyInfoRecord(
+function PropertyInfo(
     name,
     type,
-    mustUseProperty,
     attributeName,
-    removeEmptyString
 ){
-    this.attributeName = attributeName;
-    this.mustUseProperty = mustUseProperty;
     this.propertyName = name;
+    this.attributeName = attributeName;
     this.type = type;
-    this.removeEmptyString = removeEmptyString;
 }
 
 reservedProps.forEach(name =>{
-    properties[name] = new PropertyInfoRecord(
+    properties[name] = new PropertyInfo(
         name,
         RESERVED,
-        false,
         name,
-        false
     )
 });
 
 [
     ['className', 'class']
 ].forEach(([name, attributeName]) =>{
-    properties[name] = new PropertyInfoRecord(
+    properties[name] = new PropertyInfo(
         name,
         STRING,
-        false,
         attributeName,
-        false
+    )
+});
+['src', 'href'].forEach(attributeName => {
+    properties[attributeName] = new PropertyInfo(
+        attributeName,
+        STRING,
+        attributeName.toLowerCase()
     )
 })
 
@@ -50,19 +48,14 @@ export function setValueForProperty(node, name, value){
     if(shouldIgnoreAttribute(name, propertyInfo)){
         return;
     }
-
     if (shouldRemoveAttribute(name, value, propertyInfo)){
         value = null;
     }
-    const {mustUseProperty} = propertyInfo;
-    if(mustUseProperty){
-        debugger;
-    }
-    const {attributeName} = propertyInfo 
-    if (value === null){
-        node.removeAttribute(attributeName);
-    } else {
-        node.setAttribute(attributeName, value);
+    if (propertyInfo === null){
+        node.setAttribute(name, ''+value);
+    }else {
+        const {attributeName} = propertyInfo;
+        node.setAttribute(attributeName, ''+value);
     }
 }
 
@@ -74,14 +67,21 @@ function shouldIgnoreAttribute(name, propertyInfo){
     if(propertyInfo !== null){
         return propertyInfo.type === RESERVED;
     }
-    debugger;
+    if(name.length>2 &&
+        name.slice(0,2).toLowerCase() === 'on'
+    ){
+        return true;
+    }
+    return false;
 }
 
 function shouldRemoveAttribute(name, value, propertyInfo){
-    if (value === null || typeof value === 'undefined'){
+    if (value === null || 
+        typeof value === 'undefined' ||
+        value === ''
+        ){
         return true;
     }
-    if (propertyInfo !== null){
-        debugger;
-    }
+    return false;
 }
+

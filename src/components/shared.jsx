@@ -6,7 +6,6 @@ export function Footer(props){
         console.log('xx',props)
         props.data();
     }
-    const year = new Date().getFullYear()
-
-    return <footer>© {year} <a onClick={handleClick}>Jacty</a></footer>
+    const year = new Date().getFullYear();
+    return <footer>©{year} <a onClick={()=> props.onClick(0)}>Jacty</a></footer>
 }

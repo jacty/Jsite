@@ -1,6 +1,6 @@
 import {setValueForProperty} from '@Jeact/vDOM/DOMProperty';
 import {getRootHostContainer} from '@Jeact/vDOM/FiberHostContext';
-import {EventMatchTovEvent} from '@Jeact/events/'
+import {EventMatchTovEvent} from '@Jeact/events/Registry'
 
 const CHILDREN = 'children';
 const TEXT_NODE = 3;

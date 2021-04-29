@@ -1,26 +1,30 @@
-const allNativeEvents = new Set();
-// registrationNameDependencies
-export const EventMatchTovEvent = {};
-const EventNames = [
-  'click',
-  'error',
-]
-// registerSimpleEvents
-for(let name of EventNames){
-  const vEventName = 'on' + name[0].toUpperCase() + name.slice(1);
-  registerEvents([name], vEventName);
-}
+import {allNativeEvents} from '@Jeact/events/Registry';
+import {
+  createEventListener,
+  addEventBubbleListener
+} from '@Jeact/events/Listener';
 
-// registerTwoPhaseEvent
-export function registerEvents(event, vevent){
-  registerEvent(vevent, event);
-  registerEvent(vevent+'Capture', event);
-}
-// registerDirectEvent
-function registerEvent(name, dependencies){
-  EventMatchTovEvent[name] = dependencies;
-  for(let item of dependencies){
-    allNativeEvents.add(item)
+const listeningMarker = '_jeactListening' 
+          + Math.random().toString(36).slice(2);
+
+export function listenToAllEvents(container){
+  if(!container[listeningMarker]){
+    container[listeningMarker] = true;
+    allNativeEvents.forEach(domEventName =>{
+      listenToNativeEvent(domEventName, container);
+    })
   }
-
 }
+
+function listenToNativeEvent(domEventName, target){
+  const listener = createEventListener(
+    target,
+    domEventName
+  );
+  addEventBubbleListener(
+    target,
+    domEventName,
+    listener
+  )
+}
+

@@ -8,6 +8,7 @@ import {
   createUpdate,
   enqueueUpdate,
 } from '@Jeact/vDOM/UpdateQueue';
+import {listenToAllEvents} from '@Jeact/events/'
 
 function vRoot(container){
   this._Root = createRootImpl(container);
@@ -19,6 +20,8 @@ vRoot.prototype.render = function(children){
 
 function createRootImpl(container){
   const root = createFiberRoot(container);
+  // listenToAllSupportedEvents
+  listenToAllEvents(container);
   return root;
 }
 

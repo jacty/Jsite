@@ -3,8 +3,10 @@
     "version": "0.0.1",
     "description": "My personal website",
     "scripts": {
+        "tsc": "tsc -w -p .",
         "start": "snowpack dev",
-        "crawl": "node src/index.js"
+        "crawl": "node src/index.js",
+        "dev": "node src/lib/Dev/index.js"
     },
     "private": true,
     "author": "Jacty",

@@ -4,15 +4,18 @@ import {
     useState,
 } from '@Jeact';
 import Aboutme from '@com/Aboutme/aboutme';
+import Jackie from '@com/Jackie/'
 import {Footer} from '@com/shared';
 import '@assets/styles/main.sass';
 
 function App(){
-  const [curPage, setCurPage] = useState(10);
+  const [curPage, setCurPage] = useState(1);
     return (<div className='page'>
-                {curPage}
-                <Aboutme />
-                <Footer onClick={()=>setCurPage(curPage + 1)} cur={curPage}/>
+            { curPage === 0 ?
+                <Aboutme /> :
+                <Jackie />
+            }
+                <Footer onClick={()=>setCurPage(0)} cur={curPage}/>
             </div>
            )
     

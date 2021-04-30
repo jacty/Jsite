@@ -1,7 +1,7 @@
 import { J } from '@Jeact';
-import data from '@data/Jackie.json';
+// import data from '@data/Jackie.json';
 
-import '@assets/styles/jackie.sass';
+// import '@assets/styles/jackie.sass';
 
 export default function Jackie(prop){
     // const people = data.people;

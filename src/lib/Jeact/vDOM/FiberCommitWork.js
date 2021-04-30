@@ -719,6 +719,11 @@ function commitWork(current, finishedWork){
             toggleAllChildren(finishedWork, isHidden);
             return;
         }
+        case HostText:{
+            const textInstance = finishedWork.stateNode;
+            const newText = finishedWork.memoizedProps;
+            textInstance.nodeValue = newText;
+        }
     }
 }
 

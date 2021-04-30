@@ -473,6 +473,14 @@ export function beginWork(current, workInProgress, renderLanes){
   // prevent lanes from passing to fiber.lanes of HostComponent's child fibers, and further to childLanes in bubbleProperties().
   workInProgress.lanes = NoLanes;
   switch (workInProgress.tag){
+    case HostRoot:
+      return updateHostRoot(current, workInProgress, renderLanes);
+    case FunctionComponent:
+      return updateFunctionComponent(current,workInProgress,renderLanes);
+    case HostComponent:
+      return updateHostComponent(current, workInProgress, renderLanes);
+    case HostText:
+      return null;
     case LazyComponent:{
       return mountLazyComponent(
         current, 
@@ -481,14 +489,6 @@ export function beginWork(current, workInProgress, renderLanes){
         renderLanes
       );
     }
-    case FunctionComponent:
-      return updateFunctionComponent(current,workInProgress,renderLanes);
-    case HostRoot:
-      return updateHostRoot(current, workInProgress, renderLanes);
-    case HostComponent:
-      return updateHostComponent(current, workInProgress, renderLanes);
-    case HostText:
-      return null;
     case SuspenseComponent:
       return updateSuspenseComponent(current, workInProgress, renderLanes);
     case OffscreenComponent:

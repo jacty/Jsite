@@ -140,16 +140,37 @@ function bubbleProperties(completedWork){
 export function completeWork(current, workInProgress,renderLanes){
   const newProps = workInProgress.pendingProps;
   switch(workInProgress.tag){
-    case LazyComponent:
-    case FunctionComponent:
+    case HostText: {
+      const current = workInProgress.alternate;
+      if (current !== null && workInProgress.stateNode !== null){
+        // Update text node
+        const oldProps = current.memoizedProps;
+        // updateHostText: Compare text between new and old.
+        if (oldProps !== newProps){
+          markUpdate(workInProgress);
+        }
+      } else {
+        // Mount text node
+        const instance = createTextNode(
+          newProps
+        );      
+        workInProgress.stateNode = instance;
+        precacheFiberNode(workInProgress, instance)
+      }
+
       bubbleProperties(workInProgress);
       return null;
+    }
     case HostRoot:{
       const fiberRoot = workInProgress.stateNode;
       popHostContainer(workInProgress);
       bubbleProperties(workInProgress);
       return null;
     }
+    case LazyComponent:
+    case FunctionComponent:
+      bubbleProperties(workInProgress);
+      return null;
     case HostComponent:{
       const type = workInProgress.type;
       if(current !== null && workInProgress.stateNode !== null){
@@ -177,28 +198,6 @@ export function completeWork(current, workInProgress,renderLanes){
         
         workInProgress.stateNode = instance;
       }
-      bubbleProperties(workInProgress);
-      return null;
-    }
-    case HostText: {//6
-      const newText = newProps;
-      const current = workInProgress.alternate;
-      if (current && workInProgress.stateNode!==null){
-        // Update text node
-        const oldText = current.memoizedProps;
-        // updateHostText
-        if (oldText !== newText){
-          markUpdate(workInProgress);
-        }
-      } else {
-        // Mount text node
-        const instance = createTextNode(
-          newText
-        );      
-        workInProgress.stateNode = instance;
-        precacheFiberNode(workInProgress, instance)
-      }
-
       bubbleProperties(workInProgress);
       return null;
     }

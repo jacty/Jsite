@@ -6,12 +6,14 @@
         "tsc": "tsc -w -p .",
         "start": "snowpack dev",
         "crawl": "node src/index.js",
-        "dev": "node src/lib/Dev/index.js"
+        "dev": "node src/lib/Dev/index.js",
+        "build":"node build/build.js"
     },
     "private": true,
     "author": "Jacty",
     "devDependencies": {
         "@snowpack/plugin-sass": "^1.1.1",
+        "esbuild": "^0.8.57",
         "snowpack": "^2.18.5"
     }
 }

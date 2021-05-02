@@ -7,12 +7,14 @@ import {Footer} from '@com/shared';
 import '@assets/styles/main.sass';
 
 function App(){
-  const [curPage, setCurPage] = useState(10);
+  const [curPage, setCurPage] = useState(0);
     return (
       <div className='page'>
-        {curPage}
-        <Aboutme />
-        <Footer onClick={()=>{setCurPage(curPage + 1)}} cur={curPage}/>
+        {curPage === 0?
+          <Aboutme />:
+          <h1>demo</h1>
+        }
+        <Footer onClick={()=>{setCurPage(1)}} cur={curPage}/>
       </div>
     )
 }

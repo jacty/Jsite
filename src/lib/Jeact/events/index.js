@@ -75,6 +75,7 @@ function listenToNativeEvent(domEventName, isCapturePhaseListener, target){
   if (isCapturePhaseListener){
     eventSystemFlags |= IS_CAPTURE_PHASE;
   }
+
   addTrappedEventListener(
     target,
     domEventName,

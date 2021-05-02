@@ -5,7 +5,6 @@ import {
 } from '@Jeact/shared/Constants';
 import { 
   getClosestFiberFromNode,
-  getNearestMountedFiber,
   getFiberCurPropsFromNode
 } from '@Jeact/vDOM/DOMComponentTree';
 import {dispatchEventsFromSystem} from '@Jeact/events/';
@@ -57,23 +56,9 @@ function dispatchDiscreteEvent(
   )
 }
 
-function dispatchEvent(domEventName, target, eventSystemFlags, nativeEvent){
+function dispatchEvent(domEventName, eventSystemFlags, target, nativeEvent){
   const nativeEventTarget = nativeEvent.target;
   let targetInst = getClosestFiberFromNode(nativeEventTarget);
-  if(!!targetInst){
-    const nearestMounted = getNearestMountedFiber(targetInst);
-    if (!nearestMounted){
-      // tree unmounted already
-      targetInst = null;
-    } else {
-      const tag = nearestMounted.tag;
-      if (tag === SuspenseComponent){
-        console.error('Unimplement feature!')
-      } else if (nearestMounted !== targetInst){
-        targetInst = null;
-      } 
-    }
-  }
   
   batchedEventUpdates(()=>
     dispatchEventsFromSystem(

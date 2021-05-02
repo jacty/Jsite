@@ -15,7 +15,7 @@ function App(){
                 <Aboutme /> :
                 <Jackie />
             }
-                <Footer onClick={()=>setCurPage(0)} cur={curPage}/>
+                <Footer onClick={()=>setCurPage(0)}/>
             </div>
            )
     

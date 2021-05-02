@@ -409,8 +409,14 @@ function commitPassiveUnmountEffectsInDelTreeOnFiber(
     current, nearestMountedAncestor
 ){
     switch(current.tag){
-        case FunctionComponent:
-            debugger;
+        case FunctionComponent:{
+            commitHookEffectListUnmount(
+                HookPassive,
+                current,
+                nearestMountedAncestor
+            );
+            break;
+        }
     }
 }
 

@@ -13,10 +13,9 @@ function createSyntheticEvent(Interface){
   }
   return SyntheticBaseEvent;
 }
-const EventInterface = {};
 
+const EventInterface = {};
 export const SyntheticEvent = createSyntheticEvent(EventInterface);
 
 const MouseEventInterface = {}
-
 export const SyntheticMouseEvent = createSyntheticEvent(MouseEventInterface);

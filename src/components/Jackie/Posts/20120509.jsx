@@ -3,6 +3,9 @@ import './post.sass';
 import Broken from '../broken.jpg';
 import Img from './20120509.jpg';
 
+import data from '../Comments/20120509.json';
+import Comments from '../Comments/Comments';
+
 export default function Post(prop){
     return (
         <section className='post'>
@@ -102,6 +105,7 @@ export default function Post(prop){
                 </p>
                 <p className='copyright'>All Rights Reserved</p>
               </div>
+              <Comments data={data} />
             </div>
         </section>
     )

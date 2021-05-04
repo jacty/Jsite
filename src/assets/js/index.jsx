@@ -9,7 +9,7 @@ import {Footer} from '@com/shared';
 import '@assets/styles/main.sass';
 
 function App(){
-  const [curPage, setCurPage] = useState(0);
+  const [curPage, setCurPage] = useState(1);
     return (<div className='page'>
             { curPage === 0 ?
                 <Aboutme /> :

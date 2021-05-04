@@ -1,13 +1,12 @@
 import { J } from '@Jeact';
 import './aboutme.sass';
-
-import Avatar from '@com/Avatar/avatar';
+import Logo from './logo.jpg';
 
 function Aboutme(){
     return (
         <div className='aboutme'>
             <header>
-                <Avatar /> 
+                <img className='avatar' src={Logo} alt="Jacty" title="Jacty" width='160' height='160'/>
                 <h1>Jacty</h1>
                 <p>React developer keen on adapting React philosophy to practice. Make it practical and simple.</p>  
             </header>

@@ -1,5 +1,5 @@
 // a demo file to develop Pup.
-import {Pup} from './lib/Pup/index.js';
+import {Pup} from './index.js';
 
 
   const pup = new Pup();

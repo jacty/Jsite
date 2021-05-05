@@ -2,10 +2,10 @@
 import {Pup} from './index.js';
 
 
-  const pup = new Pup();
+const pup = new Pup();
 const browser = await pup.launch(); 
 const page = await browser.newPage();
 browser.close(); 
-// console.error('browserGot')
+
 
 

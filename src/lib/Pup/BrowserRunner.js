@@ -5,16 +5,17 @@ import { WebSocketTransport} from './WebSocketTransport.js'
 import {Connection} from './Connection.js';
 
 export class BrowserRunner{
-    _closed = true;
-    _listeners = [];
     constructor(
         executablePath = '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome',
         processArg = ['--headless',"--user-data-dir=temp",'--remote-debugging-port=9222'],
-        ){
+    ){
         this._executablePath = executablePath;
         this._processArg = processArg;
+        this._closed = true;
+        this._listeners = [];
+        this._processClosing = null;
     }
-    start(options){
+    start(){
         // start Chrome
         this.proc = childProcess.spawn(
             this._executablePath,
@@ -45,9 +46,9 @@ export class BrowserRunner{
         return this._processClosing;
     }
     kill(){
-        console.error('kill', this.proc);
         if(this.proc && this.proc.pid && !this.proc.killed){
             try{
+                console.log('Killing Process!');
                 this.proc.kill('SIGKILL');
             } catch (err){
                 throw new Error(
@@ -57,11 +58,9 @@ export class BrowserRunner{
         }
         helper.removeEventListeners(this._listeners);
     }
-    async setupConnection(options){
-        const {timeout} = options;
+    async setupConnection(){
         const browserWSEndpoint = await waitForWSEndpoint(
-            this.proc,
-            timeout,
+            this.proc
         )
         const transport = await WebSocketTransport.create(browserWSEndpoint);
         this.connection = new Connection(browserWSEndpoint, transport)
@@ -69,7 +68,7 @@ export class BrowserRunner{
     }
 }
 
-function waitForWSEndpoint(browserProcess, timeout){
+function waitForWSEndpoint(browserProcess){
     return new Promise((resolve, reject) => {
         const rl = readline.createInterface({input: browserProcess.stderr});
         let stderr = '';
@@ -79,22 +78,13 @@ function waitForWSEndpoint(browserProcess, timeout){
             helper.addEventListener(browserProcess, 'exit', onClose),
             helper.addEventListener(browserProcess, 'error', (err) => onClose(err))
         ];
-        const timeoutId = timeout ? setTimeout(onTimeout, timeout) : 0;
-
         function onClose(error){
+            console.error('Closing readline!!');
             cleanup();
             reject(
                 new Error(`Failed to launch the browser process! ${error ? error.message : ''} ${stderr}`)
             )
         }
-
-        function onTimeout(){
-            cleanup();
-            reject(
-                new Error(`Timed out after ${timeout} ms while trying to connect to the browser.`)
-            )
-        }
-
         function onLine(line){
             stderr += line +'\n';
             const match = line.match(/^DevTools listening on (ws:\/\/.*)$/);
@@ -102,9 +92,7 @@ function waitForWSEndpoint(browserProcess, timeout){
             cleanup();
             resolve(match[1]);
         }
-
         function cleanup(){
-            if (timeoutId) clearTimeout(timeoutId);
             helper.removeEventListeners(listeners);
         }
     });

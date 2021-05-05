@@ -1,3 +1,5 @@
+import {Page} from './Page.js';
+
 export class Target{
     constructor(
         targetInfo,
@@ -25,6 +27,22 @@ export class Target{
         this._isInitialized = 
             this._targetInfo.type !== 'page' || this._targetInfo.url !== '';
         if (this._isInitialized) this._initializedCallback(true);
+    }
+    async page(){
+        if (
+        (this._targetInfo.type === 'page' ||
+            this._targetInfo.type === 'background_page' ||
+            this._targetInfo.type === 'webview') &&
+        !this._pagePromise
+        ){
+          this._pagePromise = this._sessionFactory().then((client) =>
+              Page.create(
+                  client,
+                  this,
+              )
+          );
+        }
+        return this._pagePromise;
     }
     url(){
         return this._targetInfo.url;

@@ -2,15 +2,11 @@
 import {Launcher} from './Launcher.js';
 // class Puppeteer
 export class Pup{
-    constructor(settings){ 
-    }
-    connect(options){
-       // return connectToBrowser(options);
-    }
+    constructor(settings){}
     // Launches a pup and a browser instance.
-    launch(options={}){
+    launch(){
         // class ChromeLauncher
         this.launcher = new Launcher();
-        return this.launcher.launch(options);
+        return this.launcher.launch();
     }
 }

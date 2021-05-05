@@ -78,7 +78,6 @@ export class Browser extends Events{
             context.emit(BrowserContextEmittedEvents.TargetCreated, target);
         }
     }
-
     async _targetDestroyed(event){
         const target = this._targets.get(event.targetId);
         target._initializedCallback(false);
@@ -105,6 +104,15 @@ export class Browser extends Events{
                 .browserContext()
                 .emit(BrowserContextEmittedEvents.TargetChanged, target);
         }
+    }
+    async _createPageInContext(contextId){
+      const { targetId } = await this._connection.send('Target.createTarget',{
+        url: 'about:blank',
+        browserContextId: contextId || undefined,
+      });
+      const target = await this._targets.get(targetId);
+      const page = await target.page();
+      return page;
     }
     targets(){
         return Array.from(this._targets.values()).filter(
@@ -152,7 +160,7 @@ export class BrowserContext extends Events{
         this._id = contextId;
     }
     newPage(){
-        console.error('newPage');
+        return this._browser._createPageInContext(this._id);
     }
     browser(){
         return this._browser;

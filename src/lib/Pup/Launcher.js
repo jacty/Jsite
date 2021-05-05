@@ -4,11 +4,10 @@ import {Browser} from './Browser.js';
 export class Launcher{
     constructor(){}
     async launch(options){
-        const {timeout = 30000} = options;
         const runner = new BrowserRunner();
         runner.start();
         try{
-            const connection = await runner.setupConnection({timeout});
+            const connection = await runner.setupConnection();
             const browser = await Browser.create(
                 connection,
                 [],

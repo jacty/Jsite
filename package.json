@@ -6,13 +6,14 @@
         "start": "snowpack dev",
         "crawl": "node src/lib/Pup/demo.js",
         "dev": "node src/lib/Dev/index.js",
-        "build":"node build/build.js"
+        "build": "node build/build.js"
     },
     "private": true,
     "author": "Jacty",
     "devDependencies": {
         "@snowpack/plugin-sass": "^1.1.1",
         "esbuild": "^0.8.57",
+        "puppeteer": "^9.1.1",
         "snowpack": "^2.18.5"
     }
 }

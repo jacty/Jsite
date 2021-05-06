@@ -11,7 +11,7 @@ export class BrowserRunner{
     ){
         this._executablePath = executablePath;
         this._processArg = processArg;
-        this._closed = true;
+        this._closed = false;
         this._listeners = [];
         this._processClosing = null;
     }
@@ -24,7 +24,6 @@ export class BrowserRunner{
                 detached:true
             }
         );
-        this._closed = false;
         this._processClosing = new Promise((fulfill) =>{
             this.proc.once('exit', ()=>{
                 this._closed = true;

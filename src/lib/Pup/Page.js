@@ -15,6 +15,12 @@ export class Page extends Events{
     this._target = target;
   }
   async _initialize(){
-    console.log('_initialize');
+    await Promise.all([
+      this._client.send('Target.setAutoAttach', {
+        autoAttach: true,
+        waitForDebuggerOnStart: false,
+        flatten: true
+      }),
+    ])
   }
 }

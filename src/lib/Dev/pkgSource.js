@@ -1,4 +1,5 @@
 import {getInstallTargets} from './scanImports.js';
+import {parsePackageImportSpecifier} from './util.js';
 
 const sourceCache = new WeakMap();
 
@@ -19,6 +20,7 @@ export class PackageSource{
   async prepare(){
     const {config} = this;
     const installTargets = await getInstallTargets(config);
-    console.log('prepare');
+    this.allKnownProjectSpecs = new Set(installTargets.map((t) => t.specifier));
+    return;
   }
 }

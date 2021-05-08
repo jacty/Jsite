@@ -4,6 +4,7 @@ import {
   getExtension,
   readFile,
   isTruthy,
+  findMatchingAliasEntry,
 } from './util.js';
 import path from 'path';
 import picomatch from 'picomatch';
@@ -21,8 +22,8 @@ const CSS_REGEX = /@import\s*['"](.*?)['"];/gs;
 export async function getInstallTargets(config){
   let installTargets = [];
   installTargets.push(...(await scanImports(config)));
-  console.log('getInstallTargets');
-  // return installTargets;
+  
+  return installTargets;
 }
 
 function getWebModSpecifierFromCode(code, imp){
@@ -102,12 +103,14 @@ function parseJsForInstallTargets(contents){
 }
 
 function parseCssForInstallTargets(code){
-  // const installTargets = [];
-  // let match;
-  // const importReg = new RegExp(CSS_REGEX);
-  // match = importReg.exec(code);
-  // const [, spec] = match;
-  console.log('parseCssForInstallTargets')
+  const installTargets = [];
+  let match;
+  const importReg = new RegExp(CSS_REGEX);
+  if(match = importReg.exec(code)){
+    console.error('Unimplement Css import feature')
+  }
+  
+  return installTargets;
 }
 
 function parseFileForInstallTargets({
@@ -173,9 +176,13 @@ export async function scanImports(config){
 }
 
 export async function scanImportsFromFiles(loadedFiles, config){
-  const demo = loadedFiles
+  return loadedFiles
         .filter((sourceFile) => !Buffer.isBuffer(sourceFile.contents))
         .map((sourceFile) => parseFileForInstallTargets(sourceFile))
-
-  console.log('demo', demo)
+        .reduce((flat, item) => flat.concat(item), [])
+        .filter((target) => {
+          const aliasEntry = findMatchingAliasEntry(config, target.specifier);
+          return !aliasEntry || aliasEntry.type === 'package';
+        })
+        .sort((impA, impB) => impA.specifier.localeCompare(impB.specifier));
 }

@@ -1,4 +1,9 @@
+import {config} from './config.js';
+import {getPackageSource} from './pkgSource.js';
+
 async function startDevServer(){
-  startDashboard();
+  const pkgSource = getPackageSource(config);
+  await pkgSource.prepare();
+  console.log('startDevServer');
 };
 startDevServer();

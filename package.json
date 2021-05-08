@@ -12,7 +12,9 @@
     "author": "Jacty",
     "devDependencies": {
         "@snowpack/plugin-sass": "^1.1.1",
+        "es-module-lexer": "^0.4.1",
         "esbuild": "^0.8.57",
+        "isbinaryfile": "^4.0.8",
         "puppeteer": "^9.1.1",
         "snowpack": "^3.3.7"
     }

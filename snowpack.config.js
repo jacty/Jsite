@@ -6,6 +6,7 @@ module.exports = {
         "@Jeact":"./src/lib/Jeact"
     },
     plugins: ["@snowpack/plugin-sass"],
+    exclude:['**/src/lib/Dev/**', '**/src/lib/Pup/**'],
     mount:{
         src:'/',
     },

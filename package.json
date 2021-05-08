@@ -14,6 +14,6 @@
         "@snowpack/plugin-sass": "^1.1.1",
         "esbuild": "^0.8.57",
         "puppeteer": "^9.1.1",
-        "snowpack": "^2.18.5"
+        "snowpack": "^3.3.7"
     }
 }
